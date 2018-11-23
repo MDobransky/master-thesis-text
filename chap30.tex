@@ -1,5 +1,6 @@
 \chapter{Experiments}
-
+\todo{something
+}
 \section{Experiments with Single-Shot Detector}
 \label{chapt:experiments}
 Based on our needs in terms of speed and accuracy we decided to base our first set of experiments on SSD detector (\cref{ssd}). The decision between SSD and YOLO (\cref{yolo}) was made by personal experience with SSD detector and it's application in real-time video analyses. However we decided replace the originally used VGG-16 network (\cref{VGG}) and instead build our detector atop the faster ResNet classifier (\cref{resnet}). We started our experiments with small ResNet-18, but the block structure of ResNet allows for using the same implementation of SSD-ResNet on any standard ResNet size, by using outputs of individual blocks as detectors inputs.
@@ -7,19 +8,16 @@ Based on our needs in terms of speed and accuracy we decided to base our first s
 This section will describe the process of creating our SSD-ResNet network and multiple experiments performed in the course of development. We experimented with different methods of training the network, speed of inference based on the multiple parameters, we also tried training on artificial data for real-life applications.
 
 
-\subsection{Building SSD on ResNet}
+\subsection{Building SSD based on ResNet}
 The task of building full SSD detector can be a little overwhelming without prior experience of building similar networks, so we decided to start with ResNet classifier and add localization layer. After successful implementation we went on to implement full detector. 
 
-In order to verify the functionality and precision of our implementation we started by designing and implementing a simple artificial data generator. We chose to avoid using any common datasets (see \cref{datasets}) because of non-trivial preprocessing requirements. The detector will be trained on real data after it's functionality and viability are proven.
+In order to verify the functionality and precision of our implementation we started by designing and implementing a simple artificial data generator. We chose to avoid using any common datasets (see \cref{datasets}) because of non-trivial pre-processing requirements. The detector will be trained on real data after it's functionality and viability are proven.
 
 \subsubsection{Testing data}
-We will be testing our implementation on artificial data generated on demand. We implemented simple generator for geometric shapes. We used squares, triangles and circles with fully randomized position, size, color and thickness. The triangles are in general position only conditioned by minimal ratio of circumference to area.
-To make dataset harder, shapes are drawn over random background composed of the segments of the same shapes. The background shapes are never fully in the picture background. The example image seen be seen in \todo{example data}.
+We will test our implementation on artificial data generated on demand. We implemented simple generator for geometric shapes. We used squares, triangles and circles with fully randomized position, size, color and thickness. The triangles are in general position only conditioned by minimal ratio of circumference to area.
+To make dataset more complex, shapes are drawn over random background composed of the segments of the same shapes. The background shapes are never fully in the picture background. The example image seen be seen in \todo{example data}.
 
 
-
-% resnet
-% bla bla 10,18,32,50,101...
 
 % feature map sized
 % block1: 56x56
@@ -36,11 +34,11 @@ To make dataset harder, shapes are drawn over random background composed of the 
 %     \label{fig:resnet}
 % \end{figure}
 
-
-
-
-
 \subsubsection{Simple detector for one object}
+The first step towards detector network is classification network. Ussually the detectors initialized with weights from classification networks pretrained on imagenet \cref{datasets} or similar dataset and then the multibox head is trained. Many pretrained classifiers are publicly available and included in popular frameworks like PyTorch or TensorFlow.
+
+We decided  to go one step further and start with network that combines classification and detection for one object. We started by taking PyTorch implementation of ResNet and modified last layers of the network accordingly. 
+
 
 optimizer = Adam(lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight decay=0)
 class loss = CrossEntropyLoss
