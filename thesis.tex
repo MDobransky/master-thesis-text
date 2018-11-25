@@ -59,6 +59,7 @@
 
 \usepackage{xspace}         %for......xspace.
 \usepackage{fancyvrb}
+\usepackage{mypackage}
 
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.8}
@@ -129,29 +130,28 @@ TODO
 \hypersetup{breaklinks=true}
 
 % Definitions of macros (see description inside)
-\include{macros}
+\include{utility/macros}
 
 % Title page and various mandatory informational pages
 \begin{document}
-\include{title}
+\include{utility/title}
 
 %%% A page with automatically generated table of contents of the bachelor thesis
 \tableofcontents
 %%% Each chapter is kept in a separate file
-\include{preface}
-\include{chap05}
-\include{chap10}
-\include{chap20}
-\include{chap30}
-
-\include{epilog}
+\include{chapters/chap00}
+\include{chapters/chap01}
+\include{chapters/chap02}
+\include{chapters/chap03}
+\include{chapters/chap04}
+\include{chapters/chap99}
 
 %%% Bibliography
 \include{bibliography}
 
 \appendix
-\include{chap60}
-\include{chap70}
+\include{chapters/chapA}
+\include{chapters/chapB}
 
 
 %%% Figures used in the thesis (consider if this is needed)

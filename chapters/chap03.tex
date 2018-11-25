@@ -1,0 +1,63 @@
+\chapter{Convolutional Networks and Commonly Used Models}
+\label{chapt:models}
+\section{Precision Metrics}
+mAP, IoU
+
+\section{Commonly used datasets}
+\label{sec:datasets}
+\begin{itemize}
+    \item Pascal VOC (Visual Object Classes)
+    \item COCO (Common Objects in Context)
+    \item ImageNet
+    \item OID (Open Images Dataset)
+\end{itemize}
+
+\section{Classification Networks}
+\subsection{VGG}
+\label{sec:VGG}
+\subsection{Inception}
+\label{sec:inception}
+\subsection{ResNet}
+\label{sec:resnet}
+
+All ResNet \cite{bib:resnet} architectures (ResNet-10, ResNet-18, 34, 50...) use the same architecture (left chart), which is build from a few input layers, four sets of building blocks and output layers. Each of four blocks can be composed of multiple residual building blocks. There are two types of building blocks, larger block with three convolutional layers called "bottleneck", or smaller "basic" block with two convolutional layers.  see \cref{fig:resnet_arch}
+
+\begin{figure}
+    \label{fig:resnet_arch}
+    \resnetArch
+    \caption{Architecture of ResNet network.
+    Note that the give number of convolutional filters in building blocks depends on whitch block do they belong to. For more detailed specification see Table 1 in  \cite{bib:resnet}.}
+\end{figure}
+
+maybe more
+
+\section{Detection Networks}
+
+\subsection{Region-based Convolutional Network (R-CNN)}
+\subsubsection{R-CNN}
+\subsubsection{Fast R-CNN}
+\subsubsection{Faster R-CNN}
+
+\subsection{You Only Look Once (YOLO)}
+\subsubsection{YOLO}
+\label{sec:yolo}
+\subsubsection{YOLO v2 and YOLO 9000}
+
+\subsection{Single-Shot Detector (SSD)}
+\label{sec:ssd}
+\subsubsection{SSD}
+
+\subsubsection{FSSD}
+\subsubsection{RFB}
+
+\subsection{Mask Region-based Convolutional Network (Mask R-CNN)}
+
+\section{Use of Detection networks for video processing}
+
+%Optional section
+\section{Other uses of CNNs}
+\subsection{Noise removal/ Regularization}
+\subsection{Image generation}
+
+
+
