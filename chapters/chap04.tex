@@ -11,7 +11,7 @@ This section will describe the process of creating our SSD-ResNet network and mu
 \subsection{Building SSD based on ResNet}
 The task of building full SSD detector can be a little overwhelming without prior experience of building similar networks, so we decided to start with ResNet classifier and add localization layer. After successful implementation we went on to implement full detector. 
 
-In order to verify the functionality and precision of our implementation we started by designing and implementing a simple artificial data generator. We chose to avoid using any common datasets (see \cref{datasets}) because of non-trivial pre-processing requirements. The detector will be trained on real data after it's functionality and viability are proven.
+In order to verify the functionality and precision of our implementation we started by designing and implementing a simple artificial data generator. We chose to avoid using any common datasets (see \cref{sec:datasets}) because of non-trivial pre-processing requirements. The detector will be trained on real data after it's functionality and viability are proven.
 
 \subsubsection{Testing data}
 We will test our implementation on artificial data generated on demand. We implemented simple generator for geometric shapes. We used squares, triangles and circles with fully randomized position, size, color and thickness. The triangles are in general position only conditioned by minimal ratio of circumference to area.
@@ -35,7 +35,7 @@ To make dataset more complex, shapes are drawn over random background composed o
 % \end{figure}
 
 \subsubsection{Simple detector for one object}
-The first step towards detector network is classification network. Ussually the detectors initialized with weights from classification networks pretrained on imagenet \cref{datasets} or similar dataset and then the multibox head is trained. Many pretrained classifiers are publicly available and included in popular frameworks like PyTorch or TensorFlow.
+The first step towards detector network is classification network. Ussually the detectors initialized with weights from classification networks pretrained on imagenet \cref{sec:datasets} or similar dataset and then the multibox head is trained. Many pretrained classifiers are publicly available and included in popular frameworks like PyTorch or TensorFlow.
 
 We decided  to go one step further and start with network that combines classification and detection for one object. We started by taking PyTorch implementation of ResNet and modified last layers of the network accordingly. 
 
@@ -44,7 +44,7 @@ optimizer = Adam(lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight decay=0)
 class loss = CrossEntropyLoss
 loc loss = MSELoss output of NN with absolute coordinates of ground truth box normalized to -1,1 
 
-resnet 18: in addition to fully connected layer we use feature map before avg pooling as input to 7x7 convolution with 4 filters (4 coordinates) Only output of B4 on picture \cref{fig:resnet} 
+resnet 18: in addition to fully connected layer we use feature map before avg pooling as input to 7x7 convolution with 4 filters (4 coordinates) Only output of B4 on picture \cref{fig:resnet_arch} 
 
 test on 10000 images
 results: class accuracy: over 99.73\%
@@ -73,12 +73,6 @@ batch size 256, batches per epoch 500
 %     \label{tab:Comparison of training}
 % \end{table}
 
-SSD 6cls random >96
-same SSD on imgs on coco - 93
-
-SSD 4cls random >97
-same SSD on imgs on coco 87
-
 \begin{figure}
     \label{fig:resnetSSD}
     \resnetSSD
@@ -87,6 +81,22 @@ same SSD on imgs on coco 87
 
 
 \subsection{Applying SSD trained on artificial dataset to realistic images}
+SSD 6cls random $>96$
+same SSD on imgs on coco - 93
+
+SSD 4cls random $>97$
+same SSD on imgs on coco 87
+
+
+SSD coco mAP 25.78
+
+SSD coco subset [1 person
+2 bicycle
+3 car
+4 motocycle
+6 bus
+7 train
+8 truck] mAP
 
 \subsection{Measuring the impact of number of classes}
 

@@ -7,6 +7,46 @@
 % \RequirePackage{xcolor}
 
 
+\newcommand{\vggArch}{
+    \begin{tabular}{|c|}
+        \hline 
+        VGG-16 Configuration \\ \hline
+        input (224 $\times$ 224) \\ \hline
+        conv3-64  \\ 
+        conv3-64 \\ 
+        \hline
+        maxpool \\ 
+        \hline
+        conv3-128 \\ 
+        conv3-128\\ 
+        \hline
+        maxpool \\ 
+        \hline
+        conv3-256 \\
+        conv3-256 \\
+        conv3-256 \\ 
+        \hline
+        maxpool \\ 
+        \hline
+        conv3-512 \\
+        conv3-512 \\
+        conv3-512 \\ 
+        \hline
+        maxpool \\ 
+        \hline
+        conv3-512 \\
+        conv3-512 \\
+        conv3-512 \\ 
+        \hline 
+        maxpool \\ \hline
+        FC-4096 \\ \hline
+        FC-4096 \\ \hline
+        FC-1000 \\ \hline
+        soft-max \\ \hline
+    \end{tabular}
+}
+
+
 \newcommand{\resnetArch}{
     \usetikzlibrary{shapes,arrows}
     
