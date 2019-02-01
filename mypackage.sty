@@ -6,43 +6,41 @@
 % \RequirePackage{xstring}
 % \RequirePackage{xcolor}
 
-
 \newcommand{\vggArch}{
     \begin{tabular}{|c|}
         \hline 
-        VGG-16 Configuration \\ \hline
-        input (224 $\times$ 224) \\ \hline
-        conv3-64  \\ 
-        conv3-64 \\ 
+        \cellcolor{SkyBlue}Input 224$\times$224$\times$3\\ \hline
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$64  \\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$64  \\ 
         \hline
-        maxpool \\ 
+        \cellcolor{Apricot}Max-pooling \\ 
         \hline
-        conv3-128 \\ 
-        conv3-128\\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$128 \\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$128\\ 
         \hline
-        maxpool \\ 
+        \cellcolor{Apricot}Max-pooling \\ 
         \hline
-        conv3-256 \\
-        conv3-256 \\
-        conv3-256 \\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$256 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$256 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$256 \\ 
         \hline
-        maxpool \\ 
+        \cellcolor{Apricot}Max-pooling \\ 
         \hline
-        conv3-512 \\
-        conv3-512 \\
-        conv3-512 \\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\ 
         \hline
-        maxpool \\ 
+        \cellcolor{Apricot}Max-pooling \\ 
         \hline
-        conv3-512 \\
-        conv3-512 \\
-        conv3-512 \\ 
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\
+        \cellcolor{SpringGreen}Conv. 3$\times$3$\times$512 \\ 
         \hline 
-        maxpool \\ \hline
-        FC-4096 \\ \hline
-        FC-4096 \\ \hline
-        FC-1000 \\ \hline
-        soft-max \\ \hline
+        \cellcolor{Apricot}Max-pooling \\ \hline
+        \cellcolor{CadetBlue!70}FC - 4096 \\ \hline
+        \cellcolor{CadetBlue!70}FC - 4096 \\ \hline
+        \cellcolor{CadetBlue!70}FC - 1000 \\ \hline
+        \cellcolor{Thistle!80}Softmax \\ \hline
     \end{tabular}
 }
 
@@ -53,27 +51,31 @@
     
     % Define block styles
 
-    \tikzstyle{block} = [rectangle, draw,  text centered, rounded corners, minimum height=2em]
-    \tikzstyle{rect} = [rectangle, draw, text width=5em, text centered, minimum height=2em, node distance=1.5cm]
-    \tikzstyle{head} = [rectangle, draw, fill=green!60, text width=9em, rounded corners, text centered, minimum height=2em]
+    \tikzstyle{block} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Mahogany!50]
+    \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SkyBlue]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SpringGreen]
+    \tikzstyle{pool} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Apricot]
+     \tikzstyle{relu} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Thistle]
+      \tikzstyle{bnorm} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Goldenrod]
+    \tikzstyle{rect} = [rectangle, draw, text width=5em, text centered, minimum height=2em, node distance=1.5cm, fill=ForestGreen!40]
+    \tikzstyle{fc} = [rectangle, draw, fill=CadetBlue!60, text width=9em, rounded corners, text centered, minimum height=2em]
     \tikzstyle{line} = [draw, -latex']
     
     \begin{multicols}{3}   
 
         \subsection*{ResNet}
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
-            \node [block] (input) {Input};
-            \node [block, below of=input] (conv1) {7x7 conv, 64, /2};
-            \node [block, below of=conv1] (bn) {BatchNorm};
-            \node [block, below of=bn] (relu) {ReLU};
-            \node [block, below of=relu] (maxpool) {3x3 max pool, /2};
+            \node [input] (input) {Input};
+            \node [conv, below of=input] (conv1) {Conv. 7$\times$7$\times$64, /2};
+            \node [bnorm, below of=conv1] (bn) {BatchNorm.};
+            \node [relu, below of=bn] (relu) {ReLU};
+            \node [pool, below of=relu] (maxpool) {Max pool. 3$\times$3, /2};
             \node [rect, below of=maxpool] (block1) {Block 1  (N=1)};
             \node [rect, below of=block1] (block2) {Block 2  (N=2)};
             \node [rect, below of=block2] (block3) {Block 3  (N=4)};
             \node [rect, below of=block3] (block4) {Block 4  (N=8)};
-            \node [head, below of=block4] (avgpool) {Average Pooling};
-            \node [head, below of=avgpool] (flatten) {Flatten};
-            \node [head, below of=flatten] (fc) {Fully connected (Classifier)};
+            \node [pool, below of=block4] (avgpool) {Average Pooling};
+            \node [fc, below of=avgpool] (fc) {Fully connected (Classifier)};
             
             \path[line] (input) -- (conv1);
             \path[line] (conv1) -- (bn);
@@ -84,8 +86,7 @@
             \path[line] (block2) -- (block3);
             \path[line] (block3) -- (block4);
             \path[line] (block4) -- (avgpool);
-            \path[line] (avgpool) -- (flatten);
-            \path[line] (flatten) -- (fc);
+            \path[line] (avgpool) -- (fc);
         
         \end{tikzpicture}
         \vfill\null
@@ -93,13 +94,13 @@
         
         \subsection*{Basic Block}
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
-            \node [block] (input) {Input};
-            \node [block, below of=input] (conv1) {3x3 conv, N*64};
-            \node [block, below of=conv1] (bn) {BatchNorm};
+            \node [input] (input) {Input};
+            \node [conv, below of=input] (conv1) {Conv. 3$\times$3$\times$64*N};
+            \node [bnorm, below of=conv1] (bn) {BatchNorm.};
             
-            \node [block, below of=bn] (relu) {ReLU};
-            \node [block, below of=relu] (conv2) {3x3 conv, N*64};
-            \node [block, below of=conv2] (bn2) {BatchNorm};
+            \node [relu, below of=bn] (relu) {ReLU};
+            \node [conv, below of=relu] (conv2) {Conv. 3$\times$3$\times$64*N};
+            \node [bnorm, below of=conv2] (bn2) {BatchNorm.};
             \node  [block, below of=bn2] (plus) {+};
         
             \path[line] (input) -- (conv1);
@@ -117,17 +118,17 @@
         
         \subsection*{Bottleneck Block}
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
-            \node [block] (input) {Input};
-            \node [block, below of=input] (conv1) {1x1 conv, N*64};
-            \node [block, below of=conv1] (bn) {BatchNorm};
+            \node [input] (input) {Input};
+            \node [conv, below of=input] (conv1) {Conv. 1$\times$1$\times$64*N};
+            \node [bnorm, below of=conv1] (bn) {BatchNorm.};
             
-            \node [block, below of=bn] (relu) {ReLU};
-            \node [block, below of=relu] (conv2) {3x3 conv, N*64};
-            \node [block, below of=conv2] (bn2) {BatchNorm};
+            \node [relu, below of=bn] (relu) {ReLU};
+            \node [conv, below of=relu] (conv2) {Conv. 3$\times$3$\times$64*N};
+            \node [bnorm, below of=conv2] (bn2) {BatchNorm.};
             
-            \node [block, below of=bn2] (relu2) {ReLU};
-            \node [block, below of=relu2] (conv3) {1x1 conv, N*256};
-            \node [block, below of=conv3] (bn3) {BatchNorm};
+            \node [relu, below of=bn2] (relu2) {ReLU};
+            \node [conv, below of=relu2] (conv3) {Conv. 3$\times$3$\times$256*N};
+            \node [bnorm, below of=conv3] (bn3) {BatchNorm.};
             
             \node  [block, below of=bn3] (plus) {+};
         
