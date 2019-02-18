@@ -64,13 +64,12 @@ A baseline of ResNet is directly inspired by VGG (\cref{sec:VGG}). Most of the c
     \label{fig:resnet_arch}
 \end{figure}
 
-We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} is composed of multiple linearly stacked residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. Inside each of the \textit{Layers} a feature map size is preserved, between them, it is halved. A type of residual block we described previously was a \textit{Basic block} (middle) with two convolutional layers and is used for smaller ResNet models (ResNet-18, ResNet-34). Deeper ResNet models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} (right) with three convolutional layers, where the 1$\times$1 layers are responsible for reducing and then restoring dimensions, leaving the 3$\times$3 layer a with smaller input and output dimensions. Remarkably, the 152-layer ResNet has lower complexity than the 16-layer VGG network.
+We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} is composed of multiple linearly stacked residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. A feature map size is preserved inside each of the \textit{Layers} and halved between them. A type of residual block we described previously was a \textit{Basic block} with two convolutional layers and is used for smaller ResNet models (ResNet-18, ResNet-34). Deeper ResNet models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} with three convolutional layers, where the 1$\times$1 layers are responsible for reducing and then restoring dimensions, leaving the 3$\times$3 layer a with smaller input and output dimensions. Remarkably, the 152-layer ResNet has lower complexity than the 16-layer VGG network.
 
 
 
-\paragraph{Inception-ResNet}
-
-
+\subsection*{Xception (2017)}
+\label{sec:xception}
 
 \subsection*{NasNet (2017)}
 \label{sec:nasnet}
