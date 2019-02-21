@@ -1,10 +1,40 @@
 \chapter{Contributions}
+ \cite{bib:benchmark}
 
 \section{Reimplement SSd on other base}
-\subsection{ResNet}
-\subsection{NasNet}
-pick second net $->$ \cite{bib:benchmark}
+\subsection{ResNet-SSD}
+\begin{figure}
+    \label{fig:resnetSSD}
+    \resnetSSD
+    \caption{SSD detector build on ResNet base. Depth of classification convolutions depends on number of classes (C). For detailed description of \textit{Layers} see \cref{fig:resnet_arch}.}
+\end{figure}
+
+\subsection{Xception-SSD}
+
+
+\begin{figure}
+    \label{fig:resnetSSD}
+    \xceptionSSD
+    \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalization functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
+\end{figure}
+
+\subsection{NasNet-SSD}
+
+\begin{figure}
+    \label{fig:nasnetSSD}
+    \nasnetSSD
+    \caption{SSD detector build on NASNet base. Depth of classification convolutions depends on number of classes (C). For detailed description of cells see \cref{sec:nasnet}}
+\end{figure}
+
 
 \section{Train only specific classes}
+downside - categorizing animals as humans because it is most similar class.
+\begin{tabular}{c|c|c}
+     & 80cls & 7 cls \\
+    Resnet50 & & 41.46 (400 epochs)\%\\
+    Resnet101 & & \\
+    Xception & & \\
+    NASNet & & \\
+\end{tabular}
 
 \section{something, use video continuity???}
