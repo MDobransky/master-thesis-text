@@ -13,9 +13,9 @@
 
 
 \begin{figure}
-    \label{fig:resnetSSD}
+    \label{fig:xceptionSSD}
     \xceptionSSD
-    \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalization functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
+    \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalisation functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
 \end{figure}
 
 \subsection{NasNet-SSD}
@@ -28,13 +28,32 @@
 
 
 \section{Train only specific classes}
-downside - categorizing animals as humans because it is most similar class.
-\begin{tabular}{c|c|c}
-     & 80cls & 7 cls \\
-    Resnet50 & & 41.46 (400 epochs)\%\\
-    Resnet101 & & \\
-    Xception & & \\
-    NASNet & & \\
-\end{tabular}
+downside - categorising animals as humans because it is most similar class.
+\begin{table}
+    \begin{tabular}{c|c|c}
+         & 80cls & 7 cls \\
+        Resnet50 & & 41.46\% (400 epochs)\\
+        Resnet101 & & \\
+        Xception & & \\
+        NASNet & & \\
+    \end{tabular}
+    \caption{mean average precision}
+    \label{tab:map}
+\end{table}
+
+\begin{table}
+    \begin{tabular}{c|c|c}
+     & 81cls & 8cls  \\
+    Resnet34 & 31.1M & 24.4M\\
+    Resnet50 & 45.5M & 28.7M\\
+    Resnet101 & 64.5M & 47.7M \\
+    Xception & 40.6M & 25.7M \\
+    NASNet & 17.3M & 7.6M \\
+    \end{tabular}
+    \caption{total number of parameters}
+    \label{tab:parameters}
+\end{table}
+
+
 
 \section{something, use video continuity???}
