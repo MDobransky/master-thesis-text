@@ -1,16 +1,19 @@
 \chapter{Neural Network Detectors}
+In recent years, the evolution of hardware allowed for creation of deep neural networks (DNNs) for multiple purposes. Eventually image processing has become one of the fields where DNNs outperformed traditional and machine learning approaches. 
+
 \todo{bla}
 NNs vs ML
 define (NNs) abbr.
 softmax
-perform object etection via bounding box localisation
+perform object detection via bounding box localisation
+augmentation - datasize
 
 \section{Metrics}
 Before we describe any models, we need to define metrics to be able to compare their performance. The main concerns are accuracy and the number of images processed per second (FPS). A real-time detector needs to find a balance between these two factors.
 
 State-of-the-art models should not be compared directly by the values presented by research groups as they can be biased. Most of classification networks are designed for \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} that is evaluated purely by accuracy. Although detection networks consider FPS an important factor, they often omit important details, such as detection thresholds, on how they calculated their precision.
 
-In this section, we define commonly used metrics to evaluate the performance of neural networks and other machine learning approaches. Later we use those metrics to compare previewed networks and our implementations.
+In this section, we define a few commonly used metrics to evaluate the performance of neural networks and other machine learning approaches. Later we use those metrics to compare previewed networks and our implementations.
 
 \subsection*{Classification}
 The most common evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This metrics is referred to as a classification accuracy. A complement to accuracy, \textbf{top-1 error}, is also often used. Alongside top-1 error, a \textbf{top-5 error} is used for evaluation in \textit{ILSVRC}. The top-5 error is the fraction of test samples where the correct label does not appear in the top 5 predicted results.
@@ -18,14 +21,14 @@ The most common evaluation metric for classification problems is the number of c
 \subsection*{Bounding box localisation}
 Having multiple objects in each image complicates the calculation of accuracy, there is no simple mapping between ground truths and detections as in the case of classification. A ground truth data are represented as a set of N boxes with labels and predictions is a set of M boxes with labels and confidence values. At his point, predictions could have been filtered by a confidence threshold and non-maximum suppression (NMS). NMS is a post-processing algorithm responsible for merging all predictions that belong to the same object. 
 
-Because predicted boxes do not perfectly match ground truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is determined by computing intersection over union (IOU) value for each pair of ground truth and predicted boxes, and filtering by given threshold.
-$$\text{IOU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
+Because predicted boxes do not perfectly match ground truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is determined by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes, and filtering by given threshold.
+$$\text{IoU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
 
 With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground truth box) we are able to calculate \textbf{precision} and \textbf{recall}.
 $$\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}} = \frac{\text{TP}}{\text{All predictions}}$$
 $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{\text{TP}}{\text{All ground truths}}$$
 
-Now that we can determine \textit{precision} and \textit{recall}, we can finally define some metrics used for object detection. Note that all metrics depend on the selected IOU threshold.
+Now that we can determine \textit{precision} and \textit{recall}, we can finally define some metrics used for object detection. Note that all metrics depend on the selected IoU threshold.
 
 \subsubsection{Precision-Recall curve}
 Precision-Recall curve (PR curve) is a curve plotted for a specific class and shows the changes in precision and recall as the confidence level changes. Points on the PR curve are determined by sorting the predictions by the confidence score and for each prediction also considering all objects above its confidence score, then calculating the resulting precision and recall for those predictions. An object detector of a particular class is considered reliable if its precision stays high as recall increases, meaning precision is good with lower confidence threshold.
@@ -40,18 +43,17 @@ $$p_{interp}(r) = \max_{\Tilde{r} \geq r} p(\Tilde{r})$$
 where $p(\Tilde{r})$ is precision at recall $\Tilde{r}$.
 
 \subsubsection{Mean Average Precision (mAP)}
-Finally, the mAP is the number we can most often see as the performance metrics of object detectors. As the name suggests, it is a mean of AP across the classes. Most common notation mAP@[0.5] means mAP with IOU threshold 0.5. The mAP can also be averaged over multiple IOU thresholds, mAP@[.5, .95] represents the average mAP from IOU 0.5 to 0.95 usually with step 0.05.
+Finally, the mAP is the number we can most often see as the performance metrics of object detectors. As the name suggests, it is a mean of AP across the classes. Most common notation mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
 \subsection*{Inference time}
-Inference time is usually a small number in milliseconds that is not directly applicable to our problem. Our task is to process a large number of images, therefore a number of frames per second (FPS)   
-
+Inference time is usually a small number in milliseconds that is not directly applicable to our problem. Our task is to process a large number of images. Therefore a number of processed \textbf{frames per second} (FPS) is more natural metrics. FPS is always averaged. However, unlike precision metrics, the FPS values are heavily dependant on hardware, batch size and amount of pre- and post-processing included in the measurement. Therefore, only the measurements done in the identical hardware and software environment can be directly compared.
 
 \section{Classification networks}
-\label{chapt:cnets}
+\label{sec:clsnets}
 In order to better understand detection networks, we will shortly describe their predecessors, classification networks. Classification network is a convolutional neural network (CNN) \cite[ch.~9]{bib:dlbook} that given an image, returns a confidence score of correspondence to each of the classes. Usually, \textit{soft-max} function is applied to the confidence score to represent a probability distribution. A commonly used benchmark for the accuracy of such networks is \textit{ILSVRC} challenge.
 The \textit{ILSVRC} challenge is usually used to benchmark the accuracy of such networks.
 
-In \cref{chapt:models}, we will show how classification models are used as a backbone for a detector network.
+In \cref{sec:detnets}, we will show how classification models are used as a backbone for a detector network.
 
 \subsection{AlexNet (2012)}
 A significant breakthrough in use of CNNs happened in 2012, when the \textit{AlexNet} \cite{bib:alexnet} won the \textit{ImageNet} image recognition challenge. It was the first time a deep CNN performed better than traditional computer vision and machine learning approaches. 
@@ -138,29 +140,35 @@ NASNet is a result of taking an architecture designed for small dataset (\textit
 \end{figure}
 
 \subsection{Comparing the classifiers}
+At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the \textit{ILSVRC} dataset. Newer models like Xception, NASNet and modifications of ResNet reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide a overview of FPS-accuracy relationship taken from an independent benchmark by Bianco et al. \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of FPS with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/fps_comp}
-    \caption{Taken from \cite[fig. 3]{bib:cnnbenchmark}}
+    \caption{Benchmark of state-of-the-art classification deep neural networks on \textit{ILSVRC} dataset. Performed on NVIDIA
+Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
     \label{fig:cnnbenchmark}
 \end{figure}
 
-\todo{add comp table for all models}
+
 
 \section{Detection networks}
-\label{chapt:models}
+\label{sec:detnets}
 
 \todo{bla}
 
 \subsection*{Region-based Convolutional Network (R-CNN)}
+
 \subsubsection{R-CNN}
 \cite{bib:rcnn}
 
 \subsubsection{Fast R-CNN}
+\cite{bib:fastrcnn}
 
 \subsubsection{Faster R-CNN}
+\cite{bib:fasterrcnn}
 
 \subsection*{Mask Region-based Convolutional Network (Mask R-CNN)}
+\cite{bib:maskrcnn}
 
 \subsection*{You Only Look Once (YOLO)}
 \subsubsection{YOLO}
@@ -174,7 +182,6 @@ NASNet is a result of taking an architecture designed for small dataset (\textit
 \subsubsection{RFB}
 
 
-\section{Use of Detection networks for video processing}
 
 %Optional section
 % \section{Other uses of CNNs}

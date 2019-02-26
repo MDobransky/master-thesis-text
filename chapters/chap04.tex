@@ -1,5 +1,4 @@
 \chapter{Contributions}
- \cite{bib:benchmark}
 
 \section{Reimplement SSd on other base}
 \subsection{ResNet-SSD}
@@ -31,15 +30,16 @@
 downside - categorising animals as humans because it is most similar class.
 \begin{table}
     \begin{tabular}{c|c|c}
-         & 80cls & 7 cls \\
-        Resnet50 & & 41.46\% (400 epochs)\\
-        Resnet101 & & \\
+         & coco & small \\
+        Resnet50 & & 48.7\\
+        Resnet101 & 32.8 & \\
         Xception & & \\
         NASNet & & \\
     \end{tabular}
-    \caption{mean average precision}
+    \caption{mean average precision, conf thr 0.2, IoU 0.5,  (400 epochs), 300x300 scaled random crops}
     \label{tab:map}
 \end{table}
+
 
 \begin{table}
     \begin{tabular}{c|c|c}
