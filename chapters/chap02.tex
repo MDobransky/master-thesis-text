@@ -3,15 +3,15 @@ In recent years, the evolution of hardware allowed for the creation of deep neur
 
 \todo{bla}
 NNs vs ML
-define (NNs) abbr.
+Define (NNs) abbr.
 softmax
 perform object detection via bounding box localization
 augmentation - data size
 
 \section{Metrics}
-Before we describe any models, we need to define metrics to be able to compare their performance. The main concerns are accuracy and the number of images processed per second (FPS). A real-time detector needs to find a balance between these two factors.
+Before we describe any models, we need to define metrics to be able to compare their performance. The main concerns are accuracy and the number of images processed per second (fps). A real-time detector needs to find a balance between these two factors.
 
-State-of-the-art models should not be compared directly by the values presented by research groups as they can be biased. Most of classification networks are designed for \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} that is evaluated purely by accuracy. Although detection networks consider FPS an important factor, they often omit important details, such as detection thresholds, on how they calculated their precision.
+State-of-the-art models should not be compared directly by the values presented by research groups as they can be biased. Most of classification networks are designed for \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} that is evaluated purely by accuracy. Although detection networks consider fps an important factor, they often omit important details, such as detection thresholds, on how they calculated their precision.
 
 In this section, we define a few commonly used metrics to evaluate the performance of neural networks and other machine learning approaches. Later we use those metrics to compare previewed networks and our implementations.
 
@@ -46,11 +46,11 @@ where $p(\Tilde{r})$ is precision at recall $\Tilde{r}$.
 Finally, the mAP is the number we can most often see as the performance metrics of object detectors. As the name suggests, it is a mean of AP across the classes. Most common notation mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
 \subsection*{Inference time}
-Inference time is usually a small number in milliseconds that is not directly applicable to our problem. Our task is to process a large number of images. Therefore a number of processed \textbf{frames per second} (FPS) is more natural metrics. FPS is always averaged. However, unlike precision metrics, the FPS values are heavily dependant on hardware, batch size and amount of pre- and post-processing included in the measurement. Therefore, only the measurements done in the identical hardware and software environment can be directly compared.
+Inference time is usually a small number in milliseconds that is not directly applicable to our problem. Our task is to process a large number of images. Therefore a number of processed \textbf{frames per second} (fps) is more natural metrics. Value of fps is always averaged. However, unlike precision metrics, the fps values are heavily dependant on hardware, batch size and amount of pre- and post-processing included in the measurement. Therefore, only the measurements done in the identical hardware and software environment can be directly compared.
 
 \section{Classification networks}
 \label{sec:clsnets}
-To better understand detection networks, we shortly describe their predecessors, classification networks. Classification network is a convolutional neural network (CNN) \cite[ch.~9]{bib:dlbook} that given an image, returns a confidence score of correspondence to each of the classes. Usually, \textit{soft-max} function is applied to the confidence score to represent a probability distribution. A commonly used benchmark for the accuracy of such networks is the \textit{ILSVRC} challenge.
+To better understand detection networks, we shortly describe their predecessors, classification networks. Classification network is a convolutional neural network (CNN) \cite[ch.~9]{bib:dlbook} that given an image, returns a confidence score of correspondence to each of the classes. Usually, soft-max function is applied to the confidence score to represent a probability distribution. A commonly used benchmark for the accuracy of such networks is the \textit{ILSVRC} challenge.
 The \textit{ILSVRC} challenge is usually used to benchmark the accuracy of such networks.
 
 In \cref{sec:detnets}, we show how classification models are used as a backbone for a detector network.
@@ -58,15 +58,15 @@ In \cref{sec:detnets}, we show how classification models are used as a backbone 
 \subsection{AlexNet (2012)}
 A significant breakthrough in use of CNNs happened in 2012, when the \textit{AlexNet} \cite{bib:alexnet} won the \textit{ImageNet} image recognition challenge. It was the first time a deep CNN performed better than traditional computer vision and machine learning approaches. 
 
-AlexNet has a simple architecture with five convolutional layers and two fully connected layers, followed by a softmax layer. It has created a foundation on which today's state-of-the-art models are built and set a new standard for image recognition.
+\textit{AlexNet} has a simple architecture with five convolutional layers and two fully connected layers, followed by a softmax layer. It has created a foundation on which today's state-of-the-art models are built and set a new standard for image recognition.
 
 \subsection{VGG (2014)}
 \label{sec:VGG}
-The network architecture, mostly known as VGG \cite{bib:vgg}, pushed the concept of AlexNet even further and has proved the feasibility of deep network with small convolutions. 
+The network architecture, mostly known as \textit{VGG} \cite{bib:vgg}, pushed the concept of AlexNet even further and has proved the feasibility of deep network with small convolutions. 
 
-Each of the VGG's convolutional filters uses 3$\times$3 kernel, and the depth of the filters is increased through the network, reaching 512 filters in the last layers. Three fully connected layers and softmax are applied after the convolutions, see \cref{tab:vggarch}. There are multiple versions of the VGG architecture, depending on the number of convolutional layers, the most popular is the 16 layer version. 
+Each of the \textit{VGG's} convolutional filters uses 3$\times$3 kernel, and the depth of the filters is increased through the network, reaching 512 filters in the last layers. Three fully connected layers and softmax are applied after the convolutions, see \cref{tab:vggarch}. There are multiple versions of the \textit{VGG} architecture, depending on the number of convolutional layers, the most popular is the 16 layer version. 
 
-VGG network is considered a general architecture for a classification network due to its linear architecture with decreasing size of the features and increasing number of channels. 
+\textit{VGG} network is considered a general architecture for a classification network due to its linear architecture with decreasing size of the features and increasing number of channels. 
 
 \begin{table}
     \centering
@@ -79,13 +79,13 @@ VGG network is considered a general architecture for a classification network du
     
 \subsection{Inception (v1) (2014)}
 \label{sec:inception}
-Previous architectures showed that increasing the number of layers and layer size, leads to better precision. Inception v1 \cite{bib:googlenet}, also known as GoogLeNet, aims at increasing precision while improving utilization of computing resources.
+Previous architectures showed that increasing the number of layers and layer size, leads to better precision. \textit{Inception v1} \cite{bib:googlenet}, also known as \textit{GoogLeNet}, aims at increasing precision while improving utilization of computing resources.
 
 A growing cost of stacking more convolutional layers can quickly overpower the benefits of increased accuracy. This network introduces the concept of sparsity by using the \textit{inception modules} \cref{fig:incept_mod}, to avoid the aforementioned cost. A sparse structure is approximated by using multiple convolutions with different kernel sizes and concatenating the outputs together. Max-pooling is also performed as an alternative to convolutions and concatenated to the output. Because high dimensional convolutions are costly, a reduction to the channels is introduced by using 1$\times$1 convolution as a preceding layer.
 
 The network is then formed by linearly stacking nine inception modules, preceded by a linear stem network and followed by a fully connected classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularisation during the training.
 
-A set of improvements to the Inception network was introduced in later versions of the network. Most notably a factorization of convolution layers was introduced in Inception v2 and v3 \cite{bib:inception2}.
+A set of improvements to the \textit{Inception} network was introduced in later versions of the network. Most notably a factorization of convolution layers was introduced in Inception v2 and v3 \cite{bib:inception2}.
 
 
 \begin{figure}
@@ -99,7 +99,7 @@ A set of improvements to the Inception network was introduced in later versions 
 
 Although it has become possible to train deeper and deeper CNNs, degradation has eventually been observed. Adding more layers to models started to produce higher training error. Theoretically, adding more layers to a smaller model should produce at least equal results, as the smaller model is the subspace of the larger one. A solution to this problem was proposed in the ResNet architecture, by directly introducing identity functions to the network \cite{bib:resnet}.  
 
-A baseline of ResNet is directly inspired by VGG (\cref{sec:VGG}). Most of the convolutional layers have 3$\times$3 filters and follow two simple rules: keep the number of filters the same, unless changing the output size and double the filters if the feature size if halved. A residual connection is then added to each pair of the convolutional layers. This connection is either an identity or a projection done by 1$\times$1 convolution to match the increased number of filters. 
+A baseline of \textit{ResNet} is directly inspired by \textit{VGG} (\cref{sec:VGG}). Most of the convolutional layers have 3$\times$3 filters and follow two simple rules: keep the number of filters the same, unless changing the output size and double the filters if the feature size if halved. A residual connection is then added to each pair of the convolutional layers. This connection is either an identity or a projection done by 1$\times$1 convolution to match the increased number of filters. 
 
 \begin{figure}
     \resnetArch
@@ -107,15 +107,15 @@ A baseline of ResNet is directly inspired by VGG (\cref{sec:VGG}). Most of the c
     \label{fig:resnet_arch}
 \end{figure}
 
-We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} is composed of multiple linearly stacked residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. A feature map size is preserved inside each of the \textit{Layers} and halved between them. A type of residual block we described previously was a \textit{Basic block} with two convolutional layers and is used for smaller ResNet models (ResNet-18, ResNet-34). Deeper ResNet models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} with three convolutional layers, where the 1$\times$1 layers are responsible for reducing and then restoring dimensions, leaving the 3$\times$3 layer a with smaller input and output dimensions. Remarkably, the 152-layer ResNet has lower complexity than the 16-layer VGG network.
+We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} is composed of multiple linearly stacked residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. A feature map size is preserved inside each of the \textit{Layers} and halved between them. A type of residual block we described previously was a \textit{Basic block} with two convolutional layers and is used for smaller \textit{ResNet} models (ResNet-18, ResNet-34). Deeper \textit{ResNet} models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} with three convolutional layers, where the 1$\times$1 layers are responsible for reducing and then restoring dimensions, leaving the 3$\times$3 layer a with smaller input and output dimensions. Remarkably, the 152-layer \textit{ResNet} has lower complexity than the 16-layer \textit{VGG} network.
 
 
 
 \subsection{Xception (2017)}
 \label{sec:xception}
-Xception architecture \cite{bib:xception} is heavily inspired by previous architectures, mainly \textit{Inception} and \textit{ResNet}. It is built on the hypothesis that "the mapping of cross-channel correlations and spatial correlations in the feature maps of convolutional neural networks can be entirely decoupled." This hypothesis expands upon the hypothesis underlying \textit{Inception} architecture. Therefore the name Extreme Inception. 
+Xception architecture \cite{bib:xception} is heavily inspired by previous architectures, mainly \textit{Inception} and \textit{ResNet}. It is built on the hypothesis that "the mapping of cross-channel correlations and spatial correlations in the feature maps of convolutional neural networks can be entirely decoupled." This hypothesis expands upon the hypothesis underlying \textit{Inception} architecture. Therefore the name \textit{Extreme Inception}. 
 
-The hypothesis is realized in the form of depthwise separable convolution layers. Depthwise separable convolution consists of two steps: a \textit{depthwise convolution} and \textit{pointwise convolution}. A depthwise convolution is a convolution performed independently over each channel, i.e., a convolution without changing the number of channels. The second step is a pointwise convolution that uses 1$\times$1 kernel to map the input channels into new channel space.
+The hypothesis is realized in the form of depthwise separable convolution layers. Depthwise separable convolution consists of two steps: a depthwise convolution and pointwise convolution. A depthwise convolution is a convolution performed independently over each channel, i.e., a convolution without changing the number of channels. The second step is a pointwise convolution that uses 1$\times$1 kernel to map the input channels into new channel space.
 
 The architecture is created by linearly stacking convolutional layers with the addition of residual connections as seen on \cref{fig:xception}. Convolutional layers, non-linearity, and poolings are structured into residual blocks similarly to \textit{ResNet} architecture.
 
@@ -130,7 +130,7 @@ The architecture is created by linearly stacking convolutional layers with the a
 \label{sec:nasnet}
 The difference between this architecture and the others mentioned is that \textit{NASNet} \cite{bib:nasnet} was designed by a machine learning algorithm. It is a result of a \textit{AutoML}\footnote{https://ai.googleblog.com/2017/05/using-machine-learning-to-explore.html} project that automates the design of network architecture. Unlike manually designing the network by trial and error, \textit{AutoML} searches space of all possible models, e.g., using reinforcement learning and evolutionary algorithms. The downside of this approach is the computational cost and therefore limitation to small datasets.
 
-NASNet is a result of taking an architecture designed for small dataset (\textit{CIFAR-10}\footnote{https://www.cs.toronto.edu/~kriz/cifar.html}) by \textit{AutoML} and using it to create larger model for \textit{ImageNet} dataset. The model is composed of two types of learned cells, a \textit{Normal Cell} and \textit{Reduction Cell} (see \cref{fig:nasnet}). A general structure of the network is then created by alternating a \textit{Reduction Cell} and \textbf{N} \textit{Normal Cells}
+\textit{NASNet} is a result of taking an architecture designed for small dataset (\textit{CIFAR-10}\footnote{https://www.cs.toronto.edu/~kriz/cifar.html}) by \textit{AutoML} and using it to create larger model for \textit{ImageNet} dataset. The model is composed of two types of learned cells, a \textit{Normal Cell} and \textit{Reduction Cell} (see \cref{fig:nasnet}). A general structure of the network is then created by alternating a \textit{Reduction Cell} and \textbf{N} \textit{Normal Cells}
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/nasnet}
@@ -139,7 +139,7 @@ NASNet is a result of taking an architecture designed for small dataset (\textit
 \end{figure}
 
 \subsection{Comparing the classifiers}
-At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the \textit{ILSVRC} dataset. Newer models like Xception, NASNet, and modifications of ResNet reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide an overview of FPS-accuracy relationship taken from an independent benchmark by Bianco et al. \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of FPS with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
+At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the \textit{ILSVRC} dataset. Newer models like \textit{Xception}, \textit{NASNet}, and modifications of \textit{ResNet} reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide an overview of fps-accuracy relationship taken from an independent benchmark by Bianco et al. \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of fps with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/fps_comp}
@@ -156,12 +156,12 @@ bla bla bla
 \todo{bla}
 
 \subsection{Region-based Convolutional Networks (R-CNN)}
-R-CNN is a family of region-based detection models, with iterative improvements in speed and accuracy. This approach is a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and classification. Thanks to the modular architecture R-CNN networks can exploit any CNN as a feature extractor. Therefore the last iteration of this approach can achieve state-of-the-art detection results exploiting the latest advances in classification networks.
+\textit{R-CNN} is a family of region-based detection models, with iterative improvements in speed and accuracy. This approach is a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and classification. Thanks to the modular architecture R-CNN networks can exploit any CNN as a feature extractor. Therefore the last iteration of this approach can achieve state-of-the-art detection results exploiting the latest advances in classification networks.
 
 \subsubsection{R-CNN (2014)}
 A first entry into this family, \textit{R-CNN} \cite{bib:rcnn}, laid foundations for state-of-the-art detection models. The idea is simple, select regions in the picture and classify each region.
 
-A naive approach would use a sliding window and classify each cutout of the image.  This approach would be extremely slow, considering different sizes and aspect ratios of possible objects. R-CNN solves this problem by applying a region proposal algorithm and selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} \cite{bib:selectivesearch} algorithm and serve as a candidates for bounding box predictions.
+A naive approach would use a sliding window and classify each cutout of the image.  This approach would be extremely slow, considering different sizes and aspect ratios of possible objects. R-CNN solves this problem by applying a region proposal algorithm and selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} (SS) \cite{bib:selectivesearch} algorithm and serve as a candidates for bounding box predictions.
 
 Each region is then separately processed by a CNN into a feature map. The original architecture uses \textit{Alexnet} CNN, but any classification network can be substituted. Finally, each feature map is scored. Instead of using a soft-max classification provided by classification CNNs, class specific linear support-vector machines are used. Additionally, bounding box regression can be trained to improve prediction accuracy. \Cref{fig:rcnn} illustrates the architecture.
 
@@ -173,9 +173,9 @@ Each region is then separately processed by a CNN into a feature map. The origin
 \end{figure}
 
 \subsubsection{Fast R-CNN (2015)}
-Even though \textit{R-CNN} was a major step in the right direction, it was still far away from real-time detection. \textit{Fast R-CNN} \cite{bib:fastrcnn} introduces a series of innovations to its predecessor, aimed at improving speed and accuracy. Benchmark on the high-end period GPU suggests improvements from 47 seconds per image using \textit{R-CNN} with \textit{VGG-16} feature extractor, to 320 milliseconds with \textit{Fast R-CNN} using the same feature extractor.
+Even though \textit{R-CNN} was a major step in the right direction, it was still far away from real-time detection. \textit{Fast R-CNN} \cite{bib:fastrcnn} introduces a series of innovations to its predecessor, aimed at improving speed and accuracy. Benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using \textit{R-CNN} with \textit{VGG-16} feature extractor, to 320 milliseconds with \textit{Fast R-CNN} using the same feature extractor, not including a time for SS proposals. 
 
-Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm and a CNN to produce a feature map. A drawback of \textit{R-CNN} was computing feature map for each region, despite overlaps. \textit{Fast R-CNN} processes whole input image into a feature map, and then, using a region of interest (RoI) pooling layers, extracts a feature vector for each region. All extracted feature vectors have the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
+Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm, and a CNN to produce a feature map. A drawback of \textit{R-CNN} was computing feature map for each region, despite overlaps. \textit{Fast R-CNN} processes whole input image into a feature map, and then, using a region of interest (RoI) pooling layers, extracts a feature vector for each region. All extracted feature vectors have the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
 
 \begin{figure}
     \centering
@@ -184,10 +184,31 @@ Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm a
     \label{fig:fastrcnn}
 \end{figure}
 
-
-
 \subsubsection{Faster R-CNN (2015)}
-\cite{bib:fasterrcnn}
+ 
+ \textit{Faster R-CNN} \cite{bib:fasterrcnn} builds further on the \textit{Fast R-CNN} with the aspiration to achieve a real-time performance. \textit{Fast R-CNN} managed to build a fast feature extraction and subsequent classification usable in a real-time environment but is heavily slowed down by a region proposal SS algorithm. \textit{Faster R-CNN} expands on the idea of sharing resources and replaces SS with \textbf{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can be applied to real-time tasks.  Whole architecture can be seen on \cref{fig:fasterrcnn}. 
+ 
+ RPN is designed to be a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs measures whether proposed region contains a object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textbf{anchors}. The anchor is a predefined box centered at a location of sliding-window. \textit{k} such boxes with different sizes and aspect ratios are used. Regression produces 4k parameters relative to anchors, and classifier 2 scores per each anchor. The number of regions is then reduced by eliminating proposals with high overlap using a non-maximum suppression (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
+ 
+ To calculate loss and train RPN, a matching between ground-truth boxes and generated region proposals needs to be determined. A positive label is assigned to two kinds of regions: the ones with the highest IoU overlap with ground-truth box; regions that have IoU higher than 0.7 with any ground-truth box. A negative label is assigned to a non-positive box if its IoU is lower than 0.3 for all ground-truth boxes. Rest of the boxes do not contribute to training. 
+ 
+ The whole model is trained using a 4-step alternating training:
+ 
+ \begin{enumerate}
+     \item train RPN initialized with ImageNet pre-trained model
+     \item train separate \textit{Fast R-CNN} using proposals generated by RPN from step 1
+     \item train RPN with feature extractor initialized by weights learned by the detector in step 2, fine-tune only layers unique to RPN
+     \item using the model from step 3, fine-tune layers unique to \textit{Fast R-CNN}
+ \end{enumerate}
+
+     
+
+ \begin{figure}
+     \centering
+     \includegraphics[width=\textwidth]{img/fasterrcnn}
+     \caption{The architecture of Faster R-CNN. From \url{https://researchgate.net/figure/The-architecture-of-Faster-R-CNN\_fig2\_324903264}.}
+     \label{fig:fasterrcnn}
+ \end{figure}
 
 \subsubsection{Mask Region-based Convolutional Network (Mask R-CNN) (2017)}
 \cite{bib:maskrcnn}
