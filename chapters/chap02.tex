@@ -1,12 +1,11 @@
 \chapter{Application of Neural Networks for Object Detection}
-In recent years, the evolution of hardware allowed for the creation of deep neural networks (DNNs) for multiple purposes. Eventually, image processing has become one of the fields where DNNs outperformed traditional and machine learning approaches. 
+There has been an upsurge in the use of neural networks in recent years. We can partially attribute it to the evolution of hardware allowing for implementation of network models with multiple layers. Deep neural networks (DNNs) are now finding their use in multiple applications in classification, time series prediction, and optimization tasks, and are replacing many older machine learning methods. Some of the benefits of using neural networks include their ability to find and learn complex non-linear relationships in provided data and subsequent generalization to unseen data. However, some applications do not allow for so-called \textit{black box} models and require the reasoning behind the decisions.
 
-\todo{bla}
-NNs vs ML
-Define (NNs) abbr.
-softmax
-perform object detection via bounding box localization
-augmentation - data size
+Image processing is one of the fields where DNNs are heavily utilized and outperform traditional machine learning approaches with big margins. Uses of DNNs for image processing vary from classification and object detection to auto-encoders for noise removal, and generative networks. A surge in DNN based image processing started in the 2010s with an implementation of a multi-layer convolutional network trained on GPU \cite{bib:deepOnGpu}. 
+
+In this chapter, we take a closer look at how are DNNs applied in object detection. The goal of such a detector is to localize and classify multiple objects of interest in the given image. There are multiple ways of localization, such as semantic segmentation, which categorizes individual pixels, or key-point and skeleton detections. However, we are interested in more straightforward, axis-aligned bounding box predictions. Each of the predicted bounding boxes needs a corresponding class prediction.
+
+Considering the importance of classification in object detection, we dedicate a significant portion of this chapter to describing multiple classification network models. Many detection models directly utilize or are inspired by those classification networks. We also define metrics used to compare the performance of DNN models used for image processing.
 
 \section{Metrics}
 In order to evaluate and compare multiple approaches, we require clearly defined metrics. A state-of-the-art model presented without full specification of used evaluation metrics makes comparing multiple such results impossible. Thankfully, there are clearly defined competitions and challenges with precisely defined rules that are often used to make such comparisons. 
@@ -50,9 +49,9 @@ Inference time is a significant factor if we want to consider the model for use 
 
 \section{Classification networks}
 \label{sec:clsnets}
-To better understand detection networks, we shortly describe their predecessors, classification networks. Classification network is a convolutional neural network (CNN) \cite[ch.~9]{bib:dlbook} that given an image, returns a confidence score of correspondence to each of the classes. Usually, soft-max function is applied to the confidence score to represent a probability distribution. A commonly used benchmark for the accuracy of such networks is the \textit{ILSVRC} challenge.
+A fundamental building block for a modern state-of-the-art classification network is a convolutional layer. Hence, we call this type of networks a convolutional neural networks (CNNs) \cite[ch.~9]{bib:dlbook}. CNN based classifier is a network that given the input image, extracts a feature map from this image and then applies classification layers to produce a confidence score for each possible class. Usually, the soft-max function is applied to the confidence score to get a probability distribution.
 
-In \cref{sec:detnets}, we show how classification models are used as a backbone for a detector network.
+We use this section to take a walk through a history of classification CNNs and outline some of the most important models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
 
 \subsection{AlexNet (2012)}
 A significant breakthrough in use of CNNs happened in 2012, when the \textit{AlexNet} \cite{bib:alexnet} won the \textit{ImageNet} image recognition challenge. It was the first time a deep CNN performed better than traditional computer vision and machine learning approaches. 
