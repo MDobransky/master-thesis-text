@@ -21,14 +21,14 @@ The most common and intuitive evaluation metric for classification problems is t
 \subsection*{Object detection}
 Multiple objects in each image, make object detection more complex task than classification. First of all, there is no simple one-to-one mapping between ground-truths and detections, like in the case of classification. A ground-truth data are a set of \textit{N} boxes with labels, and predictions generate a set of \textit{M} boxes with labels and confidence values. At this point, predictions can be filtered by a confidence threshold and non-maximum suppression (NMS). NMS is a post-processing algorithm responsible for merging all predictions that belong to the same object. 
 
-Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is determined by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes. Predictions with IoU lower than predetermind threshold are ignored.
+Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is determined by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes. Predictions with IoU lower than predetermined threshold are ignored.
 $$\text{IoU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
 
 With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground-truth box) we are able to calculate \textbf{precision} and \textbf{recall}.
 $$\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}} = \frac{\text{TP}}{\text{All predictions}}$$
 $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{\text{TP}}{\text{All ground truths}}$$
 
-With precision and recall defined, we can define the first metrics used for object detection. Note that all following metrics depend on IoU threshold.
+With precision and recall defined, we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
 \subsubsection{Precision-Recall curve}
 Precision-Recall curve (PR curve) is a curve plotted for a specific class and shows the changes in precision and recall as the confidence level changes. Points on the PR curve are determined by sorting the predictions by the confidence score and for each prediction also considering all objects above its confidence score, then calculating the resulting precision and recall for those predictions. An object detector of a particular class is considered reliable if its precision stays high as recall increases, meaning precision is good with lower confidence threshold.
