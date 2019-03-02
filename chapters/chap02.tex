@@ -1,4 +1,4 @@
-\chapter{Neural Network Detectors}
+\chapter{Application of Neural Networks for Object Detection}
 In recent years, the evolution of hardware allowed for the creation of deep neural networks (DNNs) for multiple purposes. Eventually, image processing has become one of the fields where DNNs outperformed traditional and machine learning approaches. 
 
 \todo{bla}
@@ -9,11 +9,11 @@ perform object detection via bounding box localization
 augmentation - data size
 
 \section{Metrics}
-Before we describe any models, we need to define metrics to be able to compare their performance. The main concerns are accuracy and the number of images processed per second (fps). A real-time detector needs to find a balance between these two factors.
+In order to evaluate and compare multiple approaches, we require clearly defined metrics. A state-of-the-art model presented without full specification of used evaluation metrics makes comparing multiple such results impossible. Thankfully, there are clearly defined competitions and challenges with precisely defined rules that are often used to make such comparisons. 
 
-State-of-the-art models should not be compared directly by the values presented by research groups as they can be biased. Most of classification networks are designed for \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} that is evaluated purely by accuracy. Although detection networks consider fps an important factor, they often omit important details, such as detection thresholds, on how they calculated their precision.
+The \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{VOC}, and \textit{COCO} respectively.
 
-In this section, we define a few commonly used metrics to evaluate the performance of neural networks and other machine learning approaches. Later we use those metrics to compare previewed networks and our implementations.
+In this section, we define metrics used to evaluate those challenges, but also other, not considered properties. Most notably, none of the challenges mentioned is evaluated based on the speed of the model. Because our work focuses on real-time video analysis, we are interested in finding a balance between accuracy and the number of images processed per second (fps). One more factor to consider would be the physical size of the model, usually represented by the number of parameters and directly impacting the amount of needed memory.
 
 \subsection*{Classification}
 The most common evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This metrics is referred to as a classification accuracy. A complement to accuracy, \textbf{top-1 error}, is also often used. Alongside top-1 error, a \textbf{top-5 error} is used for evaluation in \textit{ILSVRC}. The top-5 error is the fraction of test samples where the correct label does not appear in the top 5 predicted results.
@@ -77,7 +77,7 @@ Each of the \textit{VGG's} convolutional filters uses 3$\times$3 kernel, and the
     \label{tab:vggarch}
 \end{table}
     
-\subsection{Inception (v1) (2014)}
+\subsection{Inception (2014)}
 \label{sec:inception}
 Previous architectures showed that increasing the number of layers and layer size, leads to better precision. \textit{Inception v1} \cite{bib:googlenet}, also known as \textit{GoogLeNet}, aims at increasing precision while improving utilization of computing resources.
 
@@ -155,11 +155,8 @@ Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
 bla bla bla
 \todo{bla}
 
-\subsection{Region-based Convolutional Networks (R-CNN)}
-\textit{R-CNN} is a family of region-based detection models, with iterative improvements in speed and accuracy. This approach is a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and classification. Thanks to the modular architecture R-CNN networks can exploit any CNN as a feature extractor. Therefore the last iteration of this approach can achieve state-of-the-art detection results exploiting the latest advances in classification networks.
-
-\subsubsection{R-CNN (2014)}
-A first entry into this family, \textit{R-CNN} \cite{bib:rcnn}, laid foundations for state-of-the-art detection models. The idea is simple, select regions in the picture and classify each region.
+\subsection{Region-based Convolutional Network (R-CNN) (2014)}
+\textit{R-CNN} \cite{bib:rcnn} is the first member of the family of region-based detection models, with iterative improvements in speed and accuracy. The cornerstone idea is simple, select regions in the picture and classify each region. This approach leads to a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and classification. 
 
 A naive approach would use a sliding window and classify each cutout of the image.  This approach would be extremely slow, considering different sizes and aspect ratios of possible objects. R-CNN solves this problem by applying a region proposal algorithm and selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} (SS) \cite{bib:selectivesearch} algorithm and serve as a candidates for bounding box predictions.
 
@@ -172,7 +169,7 @@ Each region is then separately processed by a CNN into a feature map. The origin
     \label{fig:rcnn}
 \end{figure}
 
-\subsubsection{Fast R-CNN (2015)}
+\subsection{Fast R-CNN (2015)}
 Even though \textit{R-CNN} was a major step in the right direction, it was still far away from real-time detection. \textit{Fast R-CNN} \cite{bib:fastrcnn} introduces a series of innovations to its predecessor, aimed at improving speed and accuracy. Benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using \textit{R-CNN} with \textit{VGG-16} feature extractor, to 320 milliseconds with \textit{Fast R-CNN} using the same feature extractor, not including a time for SS proposals. 
 
 Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm, and a CNN to produce a feature map. A drawback of \textit{R-CNN} was computing feature map for each region, despite overlaps. \textit{Fast R-CNN} processes whole input image into a feature map, and then, using a region of interest (RoI) pooling layers, extracts a feature vector for each region. All extracted feature vectors have the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
@@ -184,9 +181,9 @@ Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm, 
     \label{fig:fastrcnn}
 \end{figure}
 
-\subsubsection{Faster R-CNN (2015)}
+\subsection{Faster R-CNN (2015)}
  
- \textit{Faster R-CNN} \cite{bib:fasterrcnn} builds further on the \textit{Fast R-CNN} with the aspiration to achieve a real-time performance. \textit{Fast R-CNN} managed to build a fast feature extraction and subsequent classification usable in a real-time environment but is heavily slowed down by a region proposal SS algorithm. \textit{Faster R-CNN} expands on the idea of sharing resources and replaces SS with \textbf{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can be applied to real-time tasks.  Whole architecture can be seen on \cref{fig:fasterrcnn}. 
+ \textit{Faster R-CNN} \cite{bib:fasterrcnn} builds further on the \textit{Fast R-CNN} with the aspiration to achieve a real-time performance. \textit{Fast R-CNN} managed to build a fast feature extraction and subsequent classification usable in a real-time environment but is heavily slowed down by a region proposal SS algorithm. \textit{Faster R-CNN} expands on the idea of sharing resources and replaces SS with \textbf{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can be considered a real-time performance. Whole architecture can be seen on \cref{fig:fasterrcnn}. 
  
  RPN is designed to be a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs measures whether proposed region contains a object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textbf{anchors}. The anchor is a predefined box centered at a location of sliding-window. \textit{k} such boxes with different sizes and aspect ratios are used. Regression produces 4k parameters relative to anchors, and classifier 2 scores per each anchor. The number of regions is then reduced by eliminating proposals with high overlap using a non-maximum suppression (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
  
@@ -201,6 +198,7 @@ Similarly to \textit{R-CNN}, this architecture needs region proposal algorithm, 
      \item using the model from step 3, fine-tune layers unique to \textit{Fast R-CNN}
  \end{enumerate}
 
+Thanks to the modular architecture, \textit{R-CNN} networks can exploit any CNN as a feature extractor.  Therefore \textit{Faster R-CNN} can achieve state-of-the-art detection results exploiting the latest advances in classification networks and is often used as a benchmark of their performance.
      
 
  \begin{figure}
