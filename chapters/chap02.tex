@@ -19,9 +19,9 @@ In this section, we define metrics used to evaluate those challenges, but also o
 The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textbf{classification accuracy}. However, a complement to the accuracy, \textbf{top-1 error}, is also often used. In \textit{ILSVRC},  alongside top-1 error, a \textbf{top-5 error} is used as another criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
 
 \subsection*{Object detection}
-Multiple objects in each image, make object detection more complex task than classification. Mainly because there is no simple one-to-one mapping between ground-truths and detections, like in the case of classification. A ground-truth data are a set of \textit{N} boxes with labels, and predictions generate a set of \textit{M} boxes with labels and confidence values. At this point, predictions can be filtered by a confidence threshold and non-maximum suppression (NMS). NMS is a post-processing algorithm responsible for merging all predictions that belong to the same object. 
+Evaluating a localization and classification of multiple objects in each image is a much complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
 
-Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is determined by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes. Predictions with IoU lower than predetermined threshold are ignored.
+Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is usually done by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes. Then selecting positive detections based on predetermined threshold.
 $$\text{IoU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
 
 With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground-truth box) we are able to calculate \textbf{precision} and \textbf{recall}.
@@ -31,10 +31,10 @@ $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{\text{TP}}{\text
 With precision and recall defined, we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
 \subsubsection{Precision-Recall (PR) curve}
-For each class, a separate PR curve is plotted. It reveals how much does a change in confidence, influence the precision and recall values. Firstly, predictions for the given class are sorted by a confidence score. For each prediction, precision and recall is then calculated utilizing predictions with a higher confidence score. An object detector of a particular class is considered reliable if its precision stays high while recall increases, which means that predictions with lower confidence score can be considered good predictions.
+For each class, a separate PR curve is plotted. It reveals how much does a change in confidence, influence the precision and recall values. Firstly, predictions for the given class are sorted by a confidence score. For each prediction, precision and recall are then calculated utilizing predictions with a higher confidence score. An object detector of a particular class is considered reliable if its precision stays high while recall increases, which means that predictions with lower confidence score can be considered good predictions.
 
 \subsubsection{Average Precision (AP)}
-Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. AP is a numerical metrics representing area under the PR curve. It is calculated by interpolation, either on all data points or on 11 equally spaced points.
+Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. However, we can use the area under the PR curve as numerical metrics, called \textbf{average precision}. It is calculated by interpolation, either on all data points or a small number of equally spaced points, \textit{Pascal VOC Challenge} uses 11.
 
 Interpolation equation for all points:
 $$\sum_{r=0}^1 (r_{n+1} - r_n ) p_{interp}(r_{n+1})$$
@@ -43,15 +43,14 @@ $$p_{interp}(r) = \max_{\Tilde{r} \geq r} p(\Tilde{r})$$
 where $p(\Tilde{r})$ is precision at recall $\Tilde{r}$.
 
 \subsubsection{Mean Average Precision (mAP)}
-Finally, the mAP is the number we can most often see as the performance metrics of object detectors. As the name suggests, it is a mean of AP across the classes. Most common notation mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
+Comparing two models class by class is impractical, especially with the classification of hundreds of classes. Therefore, the most often used metrics for object detectors is a \textbf{mean average precision} As the name suggests, it is a mean of AP across the classes. Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
 \subsection*{Inference time}
-Inference time is usually a small number in milliseconds that is not directly applicable to our problem. Our task is to process a large number of images. Therefore a number of processed \textbf{frames per second} (fps) is more natural metrics. Value of fps is always averaged. However, unlike precision metrics, the fps values are heavily dependant on hardware, batch size and amount of pre- and post-processing included in the measurement. Therefore, only the measurements done in the identical hardware and software environment can be directly compared.
+Inference time is a significant factor if we want to consider the model for use in real-time applications. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to visualize. Therefore number of processed \textbf{frames per second} (fps) is more intuitive metrics. However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment can be directly compared.
 
 \section{Classification networks}
 \label{sec:clsnets}
 To better understand detection networks, we shortly describe their predecessors, classification networks. Classification network is a convolutional neural network (CNN) \cite[ch.~9]{bib:dlbook} that given an image, returns a confidence score of correspondence to each of the classes. Usually, soft-max function is applied to the confidence score to represent a probability distribution. A commonly used benchmark for the accuracy of such networks is the \textit{ILSVRC} challenge.
-The \textit{ILSVRC} challenge is usually used to benchmark the accuracy of such networks.
 
 In \cref{sec:detnets}, we show how classification models are used as a backbone for a detector network.
 
@@ -83,7 +82,7 @@ Previous architectures showed that increasing the number of layers and layer siz
 
 A growing cost of stacking more convolutional layers can quickly overpower the benefits of increased accuracy. This network introduces the concept of sparsity by using the \textit{inception modules} \cref{fig:incept_mod}, to avoid the aforementioned cost. A sparse structure is approximated by using multiple convolutions with different kernel sizes and concatenating the outputs together. Max-pooling is also performed as an alternative to convolutions and concatenated to the output. Because high dimensional convolutions are costly, a reduction to the channels is introduced by using 1$\times$1 convolution as a preceding layer.
 
-The network is then formed by linearly stacking nine inception modules, preceded by a linear stem network and followed by a fully connected classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularisation during the training.
+The network is then formed by linearly stacking nine inception modules, preceded by a linear stem network and followed by a fully connected classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularization during the training.
 
 A set of improvements to the \textit{Inception} network was introduced in later versions of the network. Most notably a factorization of convolution layers was introduced in Inception v2 and v3 \cite{bib:inception2}.
 
@@ -210,17 +209,6 @@ Thanks to the modular architecture, \textit{R-CNN} networks can exploit any CNN 
 
 \subsubsection{Mask Region-based Convolutional Network (Mask R-CNN) (2017)}
 \cite{bib:maskrcnn}
-
-\subsection*{You Only Look Once (YOLO)}
-\subsubsection{YOLO}
-\label{sec:yolo}
-\subsubsection{YOLO v2 and YOLO 9000}
-
-\subsection*{Single-Shot Detector (SSD)}
-\label{sec:ssd}
-\subsubsection{SSD}
-\subsubsection{FSSD}
-\subsubsection{RFB}
 
 
 %Optional section
