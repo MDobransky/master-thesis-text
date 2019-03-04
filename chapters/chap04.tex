@@ -30,13 +30,13 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
 
 
 \section{Train only specific classes}
-downside - categorising animals as humans because it is most similar class.
+downside - categorizing animals as humans because it is most similar class.
 \begin{table}
     \begin{tabular}{c|c|c}
          & coco & small \\
         Resnet50 & & 48.7\\
         Resnet101 & 32.8 & \\
-        Xception & & \\
+        Xception & 26.76 & 37.83\\
         NASNet & & \\
     \end{tabular}
     \caption{mean average precision, conf thr 0.2, IoU 0.5,  (400 epochs), 300x300 scaled random crops}

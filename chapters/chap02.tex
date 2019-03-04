@@ -54,37 +54,35 @@ A fundamental building block for a modern state-of-the-art classification networ
 We use this section to take a walk through a history of classification CNNs and outline some of the most important models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
 
 \subsection{AlexNet (2012)}
-A significant breakthrough in use of CNNs happened in 2012, when the \textit{AlexNet} \cite{bib:alexnet} won the \textit{ImageNet} image recognition challenge. It was the first time a deep CNN performed better than traditional computer vision and machine learning approaches. 
-
-\textit{AlexNet} has a simple architecture with five convolutional layers and two fully connected layers, followed by a softmax layer. It has created a foundation on which today's state-of-the-art models are built and set a new standard for image recognition.
+\textit{AlexNet} \cite{bib:alexnet} is the first CNN that won the \textit{ILSVRC} challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. \textit{AlexNet's} architecture is a stack of five convolutional layers interleaved by max-pooling layers, and two fully connected layers, followed by a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
 
 \subsection{VGG (2014)}
 \label{sec:VGG}
-The network architecture, mostly known as \textit{VGG} \cite{bib:vgg}, pushed the concept of AlexNet even further and has proved the feasibility of deep network with small convolutions. 
+The network architecture, mostly known as \textit{VGG} \cite{bib:vgg}, built onto the deep CNN concept behind \textit{AlexNet}. It managed to prove the feasibility of even deeper network utilizing small convolution filters. 
 
-Each of the \textit{VGG's} convolutional filters uses 3$\times$3 kernel, and the depth of the filters is increased through the network, reaching 512 filters in the last layers. Three fully connected layers and softmax are applied after the convolutions, see \cref{tab:vggarch}. There are multiple versions of the \textit{VGG} architecture, depending on the number of convolutional layers, the most popular is the 16 layer version. 
+Each of the \textit{VGG's} convolutional filters employs a 3$\times$3 kernel with the depth of the feature map gradually increasing through the network. In the last layers, the feature map reaches 512 channels. Three fully connected layers and softmax follow the convolutions, see \cref{tab:vggarch}. Multiple versions of the \textit{VGG} architecture can be constructed, depending on the number of convolutional layers. The most popular is the 16 layer version, dubbed \textit{VGG-16}.
 
-\textit{VGG} network is considered a general architecture for a classification network due to its linear architecture with decreasing size of the features and increasing number of channels. 
+The \textit{VGG} network is considered to be a general architecture for a classification network due to its linear architecture with a decreasing area of the features, and an increasing number of channels. 
 
 \begin{table}
     \centering
     \rotatebox{90}{
         \vggArch
     }
-    \caption{Architecture of VGG network, version D. Taken from \cite[table 1]{bib:vgg}}
+    \caption{Architecture of VGG network version D, commonly called VGG-16. Taken from \cite[table 1]{bib:vgg}}
     \label{tab:vggarch}
 \end{table}
     
 \subsection{Inception (2014)}
 \label{sec:inception}
-Previous architectures showed that increasing the number of layers and layer size, leads to better precision. \textit{Inception v1} \cite{bib:googlenet}, also known as \textit{GoogLeNet}, aims at increasing precision while improving utilization of computing resources.
+Previous architectures suggests that increasing the number of layers and layer size, leads to better precision. \textit{Inception v1} \cite{bib:googlenet}, also known as \textit{GoogLeNet}, aims at increasing precision while improving utilization of computing resources.
 
 A growing cost of stacking more convolutional layers can quickly overpower the benefits of increased accuracy. This network introduces the concept of sparsity by using the \textit{inception modules} \cref{fig:incept_mod}, to avoid the aforementioned cost. A sparse structure is approximated by using multiple convolutions with different kernel sizes and concatenating the outputs together. Max-pooling is also performed as an alternative to convolutions and concatenated to the output. Because high dimensional convolutions are costly, a reduction to the channels is introduced by using 1$\times$1 convolution as a preceding layer.
 
 The network is then formed by linearly stacking nine inception modules, preceded by a linear stem network and followed by a fully connected classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularization during the training.
 
 A set of improvements to the \textit{Inception} network was introduced in later versions of the network. Most notably a factorization of convolution layers was introduced in Inception v2 and v3 \cite{bib:inception2}.
-
+\todo{def factorization}
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/inception}
@@ -151,6 +149,7 @@ Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
 \section{Detection networks}
 \label{sec:detnets}
 bla bla bla
+something about rcnn here and truly real-time detectors in separate chapter 3
 \todo{bla}
 
 \subsection{Region-based Convolutional Network (R-CNN) (2014)}
@@ -206,13 +205,18 @@ Thanks to the modular architecture, \textit{R-CNN} networks can exploit any CNN 
      \label{fig:fasterrcnn}
  \end{figure}
 
-\subsubsection{Mask Region-based Convolutional Network (Mask R-CNN) (2017)}
-\cite{bib:maskrcnn}
+\subsection{Mask R-CNN (2017)}
+Previous \textit{R-CNN} based architectures used bounding boxes to localize individual objects. \textit{Mask R-CNN} \cite{bib:maskrcnn} adds a localization based on semantic segmentation, where the goal is to classify each pixel into a category. \textit{Mask R-CNN} is built upon \textit{Faster R-CNN}, and combines both bounding box localization and semantic segmentation by predicting segmentation masks for each RoI. Product of this approach is a bounding box and class for each object, together with binary segmentation mask. Unlike the semantic segmentation on whole input, doing it on RoIs allows for instantiated segmentation where selected pixels corresponds to given instance of a class.
+
+Implementation and architecture is very similar to \textit{Faster R-CNN} with two exceptions. One of them is already described fully convolutional segmentation branch witch works in parallel with classification and bounding box regression heads. The other difference is a replacement of RoI pooling layer with RoI alignment layer. The problem of RoI pooling is quantization of floating-number RoI to discrete feature map grid and consequent imprecision. RoI align mitigates this problem by using bi-linear interpolation to compute exact values of features at four sampled location in each of RoIs locations and aggregating the results. High level architecture and RoI alignment layer are visualized on \cref{fig:maskrcnn}.
 
 
-%Optional section
-% \section{Other uses of CNNs}
-% \subsection{Noise removal/ Regularization}
-% \subsection{Image generation}
+
+ \begin{figure}
+     \centering
+     \includegraphics[width=\textwidth]{img/maskrcnn}
+     \caption{Left: The architecture of Mask R-CNN. Right: RoI align, grid represents feature map, solid lines an RoI and the dost are sampling points. From \cite[fig. 1, 3]{bib:maskrcnn}}
+     \label{fig:maskrcnn}
+ \end{figure}
 
 
