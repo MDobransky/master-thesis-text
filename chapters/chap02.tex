@@ -10,12 +10,12 @@ Considering the importance of classification in object detection, we dedicate a 
 \section{Metrics}
 In order to evaluate and compare multiple approaches, we require clearly defined metrics. A state-of-the-art model presented without full specification of used evaluation metrics makes comparing multiple such results impossible. Thankfully, there are clearly defined competitions and challenges with precisely defined rules that are often used to make such comparisons. 
 
-The \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{VOC}, and \textit{COCO} respectively.
+The \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{PASCAL VOC}, and \textit{COCO} respectively.
 
 In this section, we define metrics used to evaluate those challenges, but also other, not considered qualities. Most notably, none of the challenges mentioned is evaluated based on the speed of the model. Because our work focuses on real-time video analysis, we are interested in finding a balance between accuracy and the number of images processed per second (fps). One more factor to consider would be the physical size of the model, usually represented by the number of parameters and directly impacting the amount of needed memory.
 
 \subsection*{Classification}
-The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textbf{classification accuracy}. However, a complement to the accuracy, \textbf{top-1 error}, is also often used. In \textit{ILSVRC},  alongside top-1 error, a \textbf{top-5 error} is used as another criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
+The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textit{classification accuracy}. However, a complement to the accuracy, \textit{top-1 error}, is also often used. In \textit{ILSVRC},  alongside top-1 error, a \textit{top-5 error} is used as another criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
 
 \subsection*{Object detection}
 Evaluating a localization and classification of multiple objects in each image is a much complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
@@ -23,7 +23,7 @@ Evaluating a localization and classification of multiple objects in each image i
 Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is usually done by computing intersection over union (IoU) value for each pair of ground truth and predicted boxes. Then selecting positive detections based on predetermined threshold.
 $$\text{IoU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
 
-With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground-truth box) we are able to calculate \textbf{precision} and \textbf{recall}.
+With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground-truth box) we are able to calculate \textit{precision} and \textit{recall}.
 $$\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}} = \frac{\text{TP}}{\text{All predictions}}$$
 $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{\text{TP}}{\text{All ground truths}}$$
 
@@ -33,7 +33,7 @@ With precision and recall defined, we can define the first metrics used for obje
 For each class, a separate PR curve is plotted. It reveals how much does a change in confidence, influence the precision and recall values. Firstly, predictions for the given class are sorted by a confidence score. For each prediction, precision and recall are then calculated utilizing predictions with a higher confidence score. An object detector of a particular class is considered reliable if its precision stays high while recall increases, which means that predictions with lower confidence score can be considered good predictions.
 
 \subsubsection{Average Precision (AP)}
-Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. However, we can use the area under the PR curve as numerical metrics, called \textbf{average precision}. It is calculated by interpolation, either on all data points or a small number of equally spaced points, \textit{Pascal VOC Challenge} uses 11.
+Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. However, we can use the area under the PR curve as numerical metrics, called \textit{average precision}. It is calculated by interpolation, either on all data points or a small number of equally spaced points (\textit{PASCAL VOC Challenge} uses 11).
 
 Interpolation equation for all points:
 $$\sum_{r=0}^1 (r_{n+1} - r_n ) p_{interp}(r_{n+1})$$
@@ -42,10 +42,10 @@ $$p_{interp}(r) = \max_{\Tilde{r} \geq r} p(\Tilde{r})$$
 where $p(\Tilde{r})$ is precision at recall $\Tilde{r}$.
 
 \subsubsection{Mean Average Precision (mAP)}
-Comparing two models class by class is impractical, especially with the classification of hundreds of classes. Therefore, the most often used metrics for object detectors is a \textbf{mean average precision} As the name suggests, it is a mean of AP across the classes. Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
+Comparing two models class by class is impractical, especially with the classification of hundreds of classes. Therefore, the most often used metrics for object detectors is a \textit{mean average precision} As the name suggests, it is a mean of AP across the classes. Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] represents the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
 \subsection*{Inference time}
-Inference time is a significant factor if we want to consider the model for use in real-time applications. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to visualize. Therefore number of processed \textbf{frames per second} (fps) is more intuitive metrics. However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment can be directly compared.
+Inference time is a significant factor if we want to consider the model for use in real-time applications. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to visualize. Therefore number of processed \textit{frames per second} (fps) is more intuitive metrics. However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment can be directly compared.
 
 \section{Classification networks}
 \label{sec:clsnets}
@@ -146,10 +146,9 @@ Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
 
 \section{Detection networks}
 \label{sec:detnets}
-The goal of object detection is to find and localize all objects of chosen categories. Our focus is on the bounding box (bbox) localization. In this section we describe a family of networks designed for the object detection that all represented state-of-the-art models of their time. Faster R-CNN is still used as one of the best object detectors considering precision. However, inference time is also a important metrics for use in real-time applications, and that is where those models fail. Because this thesis is focused on the real-time application of such networks, we will give entire \cref{chap:rltm} to networks usable for this purpose. 
+The goal of the detection network is to localize all objects of chosen categories. There is a simple logical step from classification task to detection. It is to classify selected regions in the image as one of the classes or as a background. Classification applied to every possible box in the image would undoubtedly produce great detection results, but at the extreme computational cost. This section describes a family of algorithms based on this simple idea, and try to implement it more efficiently.
 
-A training data for detection network consist of set of coordinates and class for each bbox. Expected output for one image is a set of coordinates for bounding boxes, each with an probability distribution of classes. 
-\todo{this}
+We will see that this family of so-called \textit{region based} approaches can reach state-of-the-art results, with increasing efficiency with each generation. Considering precision, \textit{Faster R-CNN} is still used as one of the most reliable detectors. However, although it can process a few frames per second, we do not consider it to be a truly real-time detector and applicable for demanding tasks, such as video surveillance. We devote entire \cref{chap:rltm} to detection networks performing in real-time constraints.
 
 \subsection{R-CNN (2014)}
 Region-based Convolutional Network (\textit{R-CNN}) by \citeauthor{bib:rcnn} \cite{bib:rcnn} is the first member of the family of region-based detection models. Each iteration comes with improvements in speed and accuracy. The foundation idea is simple: select regions in the picture and classify each region. This approach leads to a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and subsequent classification. 
