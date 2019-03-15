@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{mypackage}[]
+\ProvidesPackage{models}[]
  
 \RequirePackage{multicol}
 \RequirePackage{tikz}
@@ -11,39 +11,131 @@
     \begin{tabular}{|c|}
         \hline 
         \cellcolor{SkyBlue!90}Input 224$\times$224$\times$3\\ \hline
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64  \\ 
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64  \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64 \tiny (Conv1\_1) \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64 \tiny (Conv1\_2) \\ 
         \hline
-        \cellcolor{Apricot!80}Max-pooling \\ 
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_1) \\
         \hline
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128 \\ 
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128\\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128 \tiny (Conv2\_1) \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128 \tiny (Conv2\_2) \\ 
         \hline
-        \cellcolor{Apricot!80}Max-pooling \\ 
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_2) \\
         \hline
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_1) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_2) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_3) \\
         \hline
-        \cellcolor{Apricot!80}Max-pooling \\ 
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_3) \\
         \hline
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_1) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_2) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_3) \\
         \hline
-        \cellcolor{Apricot!80}Max-pooling \\ 
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_4) \\
         \hline
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\
-        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \\ 
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_1) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_2) \\
+        \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_3) \\
         \hline 
-        \cellcolor{Apricot!80}Max-pooling \\ \hline
-        \cellcolor{CadetBlue!40}FC - 4096 \\ \hline
-        \cellcolor{CadetBlue!40}FC - 4096 \\ \hline
-        \cellcolor{CadetBlue!40}FC - 1000 \\ \hline
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_5) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC\_1) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC\_2) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 1000 \tiny (FC\_3) \\ \hline
         \cellcolor{Thistle!60}Softmax \\ \hline
     \end{tabular}
 }
+
+
+\newcommand{\VGGSSD}{
+    \usetikzlibrary{shapes,arrows}
+
+    \tikzstyle{block} = [rectangle, draw,  text centered, rounded corners, minimum height=2em]
+    \tikzstyle{line} = [draw, -latex]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SpringGreen]
+    \tikzstyle{rect} = [rectangle, draw, text centered, minimum height=2em, fill=Goldenrod]
+    \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SkyBlue]
+    \tikzstyle{pool} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Apricot]
+    \tikzstyle{relu} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Thistle]
+    \tikzstyle{bnorm} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=JungleGreen]
+    
+    \subsection*{SSD}
+    \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
+    
+        \node [input] (input) {Input};
+        \node [rect, below of=input] (block1) {Conv1\_1 - Conv4\_3};
+        \node [rect, below of=block1] (block2) {Conv5\_1 - Conv5\_3};
+        \node [pool, below of=block2] (p1) {Max pool 3$\times$3};
+        
+         \node [conv, below of=p1] (ext-1) {Conv. 3$\times$3$\times$1024};
+         \node [conv, below of=ext-1] (ext0) {Conv. 1$\times$1$\times$1024};
+    
+        \draw[red,line width=0.6mm,] ($(block1.north west)+(-0.2,0.2)$)  rectangle ($(block2.south east)+(0.2,-3.8)$);
+        \node [text=red, font=\bfseries] at ($(input.east)+(+3.2,-0.8)$) (resnet) {\LARGE VGG-16};
+        
+        % \node [text=black, font=\bfseries] at ($(input.west)+(-3.5,0.4)$) (header) {\LARGE ResNet-SSD};
+        
+        \node [conv, below= of ext0] (ext1) {Conv. 1$\times$1$\times$256};
+        \node [conv, below of=ext1] (ext2) {Conv. 3$\times$3$\times$512, /2};
+        \node [conv, below of=ext2] (ext3) {Conv. 1$\times$1$\times$128};
+        \node [conv, below of=ext3] (ext4) {Conv. 3$\times$3$\times$256, /2};
+        \node [conv, below of=ext4] (ext5) {Conv. 1$\times$1$\times$128};
+        \node [conv, below of=ext5] (ext6) {Conv. 3$\times$3$\times$256};
+        \node [conv, below of=ext6] (ext7) {Conv. 1$\times$1$\times$128};
+        \node [conv, below of=ext7] (ext8) {Conv. 3$\times$3$\times$256};
+        \draw[blue,line width=0.6mm,] ($(ext1.north west)+(-0.4,0.2)$) rectangle ($(ext8.south east)+(0.4,-0.2)$);
+        \node [text=blue, font=\bfseries] at ($(ext1.north)+(+0.0,0.6)$) (extra) {\Large Extra layers};
+        
+        \node [conv, left= of ext3] (cls4) {Conv. 3$\times$3$\times$6*C};
+        \node [conv, below= of cls4] (cls5) {Conv. 3$\times$3$\times$4*C};
+        \node [conv, below= of cls5] (cls6) {Conv. 3$\times$3$\times$4*C};
+        
+        \node [conv, above= of cls4] (cls3) {Conv. 3$\times$3$\times$6*C};
+        \node [conv, above= of cls3] (cls2) {Conv. 3$\times$3$\times$6*C};
+        \node [conv, above= of cls2] (cls1) {Conv. 3$\times$3$\times$4*C};
+        \draw[black!30!green,line width=0.6mm,] ($(cls1.north west)+(-0.3,0.6)$)  rectangle ($(cls6.south east)+(0.3,-0.2)$);
+        \node [text=black!30!green, font=\bfseries] at ($(cls1.north)+(+0.0,1.4)$) (class) {\LARGE Class};
+        
+        \node [conv, right= of ext3] (loc4) {Conv. 3$\times$3$\times$24};
+        \node [conv, below= of loc4] (loc5) {Conv. 3$\times$3$\times$16};
+        \node [conv, below= of loc5] (loc6) {Conv. 3$\times$3$\times$16};
+        \node [conv, above= of loc4] (loc3) {Conv. 3$\times$3$\times$24};
+        \node [conv, above= of loc3] (loc2) {Conv. 3$\times$3$\times$24};
+        \node [conv, above= of loc2] (loc1) {Conv. 3$\times$3$\times$16};
+        \draw[black!30!green,line width=0.6mm,] ($(loc1.north west)+(-0.3,0.6)$)  rectangle ($(loc6.south east)+(0.3,-0.2)$);
+        \node [text=black!30!green,, font=\bfseries] at ($(loc1.north)+(+0.0,1.4)$) (loc) {\LARGE Location};
+
+        \path[line] (input) -- (block1);
+        \path[line] (block1) -- (block2);
+        \path[line] (block2) -- (p1);
+        \path[line] (p1) -- (ext-1);
+        \path[line] (ext-1) -- (ext0);
+        \path[line] (ext0) -- (ext1);
+        \path[line] (ext1) -- (ext2);
+        \path[line] (ext2) -- (ext3);
+        \path[line] (ext3) -- (ext4);
+        \path[line] (ext4) -- (ext5);
+        \path[line] (ext5) -- (ext6);
+        \path[line] (ext7) -- (ext8);
+        \path[line] (ext6) -- (ext7);
+        
+        \path[line] (ext8) -- (cls6);
+        \path[line] (ext6) -- (cls5);
+        \path[line] (ext4) -- (cls4);
+        \path[line] (ext2) -- (cls3);
+        \path[line] (ext0) -- (cls2);
+        \path[line] (block1) -- (cls1);
+        
+        \path[line] (ext8) -- (loc6);
+        \path[line] (ext6) -- (loc5);
+        \path[line] (ext4) -- (loc4);
+        \path[line] (ext2) -- (loc3);
+        \path[line] (ext0) -- (loc2);
+        \path[line] (block1) -- (loc1);
+                            
+    \end{tikzpicture}
+
+}
+
 
 
 \newcommand{\resnetArch}{
@@ -168,7 +260,7 @@
         \node [conv, below of=input] (conv1) {Conv. 7$\times$7$\times$64, /2};
         \node [bnorm, below of=conv1] (bn) {BatchNorm, ReLU};
         % \node [relu, below of=bn] (relu) {ReLU};
-        \node [pool, below of=bn] (maxpool) {3x3 max pool, /2};
+        \node [pool, below of=bn] (maxpool) {Max pool. 3$\times$3, /2};
         
         \node [rect, below of=maxpool] (block1) {Layer 1};
         \node [rect, below of=block1] (block2) {Layer 2};

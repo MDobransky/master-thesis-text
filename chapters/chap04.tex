@@ -42,35 +42,50 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
 \subsection{Train results}
 \begin{table}
     \begin{tabular}{c|c|c}
-                        & coco      & small \\
-        Resnet34-SSD    & 32.4      & 47.3  \\
-        Resnet50-SSD    &           & 48.7  \\
-        Resnet101-SSD   & 32.8      & 45.7  \\
-        Xception-A-SSD  & 26.8      & 37.8  \\
-        Xception-B-SSD  & -         & 48.3  \\
-        Xception-C-SSD  & -         & x     \\
-        NASNet-mobile-SSD & -       & 36.9  \\
+                            & coco      & small \\
+        Resnet34-SSD        & 32.4      & 47.3  \\
+        Resnet50-SSD        & 32.7      & 48.7  \\
+        Resnet101-SSD       & 32.8      & 45.7  \\
+        Xception-A-SSD      & 26.8      & 37.8  \\
+        Xception-B-SSD      & -         & 48.4  \\
+        Xception-C-SSD      & -         & x     \\
+        NASNet-mobile-SSD   & -         & 36.9  \\
     \end{tabular}
     \caption{mean average precision, conf thr 0.2, IoU 0.5,  (400 epochs), 300x300 scaled random crops}
     \label{tab:map}
 \end{table}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/ap}
+    \caption{AP, small 7 class dataset S, coco dataset C}
+    \label{fig:ap}
+\end{figure}
+
 
 \begin{table}
     \begin{tabular}{c|c|c}
-     & 81cls & 8cls  \\
-    Resnet34 & 31.1M & 24.4M\\
-    Resnet50 & 45.5M & 28.7M\\
-    Resnet101 & 64.5M & 47.7M \\
-    Xception & 40.6M & 25.7M \\
-    Xception-B & x & 19.2M \\
-    Xception-C & x & xM \\
-    NASNet & 17.3M & 7.6M \\
+                    & 81cls     & 8cls  \\
+    Resnet34        & 31.1M     & 24.4M \\
+    Resnet50        & 45.5M     & 28.7M \\
+    Resnet101       & 64.5M     & 47.7M \\
+    Xception-A      & 40.6M     & 25.7M \\
+    Xception-B      & x         & 19.2M \\
+    Xception-C      & x         & xM    \\
+    NASNet          & 17.3M     & 7.6M  \\
+    VGG             & x         & 34.3M \\
     \end{tabular}
     \caption{total number of parameters}
     \label{tab:parameters}
 \end{table}
 
+fps
+testing done on GTX 1080 Ti
+10000 images, 300x300 
+224x224 for nasnet
+times include NMS
 
 
 \section{something, use video continuity???}
+
+
