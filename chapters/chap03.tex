@@ -49,18 +49,18 @@ Although the network can be trained end-to-end, it is common for CNN to pre-trai
 
 \paragraph{Classification loss}
 \begin{align*}
-\mathbf{CLS} = \sum_{i=0}^{S^2}\mathbbm{1}_i^{\text{obj}} \sum_{c\in \text{class}} (p_i(c) - \hat{p}_i(c))^2
+\mathbf{L_{cls}} = \sum_{i=0}^{S^2}\mathbbm{1}_i^{\text{obj}} \sum_{c\in \text{class}} (p_i(c) - \hat{p}_i(c))^2
 \end{align*}
 
 \paragraph{Localization loss}
 \begin{align*}
-\mathbf{LOC} &= \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} \left[(x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2\right] \\
+\mathbf{L_{loc}} &= \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} \left[(x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2\right] \\
  &+  \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} \left[(\sqrt{w_i} - \sqrt{\hat{w}_i})^2 + (\sqrt{h_i} - \sqrt{\hat{h}_i)^2}\right]
 \end{align*}
 
 \paragraph{Confidence loss}
 \begin{align*}
-\mathbf{CNF} &= \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} (C_i - \hat{C}_i)^2 
+\mathbf{L_{cnf}} &= \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} (C_i - \hat{C}_i)^2 
 + \lambda_{\text{noobj}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{noobj}} (C_i - \hat{C}_i)^2
 \end{align*}
 
@@ -99,19 +99,39 @@ Bboxes are predicted relative to prior box location which are themselves relativ
 The \textit{SSD} architecture can be describe as a set of three modules. A base network, extra convolutional layers and detection layers.
 
 \begin{itemize}
-    \item Base network is vgg
-    \item Extra layers bla
-    \item Detection layers are class loc
+    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. \textit{SSDs} base is build from \textit{VGG-16} network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. \textit{Pool5} layer is also changed from 2\x2/2 to 3\x3/1 pooling. Technically, \textit{SSD} does not force any constraints on the base network and the \textit{VGG} can be replaced by any CNN.
+    \item \textbf{Extra layers} serve the purpose of providing more feature maps on decreasing scale to the detector. Smaller feature maps aggregate more information to smaller area and allow for detection of larger objects with small convolutional window. On the other hand the information about small objects can be lost. Therefore the use of gradually decreasing series of feature maps. \textit{Extra layers} are implemented as a sequence of convolution layers connected to the end of the \textit{base}.
+    \item \textbf{Detection layers} are the final layers of the network. There is a pair of classification and localization convolutions for each feature map. Considering \textit{SSD300}, where 300 stands for the width and height of input image. Detection is performed on 6 feature maps of sizes [38, 19, 10, 5, 3, 1], using [4, 6, 6, 6, 4, 4] prior boxes respectively, producing 8732 predictions per class. First two of those feature maps are pulled from the \textit{VGG} network and the rest is provided by the \textit{extra layers}. All detection layers are implemented using 3\x3 convolutions with appropriate number of filters, as seen on \cref{fig:VGGSSD}.
 \end{itemize}
 
 \begin{figure}
     \VGGSSD
-    \caption{SSD architecture based on modified \textit{VGG-16} network. \textit{VGGs} three fully connected layers are replaced with two new convolutional layers and \textit{Pool\_5} layer is changed from 2\x2/2 to 3\x3/1 pooling. See more details on \textit{VGG} in \cref{sec:VGG}.}
+    \caption{SSD architecture based on modified \textit{VGG-16} network. \textit{VGGs} three fully connected layers are replaced with two new convolutional layers and \textit{Pool5} layer is changed from 2\x2/2 to 3\x3/1 pooling. Detection on the first and last two feature maps uses 4 prior boxes, while the rest uses 6 boxes. See more details on \textit{VGG} in \cref{sec:VGG}.}
     \label{fig:VGGSSD}
 \end{figure}
 
 
 \subsubsection{Training}
+\todo{matching}
+
+Similarly to \textit{YOLO}, \textit{SSD} also pre-trains the \textit{base network} on \textit{ImageNet} dataset before removing the classification layers and replacing them with \textit{extra} and \textit{detection} layers. The model is than trained for detection end-to-end. \textit{SSD} utilizes \textit{smooth L1} loss for localization and \textit{cross-entropy} loss for classification. The final loss is the sum of those two components.
+
+\paragraph{Localization loss}
+
+\begin{align*}
+\mathbf{L_{\text{loc}}}(x,l,g) = \sum_{i\in Pos}^N \sum_{m\in(cx, cy, w, h)} &x_{ij}^k\text{smooth}_{L1}(l_i^m-\hat{g}_j^m) \\
+\hat{g}_j^{cx} = (g_j^{cx} - d_i^{cx}) / d_i^{w} \qquad& \hat{g}_j^{cy} = (g_j^{cy} - d_i^{cy}) / d_i^{h} \\
+\hat{g}_j^{w} = log(\frac{g_j^{w}}{d_i^w}) \qquad& \hat{g}_j^{h} = log(\frac{g_j^{h}}{d_i^h})
+\end{align*}
+where the ground-truths are encoded in respect to their matching prior boxes
+
+
+\paragraph{Classification loss}
+\begin{align*}
+\mathbf{L_{\text{cls}}}(x,c) = -\sum_{i\in Pos}^N x_{ij}^p log(\hat{c}_i^p) - \sum_{i \in Neg} log(\hat{c}_i^0) \quad\text{where} \quad\hat{c}_i^p = \frac{exp(c_i^p)}{\sum_p exp(c_i^p)}
+\end{align*}
+
+
 
 \subsubsection{Properties}
 

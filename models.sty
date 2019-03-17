@@ -14,33 +14,33 @@
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64 \tiny (Conv1\_1) \\ 
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$64 \tiny (Conv1\_2) \\ 
         \hline
-        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_1) \\
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool1) \\
         \hline
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128 \tiny (Conv2\_1) \\ 
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$128 \tiny (Conv2\_2) \\ 
         \hline
-        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_2) \\
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool2) \\
         \hline
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_1) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_2) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$256 \tiny (Conv3\_3) \\
         \hline
-        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_3) \\
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool3) \\
         \hline
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_1) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_2) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv4\_3) \\
         \hline
-        \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_4) \\
+        \cellcolor{Apricot!80}Max-pooling \tiny (Pool4) \\
         \hline
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_1) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_2) \\
         \cellcolor{SpringGreen!60}Conv. 3$\times$3$\times$512 \tiny (Conv5\_3) \\
         \hline 
         \cellcolor{Apricot!80}Max-pooling \tiny (Pool\_5) \\ \hline
-        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC\_1) \\ \hline
-        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC\_2) \\ \hline
-        \cellcolor{CadetBlue!40}FC - 1000 \tiny (FC\_3) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC6) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 4096 \tiny (FC7) \\ \hline
+        \cellcolor{CadetBlue!40}FC - 1000 \tiny (FC8) \\ \hline
         \cellcolor{Thistle!60}Softmax \\ \hline
     \end{tabular}
 }
@@ -95,12 +95,12 @@
         \draw[black!30!green,line width=0.6mm,] ($(cls1.north west)+(-0.3,0.6)$)  rectangle ($(cls6.south east)+(0.3,-0.2)$);
         \node [text=black!30!green, font=\bfseries] at ($(cls1.north)+(+0.0,1.4)$) (class) {\LARGE Class};
         
-        \node [conv, right= of ext3] (loc4) {Conv. 3$\times$3$\times$24};
-        \node [conv, below= of loc4] (loc5) {Conv. 3$\times$3$\times$16};
-        \node [conv, below= of loc5] (loc6) {Conv. 3$\times$3$\times$16};
-        \node [conv, above= of loc4] (loc3) {Conv. 3$\times$3$\times$24};
-        \node [conv, above= of loc3] (loc2) {Conv. 3$\times$3$\times$24};
-        \node [conv, above= of loc2] (loc1) {Conv. 3$\times$3$\times$16};
+        \node [conv, right= of ext3] (loc4) {Conv. 3$\times$3$\times$6*4};
+        \node [conv, below= of loc4] (loc5) {Conv. 3$\times$3$\times$4*4};
+        \node [conv, below= of loc5] (loc6) {Conv. 3$\times$3$\times$4*4};
+        \node [conv, above= of loc4] (loc3) {Conv. 3$\times$3$\times$6*4};
+        \node [conv, above= of loc3] (loc2) {Conv. 3$\times$3$\times$6*4};
+        \node [conv, above= of loc2] (loc1) {Conv. 3$\times$3$\times$4*4};
         \draw[black!30!green,line width=0.6mm,] ($(loc1.north west)+(-0.3,0.6)$)  rectangle ($(loc6.south east)+(0.3,-0.2)$);
         \node [text=black!30!green,, font=\bfseries] at ($(loc1.north)+(+0.0,1.4)$) (loc) {\LARGE Location};
 
