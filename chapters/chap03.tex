@@ -12,7 +12,7 @@ this is related work
 
 \subsection{YOLO: You Only Look Once (2016)}
 \label{sec:yolo}
-Building on the success of neural network detectors from \textit{R-CNN} family. \citeauthor{bib:yolo} \cite{bib:yolo} introduced a new approach to object detection. They unify networks for localization and classification into  a new single network. This network predicts both bounding box positions and class probabilities in a single evaluation. This approach also simplifies the training process, as \textit{YOLO} can be directly trained end-to-end. 
+Building on the success of neural network detectors from \textit{R-CNN} family. \citeauthor{bib:yolo} \cite{bib:yolo} introduced a new approach to object detection. They unify networks for localization and classification into a new single network. This network predicts both bounding box positions and class probabilities in a single evaluation. This approach also simplifies the training process, as \textit{YOLO} can be directly trained end-to-end. 
 
 Thanks to straightforward single pass architecture \textit{YOLO} claims to perform at 45 frames per second on \textit{Titan X GPU}. Although it has to sacrifice some precision compared to region proposal methods, it out-performs other real-time systems of its time \cite{bib:overfeat}.
 
@@ -45,7 +45,7 @@ Multiple other versions and modifications are possible. A smaller and faster ver
 \end{figure}
 
 \subsubsection{Training}
-Although the network can be trained end-to-end, it is common for CNN to pre-train on \textit{ImageNet} dataset. This is also the case for \textit{YOLO}. First, convolutional layers are pre-trained on the \textit{ImageNet} dataset, then the detection layers are added and whole network is trained for detection. The model is optimized using sum-squared error between predictions and ground-truths. The loss function is a sum of three parts, classification loss, localization loss, and bbox confidence loss. 
+Although the network can be trained end-to-end, it is common for CNN to pre-train on \textit{ImageNet} dataset. This is also the case for \textit{YOLO}. First, convolutional layers are pre-trained on the \textit{ImageNet} dataset, then the detection layers are added, and the whole network is trained for detection. The model is optimized using the sum-squared error between predictions and ground-truths. The loss function is a sum of three parts, classification loss, localization loss, and bbox confidence loss. 
 
 \paragraph{Classification loss}
 \begin{align*}
@@ -79,14 +79,14 @@ On the other hand, a significant problem with \textit{YOLO}'s grid-based detecti
 
 \subsection{SSD: Single Shot MultiBox Detector (2016)}
 \label{sec:ssd}
-\textit{SSD} is another real-time detector, aiming to outperform \textit{Faster R-CNN} by using a single network with one time evaluation. \citeauthor{bib:ssd} \cite{bib:ssd} presented this model just months after \textit{YOLO}. Both networks are build on similar principles but with multiple key differences. It manages to outperform \textit{Faster R-CNN} and \textit{YOLO} both in speed and precision.
+\textit{SSD} is another real-time detector, aiming to outperform \textit{Faster R-CNN} by using a single network with one time evaluation. \citeauthor{bib:ssd} \cite{bib:ssd} presented this model just months after \textit{YOLO}. Even thought these networks are build on similar principles, there are multiple key differences. \textit{SSD} manages to outperform \textit{Faster R-CNN} and \textit{YOLO} both in speed and precision.
 
 \subsubsection{Detection}
-One of the main features of \textit{SSD} is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of convolutional window. \textit{SSD} adopts similar concept to \textit{Faster R-CNN's} anchor boxes, this time called \textit{default} or \textit{prior} boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, 6 boxes are used. Contrary to \textit{YOLO}, both bbox and classification predictions are made for each position and for each prior box.
+One of the main features of \textit{SSD} is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of a convolutional window. \textit{SSD} adopts similar concept to \textit{Faster R-CNN's} anchor boxes, this time called \textit{default} or \textit{prior} boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, 6 boxes are used. Contrary to \textit{YOLO}, both bbox and classification predictions are made for each position and each prior box.
 
 Bboxes are predicted relative to prior box location which are themselves relative to feature map location. There is no bbox or region confidence value. Instead, \textit{SSD} uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, \textit{SSD} generates $m\times n\times B\times (C+5)$ parameters on feature map of m\x n size.
 
-\textit{SSD} detects objects on multiple feature maps with different sizes, to accommodate detection of different sized objects. And allows detectors on each level to focus on predicting smaller range of bbox sizes. For illustration of this process see \cref{fig:ssddet}.
+\textit{SSD} detects objects on multiple feature maps at different scales, to accommodate detection of different sized objects. Moreover, this allows detectors on each level to focus on predicting a smaller range of bbox sizes. For the illustration of this process see \cref{fig:ssddet}.
 
 \begin{figure}
     \centering
@@ -96,12 +96,12 @@ Bboxes are predicted relative to prior box location which are themselves relativ
 \end{figure}
 
 \subsubsection{Architecture}
-The \textit{SSD} architecture can be describe as a set of three modules. A base network, extra convolutional layers and detection layers.
+The \textit{SSD} architecture can be described as a set of three modules. A base network, extra convolutional layers and detection layers.
 
 \begin{itemize}
-    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. \textit{SSDs} base is build from \textit{VGG-16} network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. \textit{Pool5} layer is also changed from 2\x2/2 to 3\x3/1 pooling. Technically, \textit{SSD} does not force any constraints on the base network and the \textit{VGG} can be replaced by any CNN.
-    \item \textbf{Extra layers} serve the purpose of providing more feature maps on decreasing scale to the detector. Smaller feature maps aggregate more information to smaller area and allow for detection of larger objects with small convolutional window. On the other hand the information about small objects can be lost. Therefore the use of gradually decreasing series of feature maps. \textit{Extra layers} are implemented as a sequence of convolution layers connected to the end of the \textit{base}.
-    \item \textbf{Detection layers} are the final layers of the network. There is a pair of classification and localization convolutions for each feature map. Considering \textit{SSD300}, where 300 stands for the width and height of input image. Detection is performed on 6 feature maps of sizes [38, 19, 10, 5, 3, 1], using [4, 6, 6, 6, 4, 4] prior boxes respectively, producing 8732 predictions per class. First two of those feature maps are pulled from the \textit{VGG} network and the rest is provided by the \textit{extra layers}. All detection layers are implemented using 3\x3 convolutions with appropriate number of filters, as seen on \cref{fig:VGGSSD}.
+    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. \textit{SSDs} base is build from \textit{VGG-16} network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. \textit{Pool5} layer is also changed from 2\x2/2 to 3\x3/1 pooling. Technically, \textit{SSD} does not force any constraints on the base network, and any CNN can replace the \textit{VGG}.
+    \item \textbf{Extra layers} serve the purpose of providing more feature maps on decreasing scale to the detector. Smaller feature maps aggregate more information to a smaller area and allow for detection of larger objects with small convolutional window. On the other hand, information about small objects can be lost. Therefore the use of gradually decreasing series of feature maps. \textit{Extra layers} are implemented as a sequence of convolution layers connected to the end of the \textit{base}.
+    \item \textbf{Detection layers} are the final layers of the network. There is a pair of classification and localization convolutions for each feature map. Considering \textit{SSD300}, where 300 stands for the width and height of input image. Detection is performed on 6 feature maps of sizes [38, 19, 10, 5, 3, 1], using [4, 6, 6, 6, 4, 4] prior boxes respectively, producing 8732 predictions per class. First, two of those feature maps are pulled from the \textit{VGG} network, and the \textit{extra layers} provide the rest. All detection layers are implemented using 3\x3 convolutions with an appropriate number of filters, as seen on \cref{fig:VGGSSD}.
 \end{itemize}
 
 \begin{figure}
@@ -112,28 +112,33 @@ The \textit{SSD} architecture can be describe as a set of three modules. A base 
 
 
 \subsubsection{Training}
-\todo{matching}
+\textit{SSD} pre-trains the \textit{base network} on \textit{ImageNet} dataset, and after that removes the classification layers and replaces them with \textit{extra} and \textit{detection} layers. The model is than trained for detection end-to-end. \textit{SSD} utilizes \textit{smooth L1} loss for localization and \textit{cross-entropy} loss for classification. The final loss is the sum of those two components.
 
-Similarly to \textit{YOLO}, \textit{SSD} also pre-trains the \textit{base network} on \textit{ImageNet} dataset before removing the classification layers and replacing them with \textit{extra} and \textit{detection} layers. The model is than trained for detection end-to-end. \textit{SSD} utilizes \textit{smooth L1} loss for localization and \textit{cross-entropy} loss for classification. The final loss is the sum of those two components.
+Before the training, we need to figure out which prior boxes match the ground-truth annotations. For each ground-truth box, two criteria are used: a prior box with highest IoU is selected, and then, the ground-truth box is also matched to all prior-boxes with IoU higher than a threshold (0.5). Let the $x_{ij}^p = {0,1}$ be an indicator that $i$th prior box matches $j$th ground-truth box with class $p$.
 
-\paragraph{Localization loss}
+To keep the balance between positive and negative samples, \textit{hard negative mining} algorithm is employed. Only top negative samples, with the highest confidence score, are chosen. The goal is to keep the ratio of positives and negatives below 1:3.
+
+\paragraph{Localization loss} expresses the error between predicted boxes $(l)$ and ground-truths $(g)$. Predictions are generated in respect to corresponding prior boxes. Therefore, after matching the boxes, a ground-truths also need to be represented in respect to prior box $(d)$, with center $(c_x,c_y)$ and width $(w)$ and height $(h)$.
 
 \begin{align*}
-\mathbf{L_{\text{loc}}}(x,l,g) = \sum_{i\in Pos}^N \sum_{m\in(cx, cy, w, h)} &x_{ij}^k\text{smooth}_{L1}(l_i^m-\hat{g}_j^m) \\
-\hat{g}_j^{cx} = (g_j^{cx} - d_i^{cx}) / d_i^{w} \qquad& \hat{g}_j^{cy} = (g_j^{cy} - d_i^{cy}) / d_i^{h} \\
+\mathbf{L_{\text{loc}}}(x,l,g) = \sum_{i\in Pos}^N \sum_{m\in(c_x, c_y, w, h)} &x_{ij}^k\text{smooth}_{L1}(l_i^m-\hat{g}_j^m) \\
+\hat{g}_j^{c_x} = (g_j^{c_x} - d_i^{c_x}) / d_i^{w} \qquad& \hat{g}_j^{c_y} = (g_j^{c_y} - d_i^{c_y}) / d_i^{h} \\
 \hat{g}_j^{w} = log(\frac{g_j^{w}}{d_i^w}) \qquad& \hat{g}_j^{h} = log(\frac{g_j^{h}}{d_i^h})
 \end{align*}
-where the ground-truths are encoded in respect to their matching prior boxes
 
-
-\paragraph{Classification loss}
+\paragraph{Confidence loss} or classification loss, is the softmax loss over class confidences $(c)$.
 \begin{align*}
 \mathbf{L_{\text{cls}}}(x,c) = -\sum_{i\in Pos}^N x_{ij}^p log(\hat{c}_i^p) - \sum_{i \in Neg} log(\hat{c}_i^0) \quad\text{where} \quad\hat{c}_i^p = \frac{exp(c_i^p)}{\sum_p exp(c_i^p)}
 \end{align*}
 
+\noindent The final loss is then a weighted sum of both losses. The weight parameter $\alpha$ is set to 1. The loss is also divided by the number of matched prior boxes to keep it independent of the number of objects.
 
+\begin{align*}
+\mathbf{L}(x,c,l,g) = \frac{1}{N}(\mathbf{L_{\text{cls}}}(x,c) + \alpha\mathbf{L_{\text{loc}}}(x,l,g))
+\end{align*}
 
-\subsubsection{Properties}
+\subsection{YOLOv2 (2017)}
+\citeauthor{bib:yolo9000} \cite{bib:yolo9000}
 
 
 \subsection{200fps}
