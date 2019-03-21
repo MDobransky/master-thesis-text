@@ -149,25 +149,33 @@ To keep the balance between positive and negative samples, \textit{hard negative
 % \subsection{Optimizing Video Object Detection via a Scale-Time Lattice}
 
 \section{Detection with temporal information}
-In this section, we present two recent models designed specifically for detecting objects in video. Comparing to single independent frames, video can provide more information to the detector, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
-A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need of post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
+In this section, we present two recent models designed specifically for detecting objects in the video. Video can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
+A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
+However, adding another dimension to the detection model has a performance impact. It is also much harder to create a dataset suitable for training of detectors with a temporal dimension because a whole series of frames needs to be precisely annotated. Of course we can find a few public datasets e.g. \textit{ImageNet VID}\footnote{\url{http://image-net.org/challenges/LSVRC/2017/\#vid}}, \textit{YouTube-8M}\footnote{\url{https://research.google.com/youtube8m}} and some smaller ones like \textit{HollywoodHeads}\footnote{\url{https://www.di.ens.fr/willow/research/headdetection}}.
 
-problem with datasets, name some
 
 \subsection{Tube-CNN (2018)}
-A model for video detection using space-time tubes proposed by \citeauthor{bib:tubeCNN} \cite{bib:tubeCNN} shares the core ideas with \textit{R-CNN}-like networks. The two main components of this approach are the \textit{tube proposal network} (TPN) and the \textit{Tube-CNN} for classification and bbox regression. The TPN is designed to only propose tubes corresponding to linear motion.
-
-The architecture of this detector is very similar to \textit{Fast-RCNN} with the added temporal dimension. The main idea based on region/tube proposals and subsequent classification network for those regions. \citeauthor{bib:tubeCNN} \cite{bib:tubeCNN} proved with this method that using a temporal information provided by subsequent video frames, enhances a detectors precision. On the other hand, this approach adds more complexity to already slow \textit{Faster-RCNN} detector and as a result achieves only low single digit frames per second, with exact figures depending on configuration. 
-
-A tube proposal network is designed to only consider tubes corresponding to linear motion in order to limit the comlexity. 
+The architecture of this detector is very similar to \textit{Fast-RCNN} with the added temporal dimension. The main idea is based on region/tube proposals and the following classification network for those regions. \citeauthor{bib:tubeCNN} \cite{bib:tubeCNN} proved that using a temporal information provided by continuous video frames enhances a precision of the detector. On the other hand, this approach adds more complexity to slower than real-time \textit{Faster-RCNN} detector. The resulting network achieves only low single digit frame per second values, depending on configuration. 
 
 \subsubsection{Tube proposal network}
-Tube proposal generation starts with a feature extraction on a chunk of video frames. After the processing of all the frames, the feature maps are stacked together in temporal dimension and a volumetric convolutional layers (conv3d) is applied to produce a feature volume. Analogously to \textit{Faster-RCNN}, each position in this feature volume is used to create a tube proposals using a \textit{K} anchor tubes. The output for each anchor is the \textit{objectness} and position parameters. The number of proposals is then reduced by eliminating tubes with high overlap using a non-maximum suppression based on \textit{objectness} score. During the training, a time series of ground-truth boxes is approximated by a ground-truth tube.  Those tubes are then matched against the tube proposals using a IoU threshold defined as a minimum of spatial IoU at the ends of tubes. 
+Tube proposal generation begins with a feature extraction on a chunk of video frames. After the processing of all frames individually, feature maps are stacked together in the temporal dimension. Then, volumetric convolutional layers (conv3d) are applied to produce a feature volume.
+
+Analogously to \textit{Faster-RCNN}, each position in this feature volume is used to create tube proposals using \textit{K} anchor tubes. The proposal for each anchor consists of the \textit{objectness} and position parameters. The \textit{objectness} score reflects the probability of the presence of the same objects as opposed to a background. 
+
+IoU value for tubes is defined as a minimum of spatial IoU at the ends of tubes. The number of proposals is reduced by eliminating tubes with high overlap using a non-maximum suppression based on \textit{objectness} score. 
+
+A provided data for the training usually consists of a series of ground-truth boxes for individual frames. During training of TPN, a series of ground-truth boxes is approximated by a ground-truth tube. Those tubes are then matched against the tube proposals using an IoU threshold. A tube proposal network is designed only to consider tubes corresponding to linear motion in order to limit the complexity. 
 
 \subsubsection{Detection network}
-\textit{Tube-CNN} as name suggests, is a fully convolutional network. The task is to extract feature maps from the incoming chunk of images, and using the tube proposals, classify the proposed tubes and refine regression for tube positions. 
+\textit{Tube-CNN}, as the name suggests, is a fully convolutional network with the task to extract feature maps from the incoming chunk of images, and using the given tube proposals, classify the tubes and refine the object positions. 
 
-Same as in TPN, feature extraction is done independently on each frame using a common extractor like \textit{ResNet}. Features are then stacked together to form a spatio-temporal feature map. Provided research paper does not make it clear whether the proposal and detection networks share the same extracted features or not. A Tube-of-Interest pooling is employed to select the sub-volume of features corresponding to the proposals. The selected volume is then max-pooled into fixed size feature, that is subsequently used as an input to a classifier, in this case starting with the 4-th block of ResNet101. Regression branch of the network predicts the exact position of the object in the starting end ending frame of the tube. Both regressions start with a RoI pooling from the shared spatio-temporal feature map and continues with convolutional layers. This process is illustrated in \cref{fig:tubecnn}. 
+Same as in TPN, the feature extraction is done independently on each frame using some general extractor, e.g., \textit{ResNet}. Feature maps are then stacked to form a spatio-temporal feature volume. Unfortunately, the provided research paper does not clarify whether the proposal and detection networks share the same extraction layers or not.
+
+A Tube-of-Interest (ToI) pooling is employed on feature volume to select the sub-volume corresponding to each tube proposal. The selected volume is then max-pooled into a fixed-size feature and subsequently used as an input for a classifier. A general convolutional classifier with soft-max activation is used. 
+
+The regression branch of the network predicts the exact position of the object in the first and last frame of the tube. Both regressions begin with a RoI pooling on the corresponding feature maps and continue with convolutional layers to produce the positional parameters. 
+
+The detection process is illustrated in \cref{fig:tubecnn}.
 
 
 \begin{figure}
@@ -178,8 +186,16 @@ Same as in TPN, feature extraction is done independently on each frame using a c
 \end{figure}
 
 
-
-
-
 \subsection{TSSD-OTA (2019)}
 \citeauthor{bib:tssd} \cite{bib:tssd}
+
+
+
+
+
+
+
+
+
+
+
