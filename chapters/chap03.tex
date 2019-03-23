@@ -1,10 +1,7 @@
 \chapter{Related work}
-\label{chap:rltm}
-aka video detection
-real time -> 25fps
-this is related work
-% \section{Optimizing Video Object Detection via a Scale-Time Lattice}
-% \section{Use of Detection networks for video processing}
+\label{chap:related}
+
+In this chapter we provide overview of the methods used for detections in video. There are two categories of detectors that can be used for video detection, a very fast single frame detectors, or a detector designed for a sequence of frames. Although there is no definition of what is real time, generally 25fps is considered as the lower bound. However in practise we need as much fps as possible to process multiple video streams. 
 
 \section{Real-time detectors}
 
@@ -74,8 +71,9 @@ On the other hand, a significant problem with \textit{YOLO}'s grid-based detecti
 
 \textit{YOLO} also suffers from multiple problems with precise localization. It learns to detect arbitrary shapes, which can be hard to generalize to objects in new and unusual aspect ratios. Also, it predicts the bboxes on the heavily down-sampled image which leads to further imprecision. 
 
-\subsection{YOLOv2 (2017)}
+\subsubsection{YOLO v2 (2017)}
 \citeauthor{bib:yolo9000} \cite{bib:yolo9000}
+The second version of \textit{YOLO} architecture implements a series of improvements to the original network. Compared to original 45fps on 448\x448 image, \textit{v2} achieves 59fps on 480\x480 images.
 
 
 \subsection{SSD: Single Shot MultiBox Detector (2016)}
@@ -196,7 +194,9 @@ The detection process is illustrated in \cref{fig:tubecnn}.
 Compared to \textit{SSD}'s 45fps, \textit{TSSD} achieves 27fps on \textit{ImageNet VID} dataset.  
 
 \subsubsection{Architecture}
-\textit{TSSD} is based on a standard backbone of \textit{SSD} implemented on fully convolutional \textit{VGG-16} base with extra layers (see \cref{sec:ssd}). This base provides six feature maps that are used for classification and bbox regression in \textit{SSD}. However, \textit{TSSD} applies one more layer on the feature maps before detection. This is where the temporal information comes into effect, using the aforementioned convolutional LSTM cells. Two \textit{Attentional ConvLSTM} (AC-LSTM) cells are deployed, one for the bottom three feature maps and one for the top three. Only a small adjustment has been done to the underlying VGG network, that being lowering the number of channels in the second feature map to 512, to equalize the channels in all low-level feature maps. The outputs of both cells are then used for classification and regression in the same way the \textit{SSD} would do. Details of \textit{TSSD} implementation, including details on \textit{AC-LSTM} can be seen on \cref{fig:tssd}.
+\textit{TSSD} is based on a standard backbone of \textit{SSD} implemented on fully convolutional \textit{VGG-16} base with extra layers (see \cref{sec:ssd}). This base provides six feature maps that are used for classification and bbox regression in \textit{SSD}. However, \textit{TSSD} applies one more layer on the feature maps before detection. This is where the temporal information comes into effect, using the aforementioned convolutional LSTM cells. Two \textit{Attentional ConvLSTM} (AC-LSTM) cells are deployed, one for the bottom three feature maps and one for the top three. Only a small adjustment has been made to the underlying VGG network, that being lowering the number of channels in the second feature map to 512, to equalize the channels in all low-level feature maps. The outputs of both cells are then used for classification and regression in the same way the \textit{SSD} would do. Details of \textit{TSSD} implementation, including details on \textit{AC-LSTM} can be seen on \cref{fig:tssd}. 
+
+Features contributing to positive object detections are unevenly distributed in feature maps and through the scales. Authors proposed the \textit{Attentional ConvLSTM} cell with the goal of background and scale suppression.  The temporal attention module in \textit{AC-LSTM} provides the rest of the cell with object-aware features. 
 
 \begin{figure}
     \centering
@@ -207,6 +207,7 @@ Compared to \textit{SSD}'s 45fps, \textit{TSSD} achieves 27fps on \textit{ImageN
 
 
 \subsubsection{Training}
+Similarly to \textit{SSD}, the loss function of \textit{TSSD} has multiple objectives weighted by $\alpha, \beta, \gamma$ and $\xi$ constants.
 
 \begin{align*}
 \mathbf{L} = \frac{1}{N}(\alpha\mathbf{L_{\text{loc}}} + \beta\mathbf{L_{\text{cls}}}) + \gamma\mathbf{L_{\text{att}}} + \xi\mathbf{L_{\text{asc}}}
@@ -214,3 +215,17 @@ Compared to \textit{SSD}'s 45fps, \textit{TSSD} achieves 27fps on \textit{ImageN
 
 
 Where $\mathbf{L_{\text{cls}}}$ and $\mathbf{L_{\text{loc}}}$ are defined according to \textit{SSD} (\cref{sec:ssd}) and \textit{N} is the number of matched boxes.
+
+Attention loss is calculated as a binary cross-entropy loss between ground-truth attention map $A_g$ and prediction maps $A_{_{sc}}$ for each scale $sc$. $A_g$ is a binary map with ones on positions inside ground-truth boxes. Each predicted attention map is up-scaled ($A^{up}_{p_{sc}}$) to match the dimensions of the $A_g$.
+
+\begin{align*}
+\mathbf{L_{\text{att}}} = \sum_{sc=1}^6 \mu (-A^{up}_{p_{sc}} log(A_g) - (1-A^{up}_{p_{sc}})log(1-A_g))
+\end{align*}
+
+Video frames are generally temporally consistent. Therefore we also expect consistency in detections on short sequences of frames. We can suppress fluctuations in temporal detections by defining association loss. We use class-discriminative score list ($sl$) to represent detection in a frame. $sl$ sums up top-k predictions after application of NMS.
+
+\begin{align*}
+\mathbf{L_{\text{asc}}} = (\sum_{t=1}^{seq} sl_t - sl_{avg})/seq
+\end{align*}
+
+Where $sl_t$ denotes the score list in frame $t$, $sl_avg$ denotes the average list in a sequence and $seq$ represents the sequence length. 
