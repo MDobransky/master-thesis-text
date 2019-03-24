@@ -1,11 +1,11 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{models}[]
  
+\RequirePackage{xcolor}
 \RequirePackage{multicol}
 \RequirePackage{tikz}
 \usetikzlibrary{calc}
-% \RequirePackage{xstring}
-% \RequirePackage{xcolor}
+
 
 \newcommand{\vggArch}{
     \begin{tabular}{|c|}
@@ -51,7 +51,7 @@
 
     \tikzstyle{block} = [rectangle, draw,  text centered, rounded corners, minimum height=2em]
     \tikzstyle{line} = [draw, -latex]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SpringGreen]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SpringGreen!60]
     \tikzstyle{rect} = [rectangle, draw, text centered, minimum height=2em, fill=Goldenrod]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=SkyBlue]
     \tikzstyle{pool} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=Apricot]
