@@ -3,7 +3,10 @@
 
 In this chapter we provide overview of the methods used for detections in video. There are two categories of detectors that can be used for video detection, a very fast single frame detectors, or a detector designed for a sequence of frames. Although there is no definition of what is real time, generally 25fps is considered as the lower bound. However in practise we need as much fps as possible to process multiple video streams. 
 
+In practise, the detectors designed for image detection hold an edge over detectors with temporal information. Mostly because currently available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
+
 \section{Real-time detectors}
+In \cref{chap:nns} we took a look on a series of two-stage detectors, with separate region proposals and classification. Few years later, a new type of detectors has been developed, with faster single-stage design. A single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time frame-rates. In this section, we show off two popular approaches.
 
 \subsection{YOLO: You Only Look Once (2016)}
 \label{sec:yolo}
@@ -73,7 +76,15 @@ On the other hand, a significant problem with \textit{YOLO}'s grid-based detecti
 
 \subsubsection{YOLO v2 (2017)}
 \citeauthor{bib:yolo9000} \cite{bib:yolo9000}
-The second version of \textit{YOLO} architecture implements a series of improvements to the original network. Compared to original 45fps on 448\x448 image, \textit{v2} achieves 59fps on 480\x480 images.
+The second version of \textit{YOLO} architecture implements a series of improvements to the original network. Compared to original 45fps on 448\x448 image, \textit{v2} achieves 59fps on 480\x480 images. 
+
+\textit{YOLO v2} improvements:
+\begin{itemize}
+    \item batch normalization
+    \item fully convolutional
+    \item anchor boxes
+    
+\end{itemize}
 
 
 \subsection{SSD: Single Shot MultiBox Detector (2016)}
@@ -135,15 +146,6 @@ To keep the balance between positive and negative samples, \textit{hard negative
 \begin{align*}
 \mathbf{L}(x,c,l,g) = \frac{1}{N}(\mathbf{L_{\text{cls}}}(x,c) + \alpha\mathbf{L_{\text{loc}}}(x,l,g))
 \end{align*}
-
-
-
-
-% \subsection{200fps}
-% \todo{ https://arxiv.org/pdf/1805.06361.pdf}
-
-% \section{video smthing}
-% \subsection{Optimizing Video Object Detection via a Scale-Time Lattice}
 
 \section{Detection with temporal information}
 In this section, we present two recent models designed specifically for detecting objects in the video. Video can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
