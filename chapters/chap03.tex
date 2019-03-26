@@ -1,12 +1,13 @@
 \chapter{Related work}
 \label{chap:related}
 
-In this chapter we provide overview of the methods used for detections in video. There are two categories of detectors that can be used for video detection, a very fast single frame detectors, or a detector designed for a sequence of frames. Although there is no definition of what is real time, generally 25fps is considered as the lower bound. However in practise we need as much fps as possible to process multiple video streams. 
+In this chapter we provide overview of the methods used for detections in video. There are two types of approaches that can be used for video detection, a very fast single frame detectors, or a detector designed for a sequence of frames. Although there is no standardized definition of how many fps are real-time, we can consider 25fps as a minimum. However in practise we need as much fps as possible not only to keep up with one video stream, but to process multiple video streams on one GPU. 
 
 In practise, the detectors designed for image detection hold an edge over detectors with temporal information. Mostly because currently available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
 
 \section{Real-time detectors}
-In \cref{chap:nns} we took a look on a series of two-stage detectors, with separate region proposals and classification. Few years later, a new type of detectors has been developed, with faster single-stage design. A single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time frame-rates. In this section, we show off two popular approaches.
+\label{sec:rltm}
+In \cref{chap:nns} we took a look on a series of two-stage detectors, with separate region proposals and classification. Few years later, a new type of detectors has been developed, with faster single-stage design. A single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also the trade-off between speed and precision is continually diminishing in favor of single-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.
 
 \subsection{YOLO: You Only Look Once (2016)}
 \label{sec:yolo}
@@ -25,7 +26,8 @@ Final confidence for each box is the product of both conditional class probabili
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/yoloDet}
-    \caption{Detection process of \textit{YOLO}. From \cite[fig. 2]{bib:yolo}.}
+    \caption[YOLO detection]%
+    {Detection process of \textit{YOLO}. From \cite[fig. 2]{bib:yolo}.}
     \label{fig:yoloDet} 
 \end{figure}
 
@@ -38,7 +40,8 @@ Multiple other versions and modifications are possible. A smaller and faster ver
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/yoylo}
-    \caption{\textit{YOLO} architecture for evaluating \textit{PASCAL VOC}. It uses 7 by 7 grid with 2 bboxes per cell. Detecting 20 categories, the output's shape is 7\x7\x30. From \cite[fig. 3]{bib:yolo}.}
+    \caption[YOLO architecture]%
+    {\textit{YOLO} architecture for evaluating \textit{PASCAL VOC}. It uses 7 by 7 grid with 2 bboxes per cell. Detecting 20 categories, the output's shape is 7\x7\x30. From \cite[fig. 3]{bib:yolo}.}
     \label{fig:yolo} 
 \end{figure}
 
@@ -75,14 +78,14 @@ On the other hand, a significant problem with \textit{YOLO}'s grid-based detecti
 \textit{YOLO} also suffers from multiple problems with precise localization. It learns to detect arbitrary shapes, which can be hard to generalize to objects in new and unusual aspect ratios. Also, it predicts the bboxes on the heavily down-sampled image which leads to further imprecision. 
 
 \subsubsection{YOLO v2 (2017)}
-\citeauthor{bib:yolo9000} \cite{bib:yolo9000}
-The second version of \textit{YOLO} architecture implements a series of improvements to the original network. Compared to original 45fps on 448\x448 image, \textit{v2} achieves 59fps on 480\x480 images. 
+The second version of \textit{YOLO} architecture by \citeauthor{bib:yolo9000} \cite{bib:yolo9000}, implements a series of improvements to the original network. Compared to original 45fps on 448\x448 image, \textit{v2} achieves 59fps on 480\x480 images. 
 
-\textit{YOLO v2} improvements:
+A selection of changes to \textit{YOLO} architecture:
 \begin{itemize}
-    \item batch normalization
-    \item fully convolutional
-    \item anchor boxes
+    \item \textbf{batch normalization} improves precision and helps regularization
+    \item \textbf{fully convolutional architecture} shortens the inference time
+    \item class and 'objectness' predictions are no longer tied to grid locations, instead five \textbf{anchor boxes} are used
+    \item detection on \textbf{multiple feature maps} with different sizes concatenated into channels
     
 \end{itemize}
 
@@ -101,7 +104,8 @@ Bboxes are predicted relative to prior box location which are themselves relativ
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/ssddet}
-    \caption{SSD detection. (a) Input image with ground-truth boxes. (b) and (c) Predictions based on prior boxes on multiple scales of feature maps.}
+    \caption[SSD detection]%
+    {SSD detection. (a) Input image with ground-truth boxes. (b) and (c) Predictions based on prior boxes on multiple scales of feature maps.}
     \label{fig:ssddet}
 \end{figure}
 
@@ -115,8 +119,10 @@ The \textit{SSD} architecture can be described as a set of three modules. A base
 \end{itemize}
 
 \begin{figure}
+    \centering
     \VGGSSD
-    \caption{SSD architecture based on modified \textit{VGG-16} network. \textit{VGGs} three fully connected layers are replaced with two new convolutional layers and \textit{Pool5} layer is changed from 2\x2/2 to 3\x3/1 pooling. Detection on the first and last two feature maps uses 4 prior boxes, while the rest uses 6 boxes. See more details on \textit{VGG} in \cref{sec:VGG}.}
+    \caption[SSD architecture]%
+    {SSD architecture based on modified \textit{VGG-16} network. \textit{VGGs} three fully connected layers are replaced with two new convolutional layers and \textit{Pool5} layer is changed from 2\x2/2 to 3\x3/1 pooling. Detection on the first and last two feature maps uses 4 prior boxes, while the rest uses 6 boxes. See more details on \textit{VGG} in \cref{sec:VGG}.}
     \label{fig:VGGSSD}
 \end{figure}
 
@@ -148,7 +154,7 @@ To keep the balance between positive and negative samples, \textit{hard negative
 \end{align*}
 
 \section{Detection with temporal information}
-In this section, we present two recent models designed specifically for detecting objects in the video. Video can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
+In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
 
 A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
 
@@ -185,7 +191,8 @@ The detection process is illustrated in \cref{fig:tubecnn}.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/tubecnn}
-    \caption{Architecture of Tube-CNN for object detection. Taken from \cite[fig.~2]{bib:tubeCNN}.}
+    \caption[Tube-CNN architecture]%
+    {Architecture of Tube-CNN for object detection. Taken from \cite[fig.~2]{bib:tubeCNN}.}
     \label{fig:tubecnn}
 \end{figure}
 
@@ -203,7 +210,8 @@ Features contributing to positive object detections are usually unevenly distrib
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/tssd}
-    \caption{Architecture of \textit{TSSD} (left) and \textit{AC-LSTM} cell (right). \textit{c} denotes concatenation; \textit{Chw-x}, \textit{Elw-x} represent channel-wise and element-wise multiplication, respectively; \textit{+} is element-wise summation. From \cite[fig.~2,~3]{bib:tssd}.}
+    \caption[TSSD architecture and AC-LSTM cell]%
+    {Architecture of \textit{TSSD} (left) and \textit{AC-LSTM} cell (right). \textit{c} denotes concatenation; \textit{Chw-x}, \textit{Elw-x} represent channel-wise and element-wise multiplication, respectively; \textit{+} is element-wise summation. From \cite[fig.~2,~3]{bib:tssd}.}
     \label{fig:tssd}
 \end{figure}
 

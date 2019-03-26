@@ -7,25 +7,29 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
 \section{Reimplement SSD on other base}
 \subsection{ResNet-SSD}
 \begin{figure}
+    \centering
     \resnetSSD
-    \caption{SSD detector build on ResNet base. Depth of classification convolutions depends on number of classes (C). For detailed description of \textit{Layers} see \cref{fig:resnet_arch}.}
-    \label{fig:resnetSSD}
+    \caption[Resnet34-SSD and Xception-SSD]%
+    {Resnet34-SSD(left) and Xception-SSD (right). For details on \textit{Layers} and \textit{Blocks} see \cref{fig:resnet_arch} and \cref{fig:xception} respectively. Base networks are highlighted with a blue rectangle and extra layers with a red dashed one.}
+
+    \label{fig:resnet_xception_SSD}
 \end{figure}
 
 \subsection{Xception-SSD}
 
 
-\begin{figure}
-    \xceptionSSD
-    \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalization functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
-    \label{fig:xceptionSSD}
-\end{figure}
+% \begin{figure}
+%     \xceptionSSD
+%     \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalization functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
+%     \label{fig:xceptionSSD}
+% \end{figure}
 
 
 \subsection{Xception-B-SSD and Xception-C-SSD }
 \begin{figure}
+\centering
     \xceptionBSSD
-    \caption{SSD detectors build on our modified Xception bases. We reduced the output depth of blocks 3 to 7 from 728 to 256 and as a consequence doubled the size of feature map. In version C, we also omitted blocks 5,6,7 and moved feature extraction from block 11 to block 10. For details on extra layers, classification and location layers see \cref{fig:xceptionSSD}}
+     \caption{TODO For details on extra layers, classification and location layers see \cref{fig:resnet_xception_SSD}}
     \label{fig:xceptionBSSD}
 \end{figure}
 
@@ -33,8 +37,10 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
 \subsection{NasNet-SSD}
 
 \begin{figure}
+    \centering
     \nasnetSSD
-    \caption{SSD detector build on NASNet base. Depth of classification convolutions depends on number of classes (C). For detailed description of cells see \cref{sec:nasnet}}
+    \caption[NASNet-SSD]%
+    {NASNet-SSD based on NASNet mobile. For detailed description of cells see \cref{sec:nasnet}}
     \label{fig:nasnetSSD}
 \end{figure}
 
@@ -69,9 +75,9 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
     Resnet34        & 31.1M     & 24.4M \\
     Resnet50        & 45.5M     & 28.7M \\
     Resnet101       & 64.5M     & 47.7M \\
-    Xception-A      & 40.6M     & 25.7M \\
-    Xception-B      & x         & 19.2M \\
-    Xception-C      & x         & 18.5M \\
+    Xception        & 40.6M     & 25.7M \\
+    XceptionB       & x         & 19.2M \\
+    XceptionC       & x         & 18.5M \\
     NASNet          & 17.3M     & 7.6M  \\
     VGG             & 34.3M     & x \\
     \end{tabular}
