@@ -145,11 +145,12 @@ This architecture stands out from others mentioned because \citeauthor{bib:nasne
 \end{figure}
 
 \subsection{Comparing the classifiers}
+\label{sec:cnncomp}
 At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the \textit{ImageNet} dataset. Newer models, like \textit{Xception}, \textit{NASNet}, and modifications of \textit{ResNet} reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide an overview of fps-accuracy relationship taken from an independent benchmark by \citeauthor{bib:cnnbenchmark} \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of fps with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/fps_comp}
-    \caption[benchmark of classification CNNs]%
+    \caption[Benchmark of classification CNNs]%
     {Benchmark of state-of-the-art classification deep neural networks on \textit{ILSVRC} dataset. Performed on NVIDIA
 Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
     \label{fig:cnnbenchmark}
