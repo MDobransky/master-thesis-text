@@ -44,7 +44,7 @@ Our general strategy was to find the deepest layer with size as close as possibl
     \centering
     \resnetSSD
     \caption[Resnet34-SSD and Xception-SSD]%
-    {Resnet34-SSD(left) and XceptionA-SSD (right). For details on \textit{Layers} and \textit{Blocks} see \cref{fig:resnet_arch} and \cref{fig:xception} respectively. Base networks are highlighted with a blue rectangle and extra layers with a red dashed one.}
+    {Resnet34-SSD(left) and XceptionA-SSD (right). For details on \textit{Layers} and \textit{Blocks} see \cref{fig:resnet_arch} and \cref{fig:xception} respectively. Extra layers are highlighted with a red dashed rectangle.}
 
     \label{fig:resnet_xception_SSD}
 \end{figure}
@@ -95,30 +95,50 @@ Training a network on a subset of larger dataset seems to be a straightforward t
 
 For example, consider a dataset of humans and monkeys. The networks learns to distinguish between the two and classifies everything else as a background. If we do not care about monkeys, we can simply filter them out in post-processing. However, consider a network that is trained to only recognize people and use it on a monkey. We are worried that such network would classify a monkey as a person, based on a large number of similar features. 
 
-To counter-measure the possibility of larger amount of false positives, we decided to increase the amount of negative samples. We did it by only filtering annotation from \textit{COCO} dataset to create the \textit{surveillance dataset}, but keeping all the images, even those without positive ground-truths. The expectation is to reach similar precision on selected classes, on both \textit{COCO} and \textit{surveillance dataset}. However, because \textit{COCO} is small dataset with only about hundred thousand images and is certainly not exhaustive in classes with similar features to \textit{surveillance dataset}, this measure would only help our evaluation data.
+To counter-measure the possibility of larger amount of false positives, we decided to increase the amount of negative samples. We did it by only filtering annotation from \textit{COCO} dataset to create the \textit{surveillance dataset}, but keeping all the images, even those without positive ground-truths. The expectation is to reach similar precision on selected classes, on both \textit{COCO} and \textit{surveillance dataset}. However, because \textit{COCO} is small dataset with only about hundred thousand images and is certainly not exhaustive in classes with similar features to \textit{surveillance dataset}, this measure would only help on our evaluation data.
 
+\paragraph{Results} in \cref{tab:ssdcocosurv} show that it is possible to remove unnecessary classes from the dataset without impacting the performance. We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. 
 
+\begin{table}[]
+    \centering
+    \begin{tabular}{c|c|c}
+         & COCO & Surveillance  \\
+         \hline
+        ResNet34 & 47.3 & 47.3 \\
+        ResNet50 & 46.6 & 48.7 \\
+        ResNet101 & 47.2 & 45.7 \\
+        XceptionA & 39.4 & 37.8 \\
+        NASNet & & 36.9 
+    \end{tabular}
+    \caption[SSD's precision comparison between COCO and surveillance datasets]{Mean average precision of \textit{surveillance} classes. Comparing networks trained on all 80 classes of \textit{COCO} dataset and \textit{surveillance} subset of \textit{COCO}.}
+    \label{tab:ssdcocosurv}
+\end{table}
+\todo{nasnet data}
 
 \subsection{Performance impact}
+We expect proportional increase of performance with removal of the classes. We saw that in the SSD (\cref{fig:VGGSSD}) the depth of the classification layers is dependent on the number of classes. Another important factor is that smaller dimensions of detection tensors will result in faster post-processing, i.e., non-maximum suppression. 
+
+We illustrate the effect of number of detected classes on performance on \cref{fig:fpscls}, based on measured data. Although the relationship of frames per second and classes is hyperbolic, on the interval between 7 and 80 classes, we approximate the loss of 0.78 frames per second per class on ResNet50-SSD. This is a significant number and means that training the networks for special purposes can bring a large benefit as opposed to using a general detector for everything.
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/fps_class}
-    \caption[Impact of number of classes on SSD performance]{Impact of number of classes on SSD performance.}
+    \caption[Impact of the number of classes on SSD performance]{Impact of the number of classes on SSD performance. Inference time values (1/fps) are linearly interpolated, the result is therefore hyperbolic approximation of frames per second.}
     \label{fig:fpscls}
 \end{figure}
-\todo{change img title}
+\todo{add NASNet data}
 
 
-
-\subsection{fixing Xception}
+\section{Modifying Xception}
 \label{sec:fixxception}
+
 
 
 \section{SSD-TC: SSD with temporal convolution}
 \begin{figure}
     \centering
     \ssdtc
-    \caption[SSDTC architecture]{SSDTC architecture on ResNet34 base. stride 1, no padding in the dimension of stacked features therefore no detections for first and last image, therefore efficiency grows with bigger chunks}
+    \caption[SSDTC architecture]{SSDTC architecture on ResNet34 base. stride 1, no padding in the dimension of stacked features therefore no detections for first and last two images, therefore efficiency grows with bigger chunks}
     \label{fig:ssdtc}
 \end{figure}
 

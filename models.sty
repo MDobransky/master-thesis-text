@@ -312,7 +312,7 @@
             \node [box, below=of ext6] (cls) {Classification};
             \node [box, below=of cls] (loc) {Localization};
             
-           \draw[blue,line width=0.4mm] ($(conv1.north west)+(-0.3,0.1)$)  rectangle ($(conv1.south east)+(0.3,-5.3)$);
+        %   \draw[blue,line width=0.4mm] ($(conv1.north west)+(-0.3,0.1)$)  rectangle ($(conv1.south east)+(0.3,-5.3)$);
             \draw[red,line width=0.4mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.3,0.1)$) rectangle ($(ext6.south east)+(0.3,-0.1)$);
 
             \path[line] (input) -- (conv1);
@@ -376,7 +376,7 @@
             \node [box, below=of ext6] (cls) {Classification};
             \node [box, below=of cls] (loc) {Localization};
             
-            \draw[blue,line width=0.4mm] ($(conv1.north west)+(-0.3,0.1)$)  rectangle ($(conv5.south east)+(0.3,-0.1)$);
+            % \draw[blue,line width=0.4mm] ($(conv1.north west)+(-0.3,0.1)$)  rectangle ($(conv5.south east)+(0.3,-0.1)$);
             \draw[red,line width=0.4mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.3,0.1)$) rectangle ($(ext6.south east)+(0.3,-0.1)$);
 
             \path[line] (input) -- (conv1);
@@ -468,7 +468,7 @@
         \node [box, below=of ext4] (cls) {Classification};
         \node [box, below=of cls] (loc) {Localization};
 
-        \draw[blue,line width=0.4mm] ($(cell1.north west)+(-0.2,2.2)$)  rectangle ($(cell14.south east)+(0.2,-1.1)$);
+        % \draw[blue,line width=0.4mm] ($(cell1.north west)+(-0.2,2.2)$)  rectangle ($(cell14.south east)+(0.2,-1.1)$);
         \draw[red,line width=0.4mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.3,0.1)$) rectangle ($(ext4.south east)+(0.8,-0.1)$);
 
         \path[line] (input) -- (conv1);
@@ -627,7 +627,6 @@
             %                         |- (cls.west) coordinate (cls);
             % \path[line] (conv5) -| node [near end]{}([xshift=-.2cm] conv5.west)
             %                         |- (loc.west) coordinate (loc);
-    
             % \path[line] (extra) -| node [near end]{}([xshift=-.5cm] extra.west)
             %                         |- (cls.west) coordinate (cls);
             % \path[line] (extra) -| node [near end]{}([xshift=.5cm] extra.east)
@@ -700,27 +699,29 @@
     \usetikzlibrary{shapes,arrows}
 
     \tikzstyle{line} = [draw, -latex]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=40mm, node distance= 0.25cm]
-    \tikzstyle{det} = [rectangle, draw,  text centered, rounded corners, fill=\convtdcol, text width=20mm, node distance= 0.8cm]
-    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.25cm, text width=30mm]
-    \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=0.7cm]
+    \tikzstyle{convl} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=1.3cm]
+    \tikzstyle{convd} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=33mm, node distance= 0.25cm, minimum height=0.7cm]
+    \tikzstyle{det} = [rectangle, draw,  text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm]
+    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.45cm, text width=30mm, minimum height=1.3cm]
+    \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol, minimum height=0.7cm, text width=10mm]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.3cm, text width=30mm]
     
     \subsection*{ResNet34-SSDTC}
     \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
     
-        \node [input] (input) {Input};
-        \node [conv, below=of input] (conv1) {Conv. 7$\times$7$\times$64 /2};
-        \node [rect, below=of conv1] (block1) {Layer 1};
-        \node [rect, below=of block1] (block2) {Layer 2 \textbf{[38\x 38\x 128]}};
-        \node [rect, below=of block2] (block3) {Layer 3 \textbf{[19\x 19\x 256]}};
-        \node [rect, below=of block3] (block4) {Layer 4 \textbf{[10\x 10\x 512]}};
-        \node [conv, below=of block4] (ext1) {Conv. 1$\times$1$\times$256};
-        \node [conv, below=of ext1] (ext2) {Conv. 3$\times$3$\times$512~/2 \textbf{[5\x 5\x 512]}};
-        \node [conv, below=of ext2] (ext3) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext3] (ext4) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
-        \node [conv, below=of ext4] (ext5) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext5] (ext6) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+        \node [input] (input) {};
+        \node [conv, below=of input] (conv1) {};
+        \node [rect, minimum height=0.7cm, below=of conv1] (block1) {ayer };
+        \node [rect, below=of block1] (block2) {ayer  \textbf{[38\x 38\x 128]}};
+        \node [rect, below=of block2] (block3) {ayer  \textbf{[19\x 19\x 256]}};
+        \node [rect, below=of block3] (block4) {ayer  \textbf{[10\x 10\x 512]}};
+        \node [conv, below=of block4] (ext1) {};
+        \node [convl, below=of ext1] (ext2) {};
+        \node [conv, below=of ext2] (ext3) {};
+        \node [convl, below=of ext3] (ext4) {};
+        \node [conv, below=of ext4] (ext5) {};
+        \node [convl, below=of ext5] (ext6) {};
 
         \path[line] (input) -- (conv1);
         \path[line] (conv1) -- (block1);
@@ -736,54 +737,99 @@
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-        \node [det, left=  of ext3] (cls4) {Conv3d 3\x 3\x 3 \x 4*C};
-        \node [det, below= of cls4] (cls5) {Conv3d 3\x 3\x 3 \x 6*C};
-        \node [det, below= of cls5] (cls6) {Conv3d 3\x 3\x 3 \x 6*C};
+        % \node [det, left=  of ext3] (cls4) {Conv3d 3\x 3\x 3 \x 4*C};
+        % \node [det, below= of cls4] (cls5) {Conv3d 3\x 3\x 3 \x 6*C};
+        % \node [det, below= of cls5] (cls6) {Conv3d 3\x 3\x 3 \x 6*C};
+        % \node [det, above= of cls4] (cls3) {Conv3d 3\x 3\x 3 \x 6*C};
+        % \node [det, above= of cls3] (cls2) {Conv3d 3\x 3\x 3 \x 4*C};
+        % \node [det, above= of cls2] (cls1) {Conv3d 3\x 3\x 3 \x 4*C};
+        % \draw[black!30!green,line width=0.6mm,] ($(cls1.north west)+(-0.3,0.6)$)  rectangle ($(cls6.south east)+(0.3,-0.2)$);
+        % \node [text=black!30!green, font=\bfseries] at ($(cls1.north)+(+0.0,1.4)$) (class) {\LARGE Class};
         
-        \node [det, above= of cls4] (cls3) {Conv3d 3\x 3\x 3 \x 6*C};
-        \node [det, above= of cls3] (cls2) {Conv3d 3\x 3\x 3 \x 4*C};
-        \node [det, above= of cls2] (cls1) {Conv3d 3\x 3\x 3 \x 4*C};
-        \draw[black!30!green,line width=0.6mm,] ($(cls1.north west)+(-0.3,0.6)$)  rectangle ($(cls6.south east)+(0.3,-0.2)$);
-        \node [text=black!30!green, font=\bfseries] at ($(cls1.north)+(+0.0,1.4)$) (class) {\LARGE Class};
+        % \node [det]  at ($(ext3.east)+(2.5,-0.0)$)  (loc4) {Conv3d 3\x 3\x 3 \x 4*4};
+        % \node [det, below= of loc4] (loc5) {Conv3d 3\x 3\x 3 \x 6*4};
+        % \node [det, below= of loc5] (loc6) {Conv3d 3\x 3\x 3 \x 6*4};
+        % \node [det, above= of loc4] (loc3) {Conv3d 3\x 3\x 3 \x 6*4};
+        % \node [det, above= of loc3] (loc2) {Conv3d 3\x 3\x 3 \x 4*4};
+        % \node [det, above= of loc2] (loc1) {Conv3d 3\x 3\x 3 \x 4*4};
+        % \draw[black!30!green,line width=0.6mm,] ($(loc1.north west)+(-0.3,0.6)$)  rectangle ($(loc6.south east)+(0.3,-0.2)$);
+        % \node [text=black!30!green,, font=\bfseries] at ($(loc1.north)+(+0.0,1.4)$) (loc) {\LARGE Location};
         
-        \node [det]  at ($(ext3.east)+(2.5,-0.0)$)  (loc4) {Conv3d 3\x 3\x 3 \x 4*4};
-        \node [det, below= of loc4] (loc5) {Conv3d 3\x 3\x 3 \x 6*4};
-        \node [det, below= of loc5] (loc6) {Conv3d 3\x 3\x 3 \x 6*4};
-        \node [det, above= of loc4] (loc3) {Conv3d 3\x 3\x 3 \x 6*4};
-        \node [det, above= of loc3] (loc2) {Conv3d 3\x 3\x 3 \x 4*4};
-        \node [det, above= of loc2] (loc1) {Conv3d 3\x 3\x 3 \x 4*4};
-        \draw[black!30!green,line width=0.6mm,] ($(loc1.north west)+(-0.3,0.6)$)  rectangle ($(loc6.south east)+(0.3,-0.2)$);
-        \node [text=black!30!green,, font=\bfseries] at ($(loc1.north)+(+0.0,1.4)$) (loc) {\LARGE Location};
+        \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det, below= of d34] (d35) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det, below= of d35] (d36) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det, above= of d34] (d33) {Conv3d 3\x 3\x 3 \x 128};
+        \node [det, above= of d33] (d32) {Conv3d 3\x 3\x 3 \x 128};
+        \node [det, above= of d32] (d31) {Conv3d 3\x 3\x 3 \x 128};
+        
+        \node [det]  at ($(d34.east)+(1.2,+0.4)$)  (d341) {Conv3d 3\x 3\x 3 \x 512};
+        \node [det, below= of d341] (d351) {Conv3d 3\x 3\x 3 \x 512};
+        \node [det, below= of d351] (d361) {Conv3d 3\x 3\x 3 \x 512};
+        \node [det, above= of d341] (d331) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det, above= of d331] (d321) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det, above= of d321] (d311) {Conv3d 3\x 3\x 3 \x 256};
+        
+        \path[line] (d34) -- (d341);
+        \path[line] (d35) -- (d351);
+        \path[line] (d36) -- (d361);
+        \path[line] (d33) -- (d331);
+        \path[line] (d32) -- (d321);
+        \path[line] (d31) -- (d311);
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        \node [convd] at ($(d311.east)+(2.3,-0.5)$) (loc1) {Conv. 3\x 3\x 4*4};
+        \node [convd] at ($(d311.east)+(2.3,+0.5)$) (cls1) {Conv. 3\x 3\x 4*C};
+        \node [convd] at ($(d321.east)+(2.3,-0.5)$) (loc2) {Conv. 3\x 3\x 6*4};
+        \node [convd] at ($(d321.east)+(2.3,+0.5)$) (cls2) {Conv. 3\x 3\x 6*C};
+        \node [convd] at ($(d331.east)+(2.3,-0.5)$) (loc3) {Conv. 3\x 3\x 6*4};
+        \node [convd] at ($(d331.east)+(2.3,+0.5)$) (cls3) {Conv. 3\x 3\x 6*C};
+        \node [convd] at ($(d341.east)+(2.3,-0.5)$) (loc4) {Conv. 3\x 3\x 6*4};
+        \node [convd] at ($(d341.east)+(2.3,+0.5)$) (cls4) {Conv. 3\x 3\x 6*C};
+        \node [convd] at ($(d351.east)+(2.3,-0.5)$) (loc5) {Conv. 3\x 3\x 4*4};
+        \node [convd] at ($(d351.east)+(2.3,+0.5)$) (cls5) {Conv. 3\x 3\x 4*C};
+        \node [convd] at ($(d361.east)+(2.3,-0.5)$) (loc6) {Conv. 3\x 3\x 4*4};
+        \node [convd] at ($(d361.east)+(2.3,+0.5)$) (cls6) {Conv. 3\x 3\x 4*C};
+
+        \path[line] (d311) -- (loc1);
+        \path[line] (d311) -- (cls1);
+        \path[line] (d321) -- (loc2);
+        \path[line] (d321) -- (cls2);
+        \path[line] (d331) -- (loc3);
+        \path[line] (d331) -- (cls3);
+        \path[line] (d341) -- (loc4);
+        \path[line] (d341) -- (cls4);
+        \path[line] (d351) -- (loc5);
+        \path[line] (d351) -- (cls5);
+        \path[line] (d361) -- (loc6);
+        \path[line] (d361) -- (cls6);
+
+        \draw[purple,line width=0.6mm,] ($(d31.north west)+(-0.3,0.6)$)  rectangle ($(d361.south east)+(0.2,-0.6)$);
+        \node [text=purple, font=\bfseries] at ($(d31.north)+(+1.0,1.0)$) (class) {\Large Temporal layers};
         
         %%%%%%%%%%%%%
         
-        \path[line] (ext6) -- (cls6);
-        \path[line] (ext6) -- (loc6);
-        \path[line] (ext4) -- (cls5);
-        \path[line] (ext4) -- (loc5);
-        \path[line] (ext2) -- (cls4);
-        \path[line] (ext2) -- (loc4);
-        \path[line] (block4) -- (cls3);
-        \path[line] (block4) -- (loc3);
-        \path[line] (block3) -- (cls2);
-        \path[line] (block3) -- (loc2);
-        \path[line] (block2) -- (cls1);
-        \path[line] (block2) -- (loc1);
-        
+        \path[line] (ext6) -- (d36);
+        \path[line] (ext4) -- (d35);
+        \path[line] (ext2) -- (d34);
+        \path[line] (block4) -- (d33);
+        \path[line] (block3) -- (d32);
+        \path[line] (block2) -- (d31);
+
         %%%%%%%%%%%%%%%%
         
-        \node [input] at ($(input.south)+(0.2,0.1)$) (input2) {Input};
-        \node [conv, below=of input2] (conv12) {Conv. 7$\times$7$\times$64 /2};
-        \node [rect, below=of conv12] (block12) {Layer 1};
-        \node [rect, below=of block12] (block22) {Layer 2 \textbf{[38\x 38\x 128]}};
-        \node [rect, below=of block22] (block32) {Layer 3 \textbf{[19\x 19\x 256]}};
-        \node [rect, below=of block32] (block42) {Layer 4 \textbf{[10\x 10\x 512]}};
-        \node [conv, below=of block42] (ext12) {Conv. 1$\times$1$\times$256};
-        \node [conv, below=of ext12] (ext22) {Conv. 3$\times$3$\times$512~/2 \textbf{[5\x 5\x 512]}};
-        \node [conv, below=of ext22] (ext32) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext32] (ext42) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
-        \node [conv, below=of ext42] (ext52) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext52] (ext62) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+        \node [input] at ($(input.south)+(0.1,0.2)$) (input2) {};
+        \node [conv, below=of input2] (conv12) {};
+        \node [rect, minimum height=0.7cm, below=of conv12] (block12) {ayer };
+        \node [rect, below=of block12] (block22) {ayer  \textbf{[38\x 38\x 128]}};
+        \node [rect, below=of block22] (block32) {ayer  \textbf{[19\x 19\x 256]}};
+        \node [rect, below=of block32] (block42) {ayer  \textbf{[10\x 10\x 512]}};
+        \node [conv, below=of block42] (ext12) {};
+        \node [convl, below=of ext12] (ext22) {};
+        \node [conv, below=of ext22] (ext32) {};
+        \node [convl, below=of ext32] (ext42) {};
+        \node [conv, below=of ext42] (ext52) {};
+        \node [convl, below=of ext52] (ext62) {};
         
         \path[line] (input2) -- (conv12);
         \path[line] (conv12) -- (block12);
@@ -799,34 +845,27 @@
         
         %%%%%%%%%
         
-        \path[line] (ext62) -- (cls6);
-        \path[line] (ext62) -- (loc6);
-        \path[line] (ext42) -- (cls5);
-        \path[line] (ext42) -- (loc5);
-        \path[line] (ext22) -- (cls4);
-        \path[line] (ext22) -- (loc4);
-        \path[line] (block42) -- (cls3);
-        \path[line] (block42) -- (loc3);
-        \path[line] (block32) -- (cls2);
-        \path[line] (block32) -- (loc2);
-        \path[line] (block22) -- (cls1);
-        \path[line] (block22) -- (loc1);
-
+        \path[line] (ext62) -- (d36);
+        \path[line] (ext42) -- (d35);
+        \path[line] (ext22) -- (d34);
+        \path[line] (block42) -- (d33);
+        \path[line] (block32) -- (d32);
+        \path[line] (block22) -- (d31);
         
         %%%%%%%%%%%%%%%%%%%%%%%
         
-        \node [input]  at ($(input2.south)+(0.2,0.1)$)  (input3) {Input};
-        \node [conv, below=of input3] (conv13) {Conv. 7$\times$7$\times$64 /2};
-        \node [rect, below=of conv13] (block13) {Layer 1};
-        \node [rect, below=of block13] (block23) {Layer 2 \textbf{[38\x 38\x 128]}};
-        \node [rect, below=of block23] (block33) {Layer 3 \textbf{[19\x 19\x 256]}};
-        \node [rect, below=of block33] (block43) {Layer 4 \textbf{[10\x 10\x 512]}};
-        \node [conv, below=of block43] (ext13) {Conv. 1$\times$1$\times$256};
-        \node [conv, below=of ext13] (ext23) {Conv. 3$\times$3$\times$512~/2 \textbf{[5\x 5\x 512]}};
-        \node [conv, below=of ext23] (ext33) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext33] (ext43) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
-        \node [conv, below=of ext43] (ext53) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext53] (ext63) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+        \node [input]  at ($(input2.south)+(0.1,0.2)$)  (input3) {};
+        \node [conv, below=of input3] (conv13) {};
+        \node [rect, minimum height=0.7cm, below=of conv13] (block13) {ayer };
+        \node [rect, below=of block13] (block23) {ayer  \textbf{[38\x 38\x 128]}};
+        \node [rect, below=of block23] (block33) {ayer  \textbf{[19\x 19\x 256]}};
+        \node [rect, below=of block33] (block43) {ayer  \textbf{[10\x 10\x 512]}};
+        \node [conv, below=of block43] (ext13) {};
+        \node [convl, below=of ext13] (ext23) {};
+        \node [conv, below=of ext23] (ext33) {};
+        \node [convl, below=of ext33] (ext43) {};
+        \node [conv, below=of ext43] (ext53) {};
+        \node [convl, below=of ext53] (ext63) {};
 
         \path[line] (input3) -- (conv13);
         \path[line] (conv13) -- (block13);
@@ -841,33 +880,27 @@
         \path[line] (ext53) -- (ext63);
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \path[line] (ext63) -- (cls6);
-        \path[line] (ext63) -- (loc6);
-        \path[line] (ext43) -- (cls5);
-        \path[line] (ext43) -- (loc5);
-        \path[line] (ext23) -- (cls4);
-        \path[line] (ext23) -- (loc4);
-        \path[line] (block43) -- (cls3);
-        \path[line] (block43) -- (loc3);
-        \path[line] (block33) -- (cls2);
-        \path[line] (block33) -- (loc2);
-        \path[line] (block23) -- (cls1);
-        \path[line] (block23) -- (loc1);
+        \path[line] (ext63) -- (d36);
+        \path[line] (ext43) -- (d35);
+        \path[line] (ext23) -- (d34);
+        \path[line] (block43) -- (d33);
+        \path[line] (block33) -- (d32);
+        \path[line] (block23) -- (d31);
         
         %%%%%%%%%%%%%
         
-        \node [input]  at ($(input3.south)+(0.2,0.1)$)  (input4) {Input};
-        \node [conv, below=of input4] (conv14) {Conv. 7$\times$7$\times$64 /2};
-        \node [rect, below=of conv14] (block14) {Layer 1};
-        \node [rect, below=of block14] (block24) {Layer 2 \textbf{[38\x 38\x 128]}};
-        \node [rect, below=of block24] (block34) {Layer 3 \textbf{[19\x 19\x 256]}};
-        \node [rect, below=of block34] (block44) {Layer 4 \textbf{[10\x 10\x 512]}};
-        \node [conv, below=of block44] (ext14) {Conv. 1$\times$1$\times$256};
-        \node [conv, below=of ext14] (ext24) {Conv. 3$\times$3$\times$512~/2 \textbf{[5\x 5\x 512]}};
-        \node [conv, below=of ext24] (ext34) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext34] (ext44) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
-        \node [conv, below=of ext44] (ext54) {Conv. 1$\times$1$\times$128};
-        \node [conv, below=of ext54] (ext64) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+        \node [input]  at ($(input3.south)+(0.1,0.2)$)  (input4) {};
+        \node [conv, below=of input4] (conv14) {};
+        \node [rect, minimum height=0.7cm, below=of conv14] (block14) {ayer };
+        \node [rect, below=of block14] (block24) {ayer  \textbf{[38\x 38\x 128]}};
+        \node [rect, below=of block24] (block34) {ayer  \textbf{[19\x 19\x 256]}};
+        \node [rect, below=of block34] (block44) {ayer  \textbf{[10\x 10\x 512]}};
+        \node [conv, below=of block44] (ext14) {};
+        \node [convl, below=of ext14] (ext24) {};
+        \node [conv, below=of ext24] (ext34) {};
+        \node [convl, below=of ext34] (ext44) {};
+        \node [conv, below=of ext44] (ext54) {};
+        \node [convl, below=of ext54] (ext64) {};
 
         \path[line] (input4) -- (conv14);
         \path[line] (conv14) -- (block14);
@@ -884,19 +917,47 @@
 
         %%%%%%%%%%%%%%%
         
-        \path[line] (ext64) -- (cls6);
-        \path[line] (ext64) -- (loc6);
-        \path[line] (ext44) -- (cls5);
-        \path[line] (ext44) -- (loc5);
-        \path[line] (ext24) -- (cls4);
-        \path[line] (ext24) -- (loc4);
-        \path[line] (block44) -- (cls3);
-        \path[line] (block44) -- (loc3);
-        \path[line] (block34) -- (cls2);
-        \path[line] (block34) -- (loc2);
-        \path[line] (block24) -- (cls1);
-        \path[line] (block24) -- (loc1);
+       \path[line] (ext64) -- (d36);
+        \path[line] (ext44) -- (d35);
+        \path[line] (ext24) -- (d34);
+        \path[line] (block44) -- (d33);
+        \path[line] (block34) -- (d32);
+        \path[line] (block24) -- (d31);
         
+        %%%%%%%%%%%%%
+        
+        \node [input]  at ($(input4.south)+(0.1,0.2)$)  (input5) {Input};
+        \node [conv, below=of input5] (conv15) {Conv. 7$\times$7$\times$64 /2};
+        \node [rect, minimum height=0.7cm, below=of conv15] (block15) {Layer 1};
+        \node [rect, below=of block15] (block25) {Layer 2 \textbf{[38\x 38\x 128]}};
+        \node [rect, below=of block25] (block35) {Layer 3 \textbf{[19\x 19\x 256]}};
+        \node [rect, below=of block35] (block45) {Layer 4 \textbf{[10\x 10\x 512]}};
+        \node [conv, below=of block45] (ext15) {Conv. 1$\times$1$\times$256};
+        \node [convl, below=of ext15] (ext25) {Conv. 3$\times$3$\times$512~/2 \textbf{[5\x 5\x 512]}};
+        \node [conv, below=of ext25] (ext35) {Conv. 1$\times$1$\times$128};
+        \node [convl, below=of ext35] (ext45) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
+        \node [conv, below=of ext45] (ext55) {Conv. 1$\times$1$\times$128};
+        \node [convl, below=of ext55] (ext65) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+
+        \path[line] (input5) -- (conv15);
+        \path[line] (conv15) -- (block15);
+        \path[line] (block15) -- (block25);
+        \path[line] (block25) -- (block35);
+        \path[line] (block35) -- (block45);
+        \path[line] (block45) -- (ext15);
+        \path[line] (ext15) -- (ext25);
+        \path[line] (ext25) -- (ext35);
+        \path[line] (ext35) -- (ext45);
+        \path[line] (ext45) -- (ext55);
+        \path[line] (ext55) -- (ext65);
+        
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \path[line] (ext65) -- (d36);
+    \path[line] (ext45) -- (d35);
+    \path[line] (ext25) -- (d34);
+    \path[line] (block45) -- (d33);
+    \path[line] (block35) -- (d32);
+    \path[line] (block25) -- (d31);
         
     \end{tikzpicture}
 }
