@@ -5,13 +5,14 @@ Our goal is to improve SSD detector proposed by \citeauthor{bib:ssd} and adjust 
 
 Because we use another framework and have access to different hardware than the one used in SSD research paper, we can not compare our performance results with the reported values. Similarly, SSD's precision is heavily dependent on the training dataset and therefore on the data augmentation process. The augmentation we used in our experiments proved to be inferior to the original ones, and our precision values are therefore lower. However, we do not mind those problems, because we trained our version of SSD which we can use as a baseline for our comparisons. 
 
-Our goal is to find the best possible architecture of SSD-like network that can be later improved by expanding the dataset and hyper-parameter tuning. We started by implementing the SSD detector on multiple base networks and training them on COCO dataset. 
+
+
 
 
 \section{Base network}
-\todo{bla what is it and what it does and why it sux}
+Our goal is to find the best possible architecture of SSD-like network that can be later improved by expanding the dataset and hyper-parameter tuning. We started by implementing the SSD detector on multiple base networks and training them on COCO dataset. We recognize that the SSD is based upon relatively old VGG-16 network that lacks in both speed and precision compared to more modern CNNs. Because the base network serves as a feature extractor, upon which SSD performs detection, it is the integral part of the network and we believe that has a large impact on overall performance. 
 
-\subsection{Implementations}
+\subsection{Architectures}
 We decided to try to implement SSD on three 'post-VGG' networks, namely \textit{ResNet}, \textit{Xception} and \textit{NASNet}. We choose ResNet because it is a well-known network with simple design and easy scalability. Xception got our attention for its performance as a classification network in \citeauthor{bib:cnnbenchmark} benchmark (\cref{sec:cnncomp}) taking a middle ground between speed and precision. NASNet, or precisely NASNet-A-Mobile, was chosen out of curiosity for its unique structure compared to the other two networks. We will be referring to ResNet networks by their number of layers, e.g., ResNet50. Also, Xception will be called Xception version A, or shortly XceptionA, to avoid confusion with a version we are going to introduce later.
 
 First of all, we needed to decide how to connect the detection layers of SSD to our base networks. SSD uses six feature layers, two extracted from the VGG-16 network and four from extra layers. The feature sizes are: [38\x38\x512], [19\x19\x1024], [10\x10\x512], [5\x5\x256], [3\x3\x256] and [1\x1\x256] for input image of 300\x300 pixels. We decided to copy the spatial resolution of feature layers as closely as possible without changing the structure of tested base networks. That means we have not kept the number of channels equal to SSD's. However, not enough channels could impact the SSD's precision, and too many channels will surely have an impact on the detection speed.
@@ -48,8 +49,6 @@ Our general strategy was to find the deepest layer with size as close as possibl
     \label{fig:resnet_xception_SSD}
 \end{figure}
 
-
-
 \paragraph{NASNet} The architecture of NASNet has proven to be the trickiest one for implementing SSD. Even though it is a fully convolutional network, due to the complex structure with many additions and concatenations, it does not accept any input except for 224\x224 pixels. Rather than doing large scale changes to the architecture, we decided to compromise on the detector side and use the lower resolution. 
 
 Other than the input size, the next problem of the NASNet-A-Mobile is the lack of choice of feature maps for detection. Because the stacks of Normal Cells do not change the spatial dimensions, there are only three available sizes of feature maps. Without any real choice, we end up with features of 28\x28, 14\x14 and 7\x7 sizes. The problem here is that 7\x7 feature map has only enough pixels for two subsequent 3\x3 convolutions. Therefore we had to implement SSD with only five feature layers for detections. See \cref{fig:nasnetSSD} for architecture details.
@@ -63,7 +62,7 @@ Other than the input size, the next problem of the NASNet-A-Mobile is the lack o
     \label{fig:nasnetSSD}
 \end{figure}
 
-\subsection{Results}
+\subsection{Performance results}
 We trained the SSDs on COCO dataset, to compare their performance, both in terms of precision and speed. The base networks we choose to compare are VGG-16, ResNet34, ResNet50, ResNet101, XceptionA, and NASNet-A-Mobile. For a relevant comparison, all networks were implemented in the same framework and trained for an equal number of iterations. We can see, from the results in \cref{fig:cocoperf}, that VGG-16 is outperformed by all of our choices in terms of speed, but overcomes the XceptionA and NASNet in precision. 
 
 We believe that the compromises we had to make in implementing NASNet-SSD, the smaller input image resolution, fewer feature maps for detections, are the reason for the poor precision performance. Concerning XceptionA, we hypothesize that we extract the first feature map from a too shallow layer, after passing only six convolutional layers. If the first feature map is compromised, that would impact the detection of small objects and have a substantial impact on the precision. We will test our hypothesis and try to rectify the problem of Xception-SSD in \cref{sec:fixxception}.
@@ -75,7 +74,40 @@ We believe that the compromises we had to make in implementing NASNet-SSD, the s
     \label{fig:cocoperf}
 \end{figure}
 
-\section{Detected classes}
+\section{Training data and classes}
+The main problem of solving problems with neural networks, is the lack of available data. Some problems can be solved by reinforcement learning, but others, like the object detection, need supervision. Creating a custom, problem specific, dataset requires a lot of manpower and is viable only for big companies. Therefore, dependent on public datasets like COCO. The problem of such datasets is that they often include many classes that are not needed for certain application. For surveillance we are interested in classes such as people and vehicles. We are going to compare the performance and precision of SSDs between training on full COCO dataset and a subset for surveillance. We expect significant performance improvement with lowering the number of detector classes, however we were not sure how will this chance impact performance. 
+
+\paragraph{Surveillance dataset classes}
+\begin{multicols}{2}
+    \begin{itemize}
+        \item person
+        \item bicycle
+        \item motorcycle
+        \item car
+        \item bus
+        \item truck
+        \item train
+    \end{itemize}
+\end{multicols}
+
+\subsection{Precision impact}
+Training a network on a subset of larger dataset seems to be a straightforward task. However, we hypothesize that by removing of classes with similar features to the ones we are detecting, there is a possibility of increasing the error on those selected classes. 
+
+For example, consider a dataset of humans and monkeys. The networks learns to distinguish between the two and classifies everything else as a background. If we do not care about monkeys, we can simply filter them out in post-processing. However, consider a network that is trained to only recognize people and use it on a monkey. We are worried that such network would classify a monkey as a person, based on a large number of similar features. 
+
+To counter-measure the possibility of larger amount of false positives, we decided to increase the amount of negative samples. We did it by only filtering annotation from \textit{COCO} dataset to create the \textit{surveillance dataset}, but keeping all the images, even those without positive ground-truths. The expectation is to reach similar precision on selected classes, on both \textit{COCO} and \textit{surveillance dataset}. However, because \textit{COCO} is small dataset with only about hundred thousand images and is certainly not exhaustive in classes with similar features to \textit{surveillance dataset}, this measure would only help our evaluation data.
+
+
+
+\subsection{Performance impact}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/fps_class}
+    \caption[Impact of number of classes on SSD performance]{Impact of number of classes on SSD performance.}
+    \label{fig:fpscls}
+\end{figure}
+\todo{change img title}
+
 
 
 \subsection{fixing Xception}
