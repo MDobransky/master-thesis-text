@@ -702,7 +702,7 @@
     \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=0.7cm]
     \tikzstyle{convl} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=1.3cm]
     \tikzstyle{convd} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=33mm, node distance= 0.25cm, minimum height=0.7cm]
-    \tikzstyle{det} = [rectangle, draw,  text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm]
+\tikzstyle{det} = [rectangle, draw, text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm]
     \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.45cm, text width=30mm, minimum height=1.3cm]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol, minimum height=0.7cm, text width=30mm]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.3cm, text width=30mm]
@@ -737,12 +737,13 @@
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-        \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 3\x 3\x 3 \x 256};
-        \node [det, below= of d34] (d35) {Conv3d 3\x 3\x 3 \x 256};
-        \node [det, below= of d35] (d36) {Conv3d 3\x 3\x 3 \x 256};
-        \node [det, above= of d34] (d33) {Conv3d 3\x 3\x 3 \x 128};
-        \node [det, above= of d33] (d32) {Conv3d 3\x 3\x 3 \x 128};
-        \node [det, above= of d32] (d31) {Conv3d 3\x 3\x 3 \x 128};
+  
+        \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 1\x 1\x 3 \x 256};
+        \node [det, below= of d34] (d35) {Conv3d 1\x 1\x 3 \x 256};
+        \node [det, below= of d35] (d36) {Conv3d 1\x 1\x 3 \x 256};
+        \node [det, above= of d34] (d33) {Conv3d 1\x 1\x 3 \x 128};
+        \node [det, above= of d33] (d32) {Conv3d 1\x 1\x 3 \x 128};
+        \node [det, above= of d32] (d31) {Conv3d 1\x 1\x 3 \x 128};
         
         \node [det]  at ($(d34.east)+(1.2,+0.4)$)  (d341) {Conv3d 3\x 3\x 3 \x 512};
         \node [det, below= of d341] (d351) {Conv3d 3\x 3\x 3 \x 512};
@@ -787,7 +788,7 @@
         \path[line] (d361) -- (cls6);
 
         \draw[purple,line width=0.6mm,] ($(d31.north west)+(-0.3,0.6)$)  rectangle ($(d361.south east)+(0.2,-0.6)$);
-        \node [text=purple, font=\bfseries] at ($(d31.north)+(+1.0,1.0)$) (class) {\Large Temporal layers};
+\node [text=purple, font=\bfseries] at ($(d31.north)+(+1.0,1.0)$) (class) {\Large Temporal layers};
         
         %%%%%%%%%%%%%
         

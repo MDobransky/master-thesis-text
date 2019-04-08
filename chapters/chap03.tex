@@ -154,6 +154,7 @@ To keep the balance between positive and negative samples, \textit{hard negative
 \end{align*}
 
 \section{Detection with temporal information}
+\label{sec:video_det}
 In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
 
 A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.

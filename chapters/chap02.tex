@@ -13,20 +13,20 @@ In order to evaluate and compare multiple approaches, we require clearly defined
 
 The \textit{ImageNet Large Scale Visual Recognition Challenge (ILSVRC)}\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{PASCAL VOC}, and \textit{COCO} respectively.
 
-In this section, we define metrics used to evaluate those challenges, but also other, not considered qualities. Most notably, none of the mentioned challenges is evaluated based on the speed of the model. Because our work is focused on real-time video analysis, we are interested in finding a balance between accuracy and the number of images processed per second (fps). One more factor to consider would be the physical size of the model, usually represented by the number of parameters and directly impacting the amount of needed memory.
+In this section, we define metrics used to evaluate those challenges, but also other, not considered qualities. Most notably, none of the mentioned challenges is evaluated based on the speed of the model. Since our work is focused on real-time video analysis, we are interested in finding a balance between accuracy and the number of images processed per second (fps). One more factor to consider would be the physical size of the model, usually represented by the number of parameters and directly impacting the amount of needed memory.
 
 \subsection{Classification}
 The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textit{classification accuracy}. However, a complement to the accuracy, \textit{top-1 error}, is also often used. In \textit{ILSVRC},  alongside top-1 error, a \textit{top-5 error} is used as another major criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
 
 \subsection{Object detection}
-Evaluating a localization and classification of multiple objects in an image is a much complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
+Evaluating a localization and classification of multiple objects in an image is a more complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
 
 Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is usually done by computing intersection over union (IoU) value for each pair of ground-truth and predicted boxes, and then selecting positive detections based on predetermined threshold.
 $$\text{IoU} = \frac{\text{Area}(\text{Prediction} \cap \text{Ground truth})}{\text{Area}(\text{Prediction} \cup \text{Ground truth})}$$
 
 With predictions sorted into true positives (TP), false positives (FP) and false negatives (FN) (no predictions matching a ground-truth box) we are able to calculate \textit{precision} and \textit{recall}.
-$$\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}} = \frac{\text{TP}}{\text{All predictions}}$$
-$$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{\text{TP}}{\text{All ground truths}}$$
+$$\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}}$$
+$$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}}$$
 
 Now we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
@@ -34,10 +34,12 @@ Now we can define the first metrics used for object detection. Note that all fol
 PR curve is simply a plot showing the relationship between values of precision and recall. It is plotted separately for each class and reveals how much does a change in confidence, influence the precision and recall values. 
 
 To create the curve, predictions for the given class are sorted by a confidence score. Then, for each prediction, precision and recall are calculated utilizing predictions with a higher confidence score. 
+\todo{rephrase}
 
 An object detector of a particular class can be considered reliable if its precision stays high while recall increases, which means that predictions with lower confidence score can be considered good predictions.
 
 \subsubsection{Average Precision (AP)}
+\todo{source AP}
 Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. However, we can use the area under the PR curve as numerical metrics, called \textit{average precision}. It is calculated by interpolation, either on all data points or a small number of equally spaced points (\textit{PASCAL VOC Challenge} uses 11).
 
 Interpolation equation for all points:
@@ -111,7 +113,7 @@ Basic principles of \textit{ResNet} are directly inspired by the \textit{VGG}. M
     \label{fig:resnet_arch}
 \end{figure}
 
-We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} represents a sequence of multiple residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. Previously described \textit{resiual block} with two convolutional layers, known as \textit{Basic block}, is used for smaller \textit{ResNet} models (ResNet-18, ResNet-34). Deeper \textit{ResNet} models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} with three convolutional layers. In \textit{Bottleneck block}, the 1$\times$1 layers are responsible for reducing and then restoring dimensions, allowing for faster 3$\times$3 layer with reduced input and output dimensions. Thanks to the efficient architecture, the 152-layer \textit{ResNet} has lower computational complexity than the 16-layer \textit{VGG} network.
+We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} represents a sequence of multiple residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. Previously described \textit{residual block} with two convolutional layers, known as \textit{Basic block}, is used for smaller \textit{ResNet} models (ResNet-18, ResNet-34). Deeper \textit{ResNet} models (ResNet-50, ResNet-101, ResNet-152) use the \textit{Bottleneck block} with three convolutional layers. In \textit{Bottleneck block}, the 1$\times$1 layers are responsible for reducing and then restoring dimensions, allowing for faster 3$\times$3 layer with reduced input and output dimensions. Thanks to the efficient architecture, the 152-layer \textit{ResNet} has lower computational complexity than the 16-layer \textit{VGG} network.
 
 
 
