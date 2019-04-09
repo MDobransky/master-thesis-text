@@ -79,13 +79,17 @@ Although the results of the XceptionA-SSD were disappointing, we believed that t
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{img/fps_map_c}
+    \includegraphics[width=0.975\textwidth]{img/fps_map_c}
     \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks. Circle diameters demonstrate relative difference of network parameter counts.}
     \label{fig:cocoperf}
 \end{figure}
 
 \section{Training data and classes}
-The main problem of solving problems with neural networks is the lack of available data. Some problems can be solved by reinforcement learning, but others, like object detection, need supervision. The creation of a custom problem-specific dataset requires a lot of human resources and is viable only for big companies. Therefore, dependent on public datasets like COCO. The problem of such datasets is that they often include many classes that are not needed for a particular application. For surveillance, we are interested in classes such as people and vehicles. We are going to compare the performance and precision of SSDs between training on full COCO dataset and a subset for surveillance. We expect significant performance improvement by lowering the number of detector classes. However, we were not sure how will this change impact precision. 
+The principal difficulty in solving problems with neural networks is the lack of available data. Although some networks can be trained using reinforcement learning, object detection is one of those that requires supervision. However, the creation of a custom, problem-specific, dataset requires a lot of human resources. The other option is to use public datasets like the COCO dataset. 
+
+The problem of such datasets is that if they include every required class, they also often include many classes that are not needed for a particular application. For surveillance, we are only interested in classes such as people and vehicles. 
+
+We compared the performance and precision of SSD trained on full COCO dataset and a subset for surveillance. We expected significant performance improvement by lowering the number of detected classes. However, we were not sure how would this change impact precision. We hypothesized that by removing classes with similar features to the detected ones, there is a possibility of increasing the error by means of false detections.
 
 \subsubsection{Surveillance dataset classes}
 \begin{multicols}{2}
@@ -101,13 +105,13 @@ The main problem of solving problems with neural networks is the lack of availab
 \end{multicols}
 
 \subsection{Precision impact}
-Training a network on a subset of larger dataset seems to be a straightforward task. However, we hypothesize that by removing classes with similar features to the ones we are detecting, there is a possibility of increasing the error on those selected classes. 
+Before we get to the comparison of the training results, we will explain our hypothesis on an example. Consider that we want to track people in a ZOO and we have access to the dataset with people and animals. Would it be better to train the network only to detect people or to detect both humans and animals, and then filter out the animals in post-processing? In the latter case, the network would ideally detect people as people, animals as animals, and everything else as a background. However, in the case where we train the network only to recognize people, how would such a network classify a monkey? Would similar features prevail and shift the classifier towards the person, or would negative examples of a monkey in dataset be strong enough for teaching the network that it is not a person? 
 
-For example, consider a dataset of humans and monkeys. The networks learn to distinguish between the two and classify everything else as a background. If we do not care about monkeys, we can filter them out in post-processing. However, consider a network that is trained only to recognize people and use it on a monkey. We are worried that such a network would classify a monkey as a person, based on a large number of similar features. 
+The problem we describe is, of course, part of a broader difficulty with non-exhaustive datasets. Our question is, therefore: If we have an available set of annotations for the classes we are not interested in, but that can be present in our input images and share similarities with detected classes, would it not be better to learn to detect those classes?
 
-To counter-measure the possibility of a larger amount of false positives, we decided to increase the number of negative samples. We did it by only filtering annotation from \textit{COCO} dataset to create the \textit{surveillance dataset}, but keeping all the images, even those without positive ground-truths. The expectation is to reach similar precision on selected classes, on both \textit{COCO} and \textit{surveillance dataset}. However, because \textit{COCO} is a small dataset with only about a hundred thousand images and is certainly not exhaustive in classes with similar features to \textit{surveillance dataset}, this measure would only help on our evaluation data.
+\paragraph{The results} in \cref{tab:ssdcocosurv} show that in our case, it is possible to remove unnecessary classes from the dataset without impacting the performance. It is worth mentioning that we tried to precautiously counter-measure our hypothesis by creating the \textit{surveillance dataset} by only filtering the annotations and keeping all images of the original dataset.
 
-\paragraph{Results} in \cref{tab:ssdcocosurv} show that it is possible to remove unnecessary classes from the dataset without impacting the performance. We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. 
+We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. However, based on this experiment, we are not able to conclusively confirm or deny our hypothesis. Even if we wanted to make a conclusion for the \textit{COCO} dataset using the provided training and validation data, the experiment is still dependant on the choice of classes.
 
 \begin{table}[]
     \centering
@@ -125,9 +129,9 @@ To counter-measure the possibility of a larger amount of false positives, we dec
 \end{table}
 
 \subsection{Performance impact}
-We expect a proportional increase in performance with the removal of the classes. We saw that in the SSD (\cref{fig:VGGSSD}) the depth of the classification layers is dependent on the number of classes. Another important factor is that smaller dimensions of detection tensors will result in faster post-processing, i.e., non-maximum suppression. 
+We expected a proportional increase in performance with the elimination of unwanted classes. We saw in \cref{fig:VGGSSD} that the depth of the classification layers in SSD is dependent on the number of classes. Shallower classification layers are not only processed faster in the neural network but also produce less data that will result in faster post-processing, mainly, non-maximum suppression.
 
-We illustrate the effect of the number of detected classes on performance on \cref{fig:fpscls}, based on measured data. Although the relationship of frames per second and classes is hyperbolic, on the interval between 7 and 80 classes, we approximate the loss of 0.78 frames per second per class on ResNet50-SSD. This is a significant number and means that training the networks for particular purposes can bring a substantial benefit as opposed to using a general detector for everything.
+We illustrate the effect that the number of detected classes has on performance in \cref{fig:fpscls}. Although the relationship of frames per second and classes is hyperbolic, on the interval between 7 and 80 classes, we approximate the loss of 0.8 frames per second per additional class on ResNet50-SSD. Considering the dataset can contain tens or hundreds of classes, we showed that the filtering out the unwanted classes could produce significant performance benefit.
 
 \begin{figure}
     \centering
