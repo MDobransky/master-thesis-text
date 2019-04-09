@@ -21,7 +21,7 @@ SSD uses six feature maps, two extracted from the VGG-16 network and four from e
 
 To find the most suitable layers for feature map extraction, we started with the strategy of finding the deepest possible layer with feature size as close as possible for every original feature map. This approach proved itself to be very straightforward since feature map sizes in convolutional networks decrease in resolution with the increasing depth, and the reduction is usually made by halving the size. After exhausting the network, we added the \textit{extra layers} as needed, similarly to VGG16-SSD. The final feature map sizes are listed in \cref{tab:features}. 
 
-After determining the layers for feature extraction, we implemented the rest of the SSD without alteration. Each feature map fed into both classification and localization layer with the corresponding scale, as described in \cref{fig:VGGSSD}.
+After determining the layers for feature extraction, we implemented the rest of the SSD without alteration. Each feature map fed into both classification and localization layer with the corresponding scale, as described in \cref{fig:VGGSSD}. 
 
 \begin{table}
     \centering
@@ -35,27 +35,31 @@ After determining the layers for feature extraction, we implemented the rest of 
         3\x 256 &    3\x 256 &   3\x 256 &      3\x 256 &   2\x 256\\
         1\x 256 &    1\x 256 &   1\x 256 &      1\x 256 &\\
     \end{tabular}
-    \caption[Feature map sizes of SSD's base networks]{Feature map sizes used in SSD's detection. The dimensions are calculated for input image of [300\x300] pixels, with the exception of NASNet, which only accepts [224\x224] inputs. First number represents spacial dimensions of square feature and the second one represents the number of channels.}
+    \caption[Feature map sizes of SSD's base networks]{Feature map sizes used in SSD's detection. The dimensions are calculated for the input image of [300\x300] pixels, except for NASNet, which only accepts [224\x224] inputs. The first number represents spacial dimensions of a square feature and the second one represents the number of channels.}
     \label{tab:features}
 \end{table}
 
-\paragraph{ResNet} We had a bit of luck finding the right layers for feature extraction in ResNet networks. The high-level \textit{Layers} in ResNet produce features of [75\x75], [38\x38], [19\x19] and [10\x10] sizes. We simply picked the outputs of second, third and fourth layers and added appropriate feature layers after last \textit{Layer} for the rest of the features. The spatial dimensions of feature sizes are consistent on all ResNet version, with the only difference being the depth of the channels. The architecture of ResNet-SSD, with highlighted detection feature maps is illustrated on \cref{fig:resnet_xception_SSD}.
+\paragraph{ResNet} Different sizes of ResNet network can be creating by parameterizing the high level, four \textit{Layer} architecture. Ideally, we wanted a single ResNet-SSD architecture that would support 34, 50 and 101 layer version without alterations. Thankfully, this is exactly how the ResNet is designed, with constant spatial feature map sizes between high-level \textit{Layers}. Those sizes are [75\x75], [38\x38], [19\x19] and [10\x10]. The latter three are exactly matching the VGG16-SSD prototype. 
 
-\paragraph{XceptionA} The high-level architecture of Xception, the entry, middle and exit flow, produce the features of [19\x19], [19\x19] and [10\x10] sizes. We can use the latter two outputs, but we had to step deeper into the entry flow and get the [38\x38] feature from the second block of the network. The network is topped by adding six extra layers that provide the remaining three feature maps. The XceptionA-SDD is illustrated on \cref{fig:resnet_xception_SSD}.
+After being provided with three feature maps by the network, we removed poolings and fully connected classifier and replaced it with appropriate extra layers to create the other three maps. The architecture of ResNet34-SSD, with highlighted detection feature maps is illustrated on \cref{fig:resnet_xception_SSD}.
+
+\paragraph{XceptionA} Similarly to ResNet, Xception can also be viewed in multiple layers of abstraction, the highest-level structure with \textit{entry}, \textit{middle} and \textit{exit flow}, or lower-level twelve \textit{block} structure with preceding and tailing convolutional layers (see \cref{fig:xception}). After we removed the classifier from the \textit{exit flow}, the three parts of the network provided feature maps of [19\x19], [19\x19] and [10\x10] sizes. The latter two feature maps met our expectations. However, we had to dive deeper inside \textit{entry flow} to find larger feature map, analogous to the original [38\x38] map. The best option was to select the feature map produced by the second \textit{block} of the network, with the [37\x37] size. 
+
+We managed to extract three feature maps for detection from the networks, meaning that we had to add enough extra layers for generation of remaining three maps. The illustration of XceptionA-SDD can be seen on \cref{fig:resnet_xception_SSD}.
 
 
 \begin{figure}
     \centering
     \resnetSSD
-    \caption[Resnet34-SSD and Xception-SSD]%
+    \caption[Resnet34-SSD and XceptionA-SSD]%
     {Resnet34-SSD(left) and XceptionA-SSD (right). For details on \textit{Layers} and \textit{Blocks} see \cref{fig:resnet_arch} and \cref{fig:xception} respectively. Extra layers are highlighted with a red dashed rectangle.}
 
     \label{fig:resnet_xception_SSD}
 \end{figure}
 
-\paragraph{NASNet} The architecture of NASNet has proven to be the trickiest one for implementing SSD. Even though it is a fully convolutional network, due to the complex structure with many additions and concatenations, it does not accept any input except for [224\x224] pixels. Rather than doing large scale changes to the architecture, we decided to compromise on the detector side and use the lower resolution. 
+\paragraph{NASNet} Transition of SSD to NASNet-A-Mobile has proven itself to be the most complex of the three. In the beginning, we ran into the restriction on input image size. Due to the complex structure of the network with a lot of branching and subsequent concatenations and additions we decided against modifying the NASNet part of the detector and continuing with the given input size of [224\x224] pixels.
 
-Other than the input size, the next problem of the NASNet-A-Mobile is the lack of choice of feature maps for detection. Because the stacks of Normal Cells do not change the spatial dimensions, there are only three available sizes of feature maps. Without any real choice, we end up with features of [28\x28], [14\x14] and [7\x7] sizes. The problem here is that [7\x7] feature map has only enough pixels for two subsequent [3\x3] convolutions. Therefore we had to implement SSD with only five feature layers for detections. See \cref{fig:nasnetSSD} for architecture details.
+Nevertheless, the input size was not the only problem. Since the mobile version of NASNet uses only four \textit{Reduction Cells}, two of which are subsequent, and the stacks of \textit{Normal Cells} do not change the spatial dimensions of feature maps, there are only three available sizes of feature maps. Therefore we were forced to use feature maps of [28\x28], [14\x14] and [7\x7] sizes. Keeping with the general formula for adding extra layers, i.e., using [3\x3] convolutions with stride 2, we were forced to reduce the number of extracted feature maps to five. See \cref{fig:nasnetSSD} for illustration.
 
 
 \begin{figure}

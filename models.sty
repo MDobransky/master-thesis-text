@@ -702,7 +702,7 @@
     \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=0.7cm]
     \tikzstyle{convl} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=1.3cm]
     \tikzstyle{convd} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=33mm, node distance= 0.25cm, minimum height=0.7cm]
-\tikzstyle{det} = [rectangle, draw, text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm]
+\tikzstyle{det} = [rectangle, draw, text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm, minimum height=1.7cm]
     \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.45cm, text width=30mm, minimum height=1.3cm]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol, minimum height=0.7cm, text width=30mm]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.3cm, text width=30mm]
@@ -736,9 +736,7 @@
         \path[line] (ext5) -- (ext6);
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
-        \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 1\x 1\x 3 \x 256};
+    \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 1\x 1\x 3 \x 256};
         \node [det, below= of d34] (d35) {Conv3d 1\x 1\x 3 \x 256};
         \node [det, below= of d35] (d36) {Conv3d 1\x 1\x 3 \x 256};
         \node [det, above= of d34] (d33) {Conv3d 1\x 1\x 3 \x 128};
@@ -758,6 +756,7 @@
         \path[line] (d33) -- (d331);
         \path[line] (d32) -- (d321);
         \path[line] (d31) -- (d311);
+
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
