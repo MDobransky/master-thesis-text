@@ -35,7 +35,7 @@ After determining the layers for feature extraction, we implemented the rest of 
         3\x 256 &    3\x 256 &   3\x 256 &      3\x 256 &   2\x 256\\
         1\x 256 &    1\x 256 &   1\x 256 &      1\x 256 &\\
     \end{tabular}
-    \caption[Feature map sizes of SSD's base networks]{Feature map sizes used in SSD's detection. The dimensions are calculated for the input image of [300\x300] pixels, except for NASNet, which only accepts [224\x224] inputs. The first number represents spacial dimensions of a square feature and the second one represents the number of channels.}
+    \caption[Feature map sizes of SSD's base networks]{Feature map sizes used in SSD's detection. The dimensions are calculated for the input image of [300\x300] pixels, except for NASNet, which only accepts [224\x224] inputs. The first number represents spatial dimensions of a square feature and the second one represents the number of channels.}
     \label{tab:features}
 \end{table}
 
@@ -66,14 +66,16 @@ Nevertheless, the input size was not the only problem. Since the mobile version 
     \centering
     \nasnetSSD
     \caption[NASNet-SSD]%
-    {NASNet-SSD based on NASNet-A-Mobile. The network is limited to input of size [224\x224] due to complex structure of NASNet cells. For detailed description of cells see \cref{sec:nasnet}.}
+    {NASNet-SSD based on NASNet-A-Mobile. For detailed description of cells see \cref{sec:nasnet}. Extra layers are highlighted with a red dashed rectangle.}
     \label{fig:nasnetSSD}
 \end{figure}
 
-\subsection{Performance results}
-We trained the SSDs on COCO dataset, to compare their performance, both in terms of precision and speed. The base networks we choose to compare are VGG-16, ResNet34, ResNet50, ResNet101, XceptionA, and NASNet-A-Mobile. For a relevant comparison, all networks were implemented in the same framework and trained for an equal number of iterations. We can see, from the results in \cref{fig:cocoperf}, that VGG-16 is outperformed by all of our choices in terms of speed, but overcomes the XceptionA and NASNet in precision. 
+\subsection{Performance results} In order to compare the performance of our SSD networks, both in terms of precision and speed, we trained them on the COCO dataset. We used the prototype VGG16-SSD, and SSDs implemented on the ResNet34, the ResNet50, the ResNet101, the XceptionA, and the NASNet-A-Mobile. After the training, we tested the networks for speed and precision and plotted the results to \cref{fig:cocoperf}. The results show that VGG16-SSD is the slowest one. However, in terms of precision, it surpasses both the XceptionA and the NASNet SSDs.
 
-We believe that the compromises we had to make in implementing NASNet-SSD, the smaller input image resolution, fewer feature maps for detections, are the reason for the poor precision performance. Concerning XceptionA, we hypothesize that we extract the first feature map from a too shallow layer, after passing only six convolutional layers. If the first feature map is compromised, that would impact the detection of small objects and have a substantial impact on the precision. We will test our hypothesis and try to rectify the problem of Xception-SSD in \cref{sec:fixxception}.
+With the knowledge gained from implementing the NASNet-SDD and the acquired results, we believe that the network, or at least its mobile version, is not suited for this task. The result exposes the significance of the trade-offs we were forced to implement, in order to build SSD on this network.
+
+Although the results of the XceptionA-SSD were disappointing, we believed that the simple structure of the network would allow us to make the necessary changes and outperform VGG16. We formulated the hypothesis that the main reason for the poor precision is the fact that the first feature map is extracted from too shallow of a layer. The depth of the network at the point of the extraction is only six convolutional layers, granted some are split into depthwise separable convolution, we believed it is not enough for the first feature map of the detector. We will test our hypothesis and try to rectify the shortcomings of Xception-SSD in \cref{sec:fixxception}.
+
 
 \begin{figure}
     \centering
