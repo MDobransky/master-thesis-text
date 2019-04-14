@@ -5,6 +5,9 @@ In this chapter we provide overview of the methods used for detections in video.
 
 In practise, the detectors designed for image detection hold an edge over detectors with temporal information. Mostly because currently available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
 
+\section{Detection explained}
+\todo{explain how conv produces predictions}
+
 \section{Real-time detectors}
 \label{sec:rltm}
 In \cref{chap:nns} we took a look on a series of two-stage detectors, with separate region proposals and classification. Few years later, a new type of detectors has been developed, with faster single-stage design. A single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also the trade-off between speed and precision is continually diminishing in favor of single-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.

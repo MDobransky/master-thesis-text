@@ -1,23 +1,5 @@
 \chapter{TMP}
 
-
-what made vgg ideal for ssds concept of detection on different scales was the gradual decrease in size of the feature map. We tried to mimic this behaviour by finding a suitably sized feature maps in other networks, which can complicate the implementation, especially in block architectures.
-
-
-\section{Reimplement SSD on other base}
-\subsection{ResNet-SSD}
-
-
-\subsection{Xception-SSD}
-
-
-% \begin{figure}
-%     \xceptionSSD
-%     \caption{SSD detector build on Xception base. Depth of classification convolutions depends on number of classes (C). Note that ReLU activation and batch normalization functions are omitted from this chart. For detailed description of blocks see \cref{fig:xception}}
-%     \label{fig:xceptionSSD}
-% \end{figure}
-
-
 \subsection{Xception-B-SSD and Xception-C-SSD }
 \begin{figure}
 \centering
@@ -42,13 +24,6 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
     \label{tab:map}
 \end{table}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{img/ap}
-    \caption{AP, small 7 class dataset S, coco dataset C}
-    \label{fig:ap}
-\end{figure}
-
 
 \begin{table}
     \begin{tabular}{c|c|c}
@@ -65,19 +40,6 @@ what made vgg ideal for ssds concept of detection on different scales was the gr
     \caption{total number of parameters}
     \label{tab:parameters}
 \end{table}
-
-fps
-testing done on GTX 1080 Ti
-10000 images, 300x300 
-224x224 for nasnet
-times include NMS
-batch 16
-
-
-\section{something, use video continuity???}
-
-
-
 
 
 \chapter*{Experiments}
@@ -164,18 +126,3 @@ same SSD on imgs on coco - 93
 
 SSD 4cls random $>97$
 same SSD on imgs on coco 87
-
-
-SSD coco mAP 25.78
-
-SSD coco subset [1 person
-2 bicycle
-3 car
-4 motocycle
-6 bus
-7 train
-8 truck] mAP
-
-\subsection{Measuring the impact of number of classes}
-
-\section{Speeding up video procesing}

@@ -80,7 +80,7 @@ Although the results of the XceptionA-SSD were disappointing, we believed that t
 \begin{figure}
     \centering
     \includegraphics[width=0.975\textwidth]{img/fps_map_c}
-    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks. Circle diameters demonstrate relative difference of network parameter counts.}
+    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks. Circle radii demonstrate relative difference of network parameter counts.}
     \label{fig:cocoperf}
 \end{figure}
 
@@ -154,7 +154,7 @@ Our modification not only helped to improve Xception-SSD to overcome VGG-16, but
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/fps_map_s}
-    \caption[Performance of SSD with multiple base networks on Surveillance dataset]{Performance of SSD detectors on multiple base networks on \textit{surveillance} dataset. Circle diameters demonstrate relative difference of network parameter counts.} 
+    \caption[Performance of SSD with multiple base networks on Surveillance dataset]{Performance of SSD detectors on multiple base networks on \textit{surveillance} dataset. Circle radii demonstrate relative difference of network parameter counts.} 
     \label{fig:surv_perf}
 \end{figure}
 
@@ -196,6 +196,8 @@ In simple terms, we add temporal information from neighboring frames to each fea
 
 
 \subsubsection{Results}
-A previously mentioned, ResNet34-SSD was trained on the same dataset to serve as s baseline for comparison. This SSD achieved the precision of 81.6\% while performing at 156 frames per second. 
+A previously mentioned, ResNet34-SSD was trained on the same dataset to serve as s baseline for comparison. This SSD achieved the precision of 81.16\% while performing at 156 frames per second. 
 
-Our SSDTC architecture managed to reach the precision of 86.9\% with processing speed of 148 fps. However, considering that detection is not performed for every processed frame, the effective speed of the network is 111 frames per second with the chunk size of 16 frames. 
+Our SSDTC architecture managed to reach the precision of 86.73\% with processing speed of 148 fps. However, considering that detection is not performed for every processed frame, the effective speed of the network is 111 frames per second with the chunk size of 16 frames. 
+
+\todo{add comparison shots ssd vs ssdtc}
