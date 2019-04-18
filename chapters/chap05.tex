@@ -110,29 +110,37 @@ Version \textit{E} is the one, where we finally implemented our original intenti
 
 We observed a noticeable drop-off in performance compared to version \textit{B} and a slight increase in precision. Although the number of parameters in the network is the same, the change from [19\x19] to [37\x37] requires about four times more computation per convolutional layer.
 
-Version \textit{F} is to \textit{E}, what \textit{C} was to \textit{B}. It skips the \textit{blocks 5, 6 and 7} and extracts the second feature map after \textit{block 10}. Although the received performance boost in relation to \textit{E} is significant, the precision is also significantly impacted.
+Version \textit{F} modifies \textit{E} in the same way, \textit{C} modified \textit{B}. It skips the \textit{blocks 5, 6 and 7} and extracts the second feature map after \textit{block 10}. Although the received performance boost in relation to \textit{E} is significant, the precision is also significantly impacted in a negative way.
 
-Version \textit{G} repeated the experiment from version \textit{D}, but instead of removing the last three detection feature maps, we removed every other one, thus keeping the first, third and fifth ones. It is based on version \textit{F}, and again we see the precision loss we cannot justify.
+Version \textit{G} repeated the experiment from version \textit{D}, but instead of removing the last three detection feature maps, we removed every other one, thus keeping the first, third and fifth ones. It is based on version \textit{F}, and again we see the precision loss we cannot justify by performance gain.
 
 \subsubsection{Version H}
-Since we managed to gain the best precision result with version \textit{E}, we designed \textit{H} intending to increase \textit{E}'s performance. However, tests \textit{C},\textit{F}, \textit{D} and \textit{G} showed that the removal of blocks or detection layers from the network is detrimental for the result. Therefore we decided for a less radical solution of trimming the channel depth of the network. We ended up trimming the [19\x19] feature map to 512 channels and [10\x10] map to 1024 channels.
+Since we managed to gain the best precision result with version \textit{E}, we decided to try and increase its performance, without impacting the precision. To this end, we designed the version \textit{H}. However, tests \textit{C},\textit{F}, \textit{D} and \textit{G} showed that the removal of blocks or detection layers from the network is detrimental for the result. Therefore we decided for a less radical solution of trimming the channel depth of the network. We ended up trimming the [19\x19] feature map to 512 channels and [10\x10] map to 1024 channels.
 
-This adjustment not only put the performance of the model halfway between \textit{E} and \textit{B} but also slightly boosted the precision.
+Experiments show that this adjustment not only put the performance of the model halfway between \textit{E} and \textit{B} but also slightly boosted the precision.
 
 \subsubsection{Version J}
-\todo{J, K?}
+After the success of version \textit{H}, we decided to try the limits of channel removal approach. We started with the setup of \textit{H}, and set the number of channels of every layer following \textit{block 7}, except extra layers, to 512. 
+
+Version \textit{J}, showed us, that this is also not a viable solution. The results are underwhelming in both, precision and performance.
+
+
+\paragraph{Conclusion}
+In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP on \textit{Surveillance} dataset, meanwhile version \textit{H} achieved 49.8\% mAP on the same data, while keeping the performance equivalent.
 
 \section{SSDTC implementation and training}
 \label{sec:ssdtcImpl}
-In order to train the SSDTC, we started with our Resnet34-SSD trained on \textit{Surveillance dataset}. We cut off the detection layers and froze the weights on the remainder of the network. This module served us as a feature extractor not only for SSDTC but also for the baseline SSD trained on the \textit{HollywoodHeads dataset}. It is important to note that every image processed by SSDTC, passes through the same extractor. 
+We have already described the architecture of SSDTC in \cref{sec:sdtc}, however the actual implementation and training process proved to be more complicated than SSD. In this section, we go through the challenges brought by SSDTC, without technical details. 
+
+As mentioned, we based the SSDTC on ResnNet34-SSD. We used the SSD initialized by the weights we learned for the other experiment on \textit{Surveillance} dataset. We did not need the detection layers of SSD, so we removed them from the model. The resulting ResNet34 with \textit{extra} layers served as a feature extractor for both SSDTC, and also for training the baseline SSD on \textit{HollywoodHeads} dataset. For training of both networks, we froze the weights in the extractor and trained only temporal and detection layers. It is important to note that every image processed by SSDTC, passes through the same extractor. 
 
 \todo{reused SSD framework.... }
 
 The SSDTC design we created, has different input data requirements for training and inference. To properly train, it needs a large number of smallest possible chunks in a batch for the network. However, one large chunk is the most effective way for inference and the most natural way as we expect a continuous stream of video.
 
-This, however, poses conflicting requirements for the implementation of the network. Namely the passing of data between the modules. For the purposes of this explanation, lets call the ResNet34 network with \textit{extra layers} the \textit{Extractor}, the two conv3d layers the \textit{Temporal module}, and the localization and classification layers the \textit{Detection module}. We will also consider only one of six feature maps coming from the extractor. 
+This, however, poses conflicting requirements for the implementation of the network. Namely in the passing of data between the modules. For the purposes of explanation, lets call the ResNet34 network with \textit{extra layers} the \textit{Extractor}, the two conv3d layers the \textit{Temporal module}, and the localization and classification layers the \textit{Detection module}. We will also consider the detection process for only one of six feature map layers of the extractor. 
 
-During training, the networks start with feature extraction on seemingly independent \textit{n*c} frames in a batch (\textit{c} being the minimal possible chunk, in our case 5, and \textit{n} the batch size). Come to the temporal layers. The feature maps need to be reshaped to represent \textit{n} chunks of size \textit{c} to allow for conv3d layers. After the temporal layers, the feature maps come out in the batch size of \textit{n}, but due to the nature of temporal layers, the chunk size is reduced to 1. This data then has to be reshaped again, to remove the temporal dimension, and create a batch of size \textit{n} for the detection layers.  
+During training, the networks start with feature extraction on seemingly independent \textit{n*c} frames in a batch (\textit{c} being the minimal possible chunk, in our case 5, and \textit{n} the batch size). Coming to the temporal layers, the feature maps need to be reshaped to represent \textit{n} chunks of size \textit{c} to allow for conv3d layers. After the temporal layers, the feature maps come out in the batch size of \textit{n}, but due to the nature of temporal layers, the chunk size is reduced to 1. This data then has to be reshaped again, to remove the temporal dimension, and create a batch of size \textit{n} for the detection layers.  
 
 On the other hand, during inference, the input is a single chunk of consecutive frames, that is equivalent to a single batch. This batch can be simply passed thorough feature extraction layers, and the only modification needed for the temporal layers is to encapsulate the whole tensor in additional dimension to represent a temporal batch of size one. After the temporal convolution, we remove the encapsulation and continue with the detection; however, the batch size in this step is smaller than at the beginning. 
 

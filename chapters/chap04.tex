@@ -168,6 +168,7 @@ Our modification not only helped to improve Xception-SSD to overcome VGG-16, but
 
 
 \section{SSD-TC: SSD with temporal convolution}
+\label{sec:ssdtc}
 Since our main priority is video surveillance, we wanted to explore the options of video detection, exploiting the additional information the video can provide over still images. In \cref{sec:video_det} we have already examined two approaches of exploiting the continuity of video frames to achieve higher precisions. One approach used network similar to \textit{Faster R-CNN} with use of temporal tubes-of-interest. The other one used \textit{Single Shot Detector} modified with convolutional LSTM cells to harness the temporal information. However, the major drawback of both approaches was their inference speed. 
 
 Inspired by the two approaches, we decided to implement our take on video detector with temporal information. To this end, we chose to expand on the SSD as we already have the understanding of the model and the single-stage models are currently the only relevant choice considering speed. We also wanted to avoid adding complex, time-consuming structures like LSTM cells used in TSSD. Instead, decided to use three-dimensional convolutional layers (conv3d), to aggregate the information from multiple images. We named our approach \textit{Single Shot Detector with Temporal Convolution} (SSDTC).
