@@ -54,47 +54,41 @@ Comparing two models class by class is impractical, especially with the classifi
 \subsection{Inference time}
 Inference time is a significant factor to consider for the model in real-time application use. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to comprehend. Therefore a more intuitive metric is used. That being the number of processed \textit{frames per second} (fps). However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment are suitable for comparison.
 
-\section{Notation}
+\section{Notation and convention}
 \label{sec:notation}
 To avoid any confusion, we define the standard notation used though-out this thesis. We tried to follow the convention, but there can be some variance compared to other works.
 
 \subsubsection*{Data}
 
-To represent the size of the multidimensional data, we use bracket notation with dimensional sizes separated by $\times $ sign (not to be confused with multiplication).
+To represent the size of the multidimensional data (tensors), we use bracket notation with dimensional sizes separated by $\times $ sign (not to be confused with multiplication).
 
-A two dimensional matrix is represented as \textbf{[a\x b]}, most often used to represent spatial dimensions of an image or a feature map. 
+A two dimensional matrix, represented as \textbf{[a\x b]}, is most often used to represent spatial dimensions of an image or a feature map. 
 
-Our data are mostly three dimensional, denoted as \textbf{[a\x b\x c]}, the first two numbers represents the spatial dimension and \textit{c} represent the number of channels, e.g., standard image has three channels. For convenience, we may use \textbf{[a\x c]} notation if \textit{a} and \textit{b} are equal, while explicitly stating the fact.
+In three dimensional data, denoted as \textbf{[a\x b\x c]}, the first two numbers represent the spatial dimension and \textit{c} represents the number of channels, e.g., standard RGB image has three channels. For convenience, we may use \textbf{[a\x c]} notation if \textit{a} and \textit{b} are equal, while explicitly stating the fact.
 
-The other dimension used in neural networks is the batch size. We will be adding this dimension as the last one to our notation, \textbf{[a\x b\x c \x n]}.
+The next dimension used in neural networks is the batch size \textit{n}. We will be adding this dimension as the last one to our notation, \textbf{[a\x b\x c\x n]}.
 
-We ordered the dimensions to allow for slicing. For example, all data passing between two-dimensional convolutional layers is in form of four dimensional tensors, but we will often use only spatial dimensions or spacial and channel dimension to describe given tensor.
+We will also be using 3d convolutional layers, that produce five dimensional tensors. However, we will not add this dimension \textit{d} to the end of the list, but instead keep the batch size at the last place \textbf{[a\x b\x c\x d\x n]}. 
 
+We ordered the values to allow for unambiguous reference o data without listing every dimension. For example, all data passing between two-dimensional convolutional layers is in form of four dimensional tensors, but we will often use only spatial dimensions or spacial and channel dimension to describe given tensor.
 
-[a\x b\x c \x d \x n]
+\subsubsection*{Convolution}
+Since convolutional layers are chained together, and always work with the data with \textit{channel} dimension, we do not need to explicitly state the channel depth of the input data. We know that if previous convolution outputs data with the size of [a\x b\x c], and we want to apply \textit{k\x k} kernel, the actual size of the kernel is [k\x k\x c]. 
 
-\subsubsection*{Layers}
-\begin{itemize}
-    \item Fully connected
-    
-    
-    \item Convolution
-    
-    Unless stated otherwise, all convolutional layers use padding and stride of one.
-    
-    \textbf{Conv. k$_1$\x k$_2$\x c} : 2d convolutional layer with kernel size \textit{k$_1$\x k$_2$} and output channel depth of \textit{c}. The input channel depth is given by the output size of the previous layer. In simple terms, the layer accepts the input of [a\x b\x c$_\text{previous}$] input and a\x b times applies k$_1$\x k$_2$ \x c$_\text{previous}$ kernel \textit{c} times, leading to [a\x b\x c] output.
-    
-    \textbf{Conv. k$_1$\x k$_2$\x c /s} : 2d convolutional layer with stride \textit{s}.
-    
-    \textbf{Conv. k$_1$\x k$_2$\x k$_3$\x c} : 3d convolutional layer with kernel size \textit{k$_1$\x k$_2$ \x k$_3$} and output channel depth of \textit{c}. The input channel depth is given by the output size of the previous layer. In simple terms, the layer accepts the input of [a\x b\x d\x c$_\text{previous}$] input and a\x b\x d times applies k$_1$\x k$_2$\x k$_3$ \x c$_\text{previous}$ kernel \textit{c} times, leading to [a\x b\x c] output.
-    
-    \item Pooling
-    
-    \textbf{Max-pooling k$_1$\x k$_2$ /s} : maximum pooling with kernel size \textit{k$_1$\x k$_2$} and stride \textit{s}. 
-    
-    
-\end{itemize}
+Unless stated otherwise, all convolutional layers use padding and stride of one.
 
+\paragraph{Conv. k$_1$\x k$_2$\x c} : 2d convolutional layer with kernel size \textit{k$_1$\x k$_2$} and output channel depth of \textit{c}. The input channel depth is given by the output size of the previous layer. In simple terms, the layer accepts the input of [a\x b\x c$_\text{previous}$] input and a\x b times applies k$_1$\x k$_2$ \x c$_\text{previous}$ kernel \textit{c} times, leading to [a\x b\x c] output.
+
+\paragraph{Conv. k$_1$\x k$_2$\x c /s} : 2d convolutional layer with stride \textit{s}.
+
+\paragraph{Conv. k$_1$\x k$_2$\x k$_3$\x c} : 3d convolutional layer with kernel size \textit{k$_1$\x k$_2$ \x k$_3$} and output channel depth of \textit{c}. The input channel depth is given by the output size of the previous layer. In simple terms, the layer accepts the input of [a\x b\x d\x c$_\text{previous}$] input and a\x b\x d times applies k$_1$\x k$_2$\x k$_3$\x c$_\text{previous}$ kernel \textit{c} times, leading to [a\x b\x c] output.
+
+ 
+
+\subsubsection*{Other layers}
+ Pooling
+
+\textbf{Max-pooling k$_1$\x k$_2$ /s} : maximum pooling with kernel size \textit{k$_1$\x k$_2$} and stride \textit{s}.
 
 \todo{notation}
 
@@ -105,7 +99,7 @@ A fundamental building block for a modern state-of-the-art image classification 
 We use this section to take a walk through the history of classification CNNs and outline some of the most important models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
 
 \subsection{AlexNet (2012)}
-\textit{AlexNet} designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the \textit{ILSVRC} challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. \textit{AlexNet}'s model is a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers and a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
+\textit{AlexNet} designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the \textit{ILSVRC} challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. \textit{AlexNet}'s model is a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers (FC) and a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
 
 \subsection{VGG (2014)}
 \label{sec:VGG}
