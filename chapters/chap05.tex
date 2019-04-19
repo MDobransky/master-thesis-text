@@ -125,7 +125,7 @@ After the success of version \textit{H}, we decided to try the limits of channel
 Version \textit{J}, showed us, that this is also not a viable solution. The results are underwhelming in both, precision and performance.
 
 
-\paragraph{Conclusion}
+\subsubsection{Conclusion}
 In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP on \textit{Surveillance} dataset, meanwhile version \textit{H} achieved 49.8\% mAP on the same data, while keeping the performance equivalent.
 
 \section{SSDTC implementation and training}
@@ -151,19 +151,19 @@ Although it is possible to use both versions for training and inference, each ha
 \begin{table}[]
     \centering
     \begin{tabular}{c|c|c}
-        Layer &  \multicolumn{2}{c}{Training}\\
+        Module &  \multicolumn{2}{c}{Training}\\
         \hline
             & Input   & Output    \\
-        Feature   &  [H$_0$\x W$_0$\x 3\x 5*N] & [H$_1$\x W$_1$\x F$_1$\x 5*N]  \\
+        Extractor   &  [H$_0$\x W$_0$\x 3\x 5*N] & [H$_1$\x W$_1$\x F$_1$\x 5*N]  \\
         Temporal   &  [H$_1$\x W$_1$\x F$_1$\x 5\x N] & [H$_2$\x W$_2$\x F$_2$\x1\x N] \\
-        Detection   &  [H$_2$\x W$_2$\x F$_2$\x N] &      \\
+        Detector  &  [H$_2$\x W$_2$\x F$_2$\x N] &      \\
         \hline
         \multicolumn{1}{c}{} & \multicolumn{2}{c}{Inference}\\
          \hline
          & Input   & Output\\
-        Feature   &   [H$_0$\x W$_0$\x 3\x C]  & [H$_1$\x W$_1$\x F$_1$\x C]\\
+        Extractor   &   [H$_0$\x W$_0$\x 3\x C]  & [H$_1$\x W$_1$\x F$_1$\x C]\\
         Temporal   &  [H$_1$\x W$_1$\x F$_1$\x C\x 1] & [H$_2$\x W$_2$\x F$_2$\x C-4\x 1]\\
-        Detection   & [H$_2$\x W$_2$\x F$_2$\x C-4] & \\
+        Detector   & [H$_2$\x W$_2$\x F$_2$\x C-4] & \\
         
     \end{tabular}
     \caption{Caption}

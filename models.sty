@@ -57,30 +57,30 @@
         \cellcolor{\convcol}Conv. 3$\times$3$\times$64 \tiny (Conv1\_1) \\ 
         \cellcolor{\convcol}Conv. 3$\times$3$\times$64 \tiny (Conv1\_2) \\ 
         \hline
-        \cellcolor{\poolcol}Max-pooling \tiny (Pool1) \\
+        \cellcolor{\poolcol}Max-pool. 2\x 2 /2 \tiny (Pool1) \\
         \hline
         \cellcolor{\convcol}Conv. 3$\times$3$\times$128 \tiny (Conv2\_1) \\ 
         \cellcolor{\convcol}Conv. 3$\times$3$\times$128 \tiny (Conv2\_2) \\ 
         \hline
-        \cellcolor{\poolcol}Max-pooling \tiny (Pool2) \\
+        \cellcolor{\poolcol}Max-pool. 2\x 2 /2 \tiny (Pool2) \\
         \hline
         \cellcolor{\convcol}Conv. 3$\times$3$\times$256 \tiny (Conv3\_1) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$256 \tiny (Conv3\_2) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$256 \tiny (Conv3\_3) \\
         \hline
-        \cellcolor{\poolcol}Max-pooling \tiny (Pool3) \\
+        \cellcolor{\poolcol}Max-pool. 2\x 2 /2 \tiny (Pool3) \\
         \hline
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv4\_1) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv4\_2) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv4\_3) \\
         \hline
-        \cellcolor{\poolcol}Max-pooling \tiny (Pool4) \\
+        \cellcolor{\poolcol}Max-pool. 2\x 2 /2 \tiny (Pool4) \\
         \hline
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv5\_1) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv5\_2) \\
         \cellcolor{\convcol}Conv. 3$\times$3$\times$512 \tiny (Conv5\_3) \\
         \hline 
-        \cellcolor{\poolcol}Max-pooling \tiny (Pool\_5) \\ \hline
+        \cellcolor{\poolcol}Max-pool. 2\x 2 /2 \tiny (Pool\_5) \\ \hline
         \cellcolor{\fccol}FC - 4096 \tiny (FC6) \\ \hline
         \cellcolor{\fccol}FC - 4096 \tiny (FC7) \\ \hline
         \cellcolor{\fccol}FC - 1000 \tiny (FC8) \\ \hline
@@ -105,7 +105,7 @@
         \node [input] (input) {Input};
         \node [rect, below of=input] (block1) {Conv1\_1 - Conv4\_3};
         \node [rect, below of=block1] (block2) {Conv5\_1 - Conv5\_3};
-        \node [pool, below of=block2] (p1) {Max pool. 3$\times$3};
+        \node [pool, below of=block2] (p1) {Max pool. 3$\times$3 p:1};
         
          \node [conv, below of=p1] (ext-1) {Conv. 3$\times$3$\times$1024};
          \node [conv, below of=ext-1] (ext0) {Conv. 1$\times$1$\times$1024};
@@ -963,16 +963,16 @@
             \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2};
             \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64};
     
-            \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74 \x 128]};
-            \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37 \x 256]};
-            \node [rect, below=of block2, fill=\blockcol!60] (block3) {Block 3 $\vert$ S:2 [19\x 19 \x 728]};
-            \node [rect, below=of block3, fill=\blockcol!60] (block4) {Blocks 4-7 $\vert$ S:1 [19\x 19 \x 728]};
-            \node [rect, below=of block4, fill=\blockcol!60] (block8) {Blocks 8 $\vert$ S:1 [19\x 19 \x 728]};
-            \node [rect, below=of block8, fill=\blockcol!60] (block9) {Blocks 9-11 $\vert$ S:1 [19\x 19 \x 728]};
-            \node [rect, below=of block9] (block12) {Block 12 $\vert$ S:2 [10\x~10~\x~1024]};
+            \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74\x 128]};
+            \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37\x 256]};
+            \node [rect, below=of block2, fill=\blockcol!60] (block3) {Block 3 $\vert$ S:2 [19\x 19\x 728]};
+            \node [rect, below=of block3, fill=\blockcol!60] (block4) {Blocks 4-7 $\vert$ S:1 [19\x 19\x 728]};
+            \node [rect, below=of block4, fill=\blockcol!60] (block8) {Blocks 8 $\vert$ S:1 [19\x 19\x 728]};
+            \node [rect, below=of block8, fill=\blockcol!60] (block9) {Blocks 9-11 $\vert$ S:1 [19\x 19\x 728]};
+            \node [rect, below=of block9] (block12) {Block 12 $\vert$ S:2 [10\x 10\x 1024]};
              https://www.overleaf.com/project/5b781b245a769a24ac49c4f3
             \node [sepconv, below=of block12] (conv4) {SepConv.~3$\times$3$\times$1536};
-            \node [sepconv, below=of conv4] (conv5) {SepConv.~3$\times$3$\times$2048 [10\x 10 \x 2048]};
+            \node [sepconv, below=of conv4] (conv5) {SepConv.~3$\times$3$\times$2048 [10\x 10\x 2048]};
 
             \path[line] (input) -- (conv1);
             \path[line] (conv1) -- (conv2);
@@ -1004,16 +1004,16 @@
             \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2};
             \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64};
     
-            \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74 \x 128]};
-            \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37 \x 256]};
-            \node [rect, below=of block2, fill=\blockcol!30] (block3) {Block 3 $\vert$ \textbf{S:1} [37\x 37 \x \textbf{256}]};
-            \node [rect, below=of block3, fill=\blockcol!30] (block4) {Blocks 4-7 $\vert$~S:1 [37\x 37 \x \textbf{256}]};
-            \node [rect, below=of block4, fill=\blockcol!60] (block8) {Block 8 $\vert$ \textbf{S:2} [19\x~19~\x~\textbf{512}]};
-            \node [rect, below=of block8, fill=\blockcol!60] (block9) {Blocks 9-11 $\vert$ S:1 [19\x~19~\x~\textbf{512}]};
-            \node [rect, below=of block9] (block12) {Block 12 $\vert$ S:2 [10\x~10~\x~\textbf{728}]};
+            \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74\x 128]};
+            \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37\x 256]};
+            \node [rect, below=of block2, fill=\blockcol!30] (block3) {Block 3 $\vert$ \textbf{S:1} [37\x 37\x \textbf{256}]};
+            \node [rect, below=of block3, fill=\blockcol!30] (block4) {Blocks 4-7 $\vert$~S:1 [37\x 37\x \textbf{256}]};
+            \node [rect, below=of block4, fill=\blockcol!60] (block8) {Block 8 $\vert$ \textbf{S:2} [19\x 19\x \textbf{512}]};
+            \node [rect, below=of block8, fill=\blockcol!60] (block9) {Blocks 9-11 $\vert$ S:1 [19\x 19\x \textbf{512}]};
+            \node [rect, below=of block9] (block12) {Block 12 $\vert$ S:2 [10\x 10\x \textbf{728}]};
              
             \node [sepconv, below=of block12] (conv4) {SepConv.~3$\times$3$\times$\textbf{1024}};
-            \node [sepconv, below=of conv4] (conv5) {SepConv.~3$\times$3$\times$1024  [10\x 10 \x \textbf{1024}]};
+            \node [sepconv, below=of conv4] (conv5) {SepConv.~3$\times$3$\times$1024  [10\x 10\x \textbf{1024}]};
 
             \path[line] (input) -- (conv1);
             \path[line] (conv1) -- (conv2);
