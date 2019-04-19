@@ -6,11 +6,11 @@ We base our work on the implementation of SSD by \citeauthor{bib:ssd}. However, 
 
 \section{Feature extraction network}
 \label{sec:base}
-Looking at the structure of the network, we found the best candidate for improvement to be the underlying feature extractor. The feature extractor provides the data on which SSD performs detection and is, therefore, the integral part of the model. SSD uses relatively old VGG-16 network that compared to more modern CNNs lacks in speed and precision.  The feature extractor is in the context of object detectors often called the \textit{base network}.
+Looking at the structure of the network, we found the best candidate for improvement to be the underlying feature extractor. The feature extractor provides the data on which SSD performs detection and is, therefore, the integral part of the model. SSD uses relatively old VGG16 network that compared to more modern CNNs lacks in speed and precision.  The feature extractor is in the context of object detectors often called the \textit{base network}.
 
-To explore the options, we started by implementing the SSD on multiple base networks and training them on the \textit{COCO} dataset to analyze the impact on SSD's performance. We decided to implement SSD on three 'post-VGG' networks, namely \textit{ResNet}, \textit{Xception} and \textit{NASNet}. 
+To explore the options, we started by implementing the SSD on multiple base networks and training them on the COCO dataset to analyze the impact on SSD's performance. We decided to implement SSD on three 'post-VGG' networks, namely ResNet, Xception and NASNet. 
 
-We chose ResNet because it is a well-known network with simple design and easy scalability. Xception got our attention for its performance in the benchmark by \citeauthor{bib:cnnbenchmark} (\cref{sec:cnncomp}), placing it around the optimal spot between speed and precision. NASNet, or precisely \textit{NASNet-A-Mobile}, was chosen out of curiosity for its unique, machine learning designed structure.
+We chose ResNet because it is a well-known network with simple design and easy scalability. Xception got our attention for its performance in the benchmark by \citeauthor{bib:cnnbenchmark} (\cref{sec:cnncomp}), placing it around the optimal spot between speed and precision. NASNet, or precisely NASNet-A-Mobile, was chosen out of curiosity for its unique, machine learning designed structure.
 
 We will be referring to ResNet networks by their number of layers, e.g., ResNet50. Also, Xception will be called Xception version A, or shortly XceptionA, to avoid confusion with versions we are going to introduce later. To emphasize the base of SSD network, we will be calling it \textit{base}-SSD, e.g., VGG16-SSD.
 
@@ -82,7 +82,7 @@ Although the results of the XceptionA-SSD were disappointing, we believed that t
 \begin{figure}
     \centering
     \includegraphics[width=0.975\textwidth]{img/fps_map_c}
-    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks. Circle radii demonstrate relative difference of network parameter counts.}
+    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks with mAP@[0.5]. Circle radii demonstrate relative difference of network parameter counts. }
     \label{fig:cocoperf}
 \end{figure}
 
@@ -111,9 +111,9 @@ Before we get to the comparison of the training results, we will explain our hyp
 
 The problem we describe is, of course, part of a broader difficulty with non-exhaustive datasets. Our question is, therefore: If we have an available set of annotations for the classes we are not interested in, but that can be present in our input images and share similarities with detected classes, would it not be better to learn to detect those classes?
 
-\paragraph{The results} in \cref{tab:ssdcocosurv} show that in our case, it is possible to remove unnecessary classes from the dataset without impacting the performance. It is worth mentioning that we tried to precautiously counter-measure our hypothesis by creating the \textit{surveillance} dataset by only filtering the annotations and keeping all images of the original dataset.
+\paragraph{The results} in \cref{tab:ssdcocosurv} show that in our case, it is possible to remove unnecessary classes from the dataset without impacting the performance. It is worth mentioning that we tried to precautiously counter-measure our hypothesis by creating the surveillance dataset by only filtering the annotations and keeping all images of the original dataset.
 
-We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. However, based on this experiment, we are not able to conclusively confirm or deny our hypothesis. Even if we wanted to make a conclusion for the \textit{COCO} dataset using the provided training and validation data, the experiment is still dependant on the choice of classes.
+We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. However, based on this experiment, we are not able to conclusively confirm or deny our hypothesis. Even if we wanted to make a conclusion for the COCO dataset using the provided training and validation data, the experiment is still dependant on the choice of classes.
 
 \begin{table}[]
     \centering
@@ -126,7 +126,7 @@ We tested the approach on multiple architectures, and the results do not conclus
         XceptionA & 39.4 & 37.8 \\
         NASNet & 36.4 & 36.9 
     \end{tabular}
-    \caption[SSD's precision comparison between COCO and surveillance datasets]{Mean average precision of \textit{surveillance} classes. Comparing networks trained on all 80 classes of \textit{COCO} dataset and \textit{surveillance} subset of \textit{COCO}.}
+    \caption[SSD's precision comparison between COCO and surveillance datasets]{Mean average precision of surveillance classes at IoU 0.5. Comparing networks trained on all 80 classes of COCO dataset and surveillance subset of COCO.}
     \label{tab:ssdcocosurv}
 \end{table}
 
@@ -145,13 +145,13 @@ We illustrate the effect that the number of detected classes has on performance 
 
 \section{Modifying Xception}
 \label{sec:fixxception}
-We managed to successfully re-implement SSD on other architectures and boost the speed of surveillance by removing unnecessary classes. We can confidently say that ResNet50-SSD with 48.7\% mAP and 108fps or ResNet34-SSD with 47.3\% mAP and 125fps outperform original SSD on VGG-16 with 46.1\% mAP and 42fps. However, we believed that the underwhelming result of XceptionA-SSD could be used as a stepping stone and the results could be pushed further with modifications to the Xception architecture. 
+We managed to successfully re-implement SSD on other architectures and boost the speed of surveillance by removing unnecessary classes. We can confidently say that ResNet50-SSD with 48.7\% mAP@[0.5] and 108fps or ResNet34-SSD with 47.3\% mAP@[0.5] and 125fps outperform original SSD on VGG16 with 46.1\% mAP@[0.5] and 42fps. However, we believed that the underwhelming result of XceptionA-SSD could be used as a stepping stone and the results could be pushed further with modifications to the Xception architecture. 
 
 We already mentioned the hypothesis that the major factor limiting the precision of XceptionA-SSD is the extraction of [37\x37] feature map after the second block of the network. To rectify this problem, we decided to make adjustments to the network, in such a way that we could extract [37\x37] feature map after \textit{block 7}, and keep the [19\x19] map after \textit{block 11} as previously dictated by network architecture. The reasoning behind choosing \textit{block 7} was that it is deep enough in the network and leaves four blocks between the feature map extractions. It is perhaps a bit arbitrary decision and blocks 6 or 8 would do just as well, or better.  In order to achieve the correct sizes of feature maps, we moved the max-pooling with stride 2 from \textit{block 3} to \textit{block 8}. This resulted in outputs of the \textit{block 2-7} to be the [37\x37] size and \textit{block 8} to output [19\x19] feature map. 
 
 The proposed change to the pooling, and thus feature map sizes results in the increased complexity of the network as the [19\x19\x728] features now grew to the [37\x37\x728] size. To remedy this, we decreased the number of channels for concerned blocks to 256. We also decided to continue with trimming layers in the rest of the network. In the end, we got the [37\x37] map with 256 channels, [19\x19] map with 512 channels and [10\x10] map with 1024 channels. The architecture with highlighted changes is illustrated on \cref{fig:xceptionH_SSD}. 
 
-Our modification not only helped to improve Xception-SSD to overcome VGG-16, but we also outperformed ResNet50-SSD's 48.7\% mean average precision with 49.8 \% mAP. However, despite our best efforts to save computation, we managed to outperform XceptionA only slightly, by achieving 92fps. \todo{check data} The relative performance of XceptionH based SSD to other SSDs using the \textit{surveillance} dataset can be seen on \cref{fig:surv_perf}.
+Our modification not only helped to improve Xception-SSD to overcome VGG16, but we also outperformed ResNet50-SSD's 48.7\% mean average precision with 49.8 \% mAP. However, despite our best efforts to save computation, we managed to outperform XceptionA only slightly, by achieving 92fps. \todo{check data} The relative performance of XceptionH based SSD to other SSDs using the surveillance dataset can be seen on \cref{fig:surv_perf}.
 
 \begin{figure}
     \centering
@@ -171,11 +171,11 @@ Our modification not only helped to improve Xception-SSD to overcome VGG-16, but
 
 \section{SSD-TC: SSD with temporal convolution}
 \label{sec:ssdtc}
-Since our main priority is video surveillance, we wanted to explore the options of video detection, exploiting the additional information the video can provide over still images. In \cref{sec:video_det} we have already examined two approaches of utilizing the continuity of video frames to achieve higher precisions. One approach used architecture similar to \textit{Faster R-CNN} with use of temporal tubes-of-interest. The other one used modified SSD with convolutional LSTM cells to harness the temporal information. However, the major drawback of both approaches was their inference speed. 
+Since our main priority is video surveillance, we wanted to explore the options of video detection, exploiting the additional information the video can provide over still images. In \cref{sec:video_det} we have already examined two approaches of utilizing the continuity of video frames to achieve higher precisions. One approach used architecture similar to Faster R-CNN with use of temporal tubes-of-interest. The other one used modified SSD with convolutional LSTM cells to harness the temporal information. However, the major drawback of both approaches was their inference speed. 
 
 Inspired by the two approaches, we decided to implement our take on video detector with temporal information. To this end, we chose to expand on the SSD. We already have the understanding of the model, and the single-stage detectors are currently the only relevant choice considering speed. We also wanted to avoid adding complex, time-consuming structures like LSTM cells used in TSSD. Instead, we decided to use three-dimensional convolutional layers (conv3d), to aggregate the information from multiple images. We named our approach \textit{Single Shot Detector with Temporal Convolution} (SSDTC).
 
-Of course, we need to prove our concept by training it on some data and comparing it to unmodified SSD. Since we require a dataset with consecutive frames, we decided to start with the \textit{HollywoodHeads} dataset. This set annotates heads in sections of movies. Considering that dataset has only one class and previous results of SSD testing suggests ResNet34-SSD would be more than sufficient for this task, we trained it as a baseline. Consequently, we also based SSDTC on ResNet34-SSD.
+Of course, we need to prove our concept by training it on some data and comparing it to unmodified SSD. Since we require a dataset with consecutive frames, we decided to start with the HollywoodHeads dataset. This set annotates heads in sections of movies. Considering that dataset has only one class and previous results of SSD testing suggests ResNet34-SSD would be more than sufficient for this task, we trained it as a baseline. Consequently, we also based SSDTC on ResNet34-SSD.
 
 \subsubsection{Architecture}
 In standard SSD, the detection is performed on a batch of independent images. We expect to perform detection on a single batch, or a chunk, of consecutive frames. 

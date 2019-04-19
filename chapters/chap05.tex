@@ -30,15 +30,15 @@ The main characteristics of our framework are the use of \textit{SGD} optimizer 
 To make our work comparable to other similar studies and future works, we explain methods used for both precision and performance measurements.
 
 \subsection{Precision}
-Rather than implementing a copy of the precision evaluation, our precision measurements were taken using an external tool. Using the external tool, independent on our implementation, allows us to easily compare our results with other works with little to no modifications. We used the implementation by \citet{bib:metricsgit}, that mirrors the evaluation process of \textit{PASCAL VOC Challenge}. The test setup used default parameters, meaning that the interpolation of AP was calculated using all data points and the IoU threshold was set to 0.5. 
+Rather than implementing a copy of the precision evaluation, our precision measurements were taken using an external tool. Using the external tool, independent on our implementation, allows us to easily compare our results with other works with little to no modifications. We used the implementation by \citet{bib:metricsgit}, that mirrors the evaluation process of PASCAL VOC Challenge. The test setup used default parameters, meaning that the interpolation of AP was calculated using all data points and the IoU threshold was set to 0.5. 
 
-We present all the measurements taken on \textit{Surveillance dataset} while performing multiple experiments described in this thesis in \cref{tab:ap}.
+We present all the measurements taken on Surveillance dataset while performing multiple experiments described in this thesis in \cref{tab:ap}.
 
 
 \begin{table}[]
     \centering
     \includegraphics[width=\textwidth]{img/ap}
-    \caption[Average precision of all tested networks on Surveillance classes]{Average precision of all tested networks on Surveillance classes. \textit{COCO} indicates that the network was trained on COCO dataset, otherwise only Surveillance data were used for training.} 
+    \caption[Average precision of all tested networks on Surveillance classes]{Average precision of all tested networks on Surveillance classes. COCO indicates that the network was trained on COCO dataset, otherwise only Surveillance data were used for training.} 
     \label{tab:ap}
 \end{table}
 
@@ -58,7 +58,7 @@ Testing was done by processing a total of 10 000 images in batches of 16. This p
 \section{Improving the Xception-SSD}
 In \cref{sec:fixxception} we introduced a hypothesis about Xception\textit{A}-SSD. Based on this hypothesis, we presented the improved Xception\textit{H} model. However, as suggested by the name, it was not our first modification, and we needed some trial-and-error testing to achieve this result.
 
-We will describe every iteration of the Xception-SSD model we trained, and the reasoning behind the particular modifications. For clarity, we will refer to the Xception\textit{X} models in this section only by their version letters. The performance of mentioned models on \textit{Surveillance dataset} is plotted on \cref{fig:xception_perf}, and more details on precision in \cref{tab:ap}. Also, the feature map sizes inside the models are shown in \cref{tab:xmods}.
+We will describe every iteration of the Xception-SSD model we trained, and the reasoning behind the particular modifications. For clarity, we will refer to the Xception\textit{X} models in this section only by their version letters. The performance of mentioned models on Surveillance dataset is plotted on \cref{fig:xception_perf}, and more details on precision in \cref{tab:ap}. Also, the feature map sizes inside the models are shown in \cref{tab:xmods}.
 
 
 \begin{figure}
@@ -126,19 +126,19 @@ Version \textit{J}, showed us, that this is also not a viable solution. The resu
 
 
 \subsubsection{Conclusion}
-In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP on \textit{Surveillance} dataset, meanwhile version \textit{H} achieved 49.8\% mAP on the same data, while keeping the performance equivalent.
+In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP@[0.5] on Surveillance dataset, meanwhile version \textit{H} achieved 49.8\% mAP@[0.5] on the same data, while keeping the performance equivalent.
 
 \section{SSDTC implementation and training}
 \label{sec:ssdtcImpl}
-We have already described the architecture of SSDTC in \cref{sec:sdtc}, however the actual implementation and training process proved to be more complicated than SSD. In this section, we go through the challenges brought by SSDTC, without technical details. 
+We have already described the architecture of SSDTC in \cref{sec:ssdtc}, however the actual implementation and training process proved to be more complicated than SSD. In this section, we go through the challenges brought by SSDTC, without technical details. 
 
-As mentioned, we based the SSDTC on ResnNet34-SSD. We used the SSD initialized by the weights we learned for the other experiment on \textit{Surveillance} dataset. We did not need the detection layers of SSD, so we removed them from the model. The resulting ResNet34 with \textit{extra} layers served as a feature extractor for both SSDTC, and also for training the baseline SSD on \textit{HollywoodHeads} dataset. For training of both networks, we froze the weights in the extractor and trained only temporal and detection layers. It is important to note that every image processed by SSDTC, passes through the same extractor. 
+As mentioned, we based the SSDTC on ResnNet34-SSD. We used the SSD initialized by the weights we learned for the other experiment on Surveillance dataset. We did not need the detection layers of SSD, so we removed them from the model. The resulting ResNet34 with \textit{extra} layers served as a feature extractor for both SSDTC, and also for training the baseline SSD on HollywoodHeads dataset. For training of both networks, we froze the weights in the extractor and trained only temporal and detection layers. It is important to note that every image processed by SSDTC, passes through the same extractor. 
 
 \todo{reused SSD framework.... }
 
 The SSDTC design we created, has different input data requirements for training and inference. To properly train, it needs a large number of smallest possible chunks in a batch for the network. However, one large chunk is the most effective way for inference and the most natural way as we expect a continuous stream of video.
 
-This, however, poses conflicting requirements for the implementation of the network. Namely in the passing of data between the modules. For the purposes of explanation, lets call the ResNet34 network with \textit{extra layers} the \textit{Extractor}, the two conv3d layers the \textit{Temporal module}, and the localization and classification layers the \textit{Detection module}. We will also consider the detection process for only one of six feature map layers of the extractor. 
+This, however, poses conflicting requirements for the implementation of the network. Namely in the passing of data between the modules. For the purposes of explanation, lets call the ResNet34 network with \textit{extra} layers the \textit{Extractor}, the two conv3d layers the \textit{Temporal module}, and the localization and classification layers the \textit{Detection module}. We will also consider the detection process for only one of six feature map layers of the extractor. 
 
 During training, the networks start with feature extraction on seemingly independent \textit{n*c} frames in a batch (\textit{c} being the minimal possible chunk, in our case 5, and \textit{n} the batch size). Coming to the temporal layers, the feature maps need to be reshaped to represent \textit{n} chunks of size \textit{c} to allow for conv3d layers. After the temporal layers, the feature maps come out in the batch size of \textit{n}, but due to the nature of temporal layers, the chunk size is reduced to 1. This data then has to be reshaped again, to remove the temporal dimension, and create a batch of size \textit{n} for the detection layers.  
 
