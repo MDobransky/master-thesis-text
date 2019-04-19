@@ -1,6 +1,6 @@
 \chapter{Application of Neural Networks for Object Detection}
 \label{chap:nns}
-In recent years, there has been an upsurge in the use of neural networks. We can partially attribute it to the evolution of hardware allowing for implementation of network models with multiple layers. Deep neural networks (DNN) are now finding their use in many applications, e.g., classification, time series prediction, and optimization tasks, and are replacing many older machine learning methods. Some of the benefits of neural networks include their ability to find and learn complex non-linear relationships in provided data and subsequent generalization to unseen data. However, some applications do not allow for so-called 'black box' models and require logical reasoning behind the decisions.
+In recent years, there has been an upsurge in the use of neural networks. We can partially attribute it to the evolution of hardware allowing for the implementation of network models with multiple layers. Deep neural networks (DNN) are now finding their use in many applications, e.g., classification, time series prediction, and optimization tasks, and are replacing many older machine learning methods. Some of the benefits of neural networks include their ability to find and learn complex non-linear relationships in provided data and subsequent generalization to unseen data. However, some applications do not allow for so-called 'black box' models and require logical reasoning behind the decisions.
 
 Image processing is one of the fields where DNNs are heavily utilized and outperform traditional machine learning approaches with big margins. Uses of DNNs for image processing vary from classification and object detection to auto-encoders for noise removal, and generative networks. A surge in DNN based image processing started in the 2010s with an implementation of a multi-layer convolutional network trained on GPU \cite{bib:deepOnGpu}. 
 
@@ -31,9 +31,9 @@ $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}}$$
 Now we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
 \subsubsection{Precision-Recall curve (PRC)}
-PRC is simply a plot showing the relationship between values of precision and recall. It is plotted separately for each class and reveals how does a change in confidence, influence the precision and recall values. 
+PRC is simply a plot showing the relationship between values of precision and recall. It is plotted separately for each class and reveals how a change in confidence influences the precision and recall values. 
 
-Every point on PRC represents a chosen confidence threshold used for determining positive predictions for given class. The curve does not show this threshold, instead it shows precision and recall received by applying this threshold.
+Every point on PRC represents a chosen confidence threshold used for determining positive predictions for a given class. The curve does not show this threshold. Instead, it shows precision and recall received by applying this threshold.
 
 An object detector of a particular class can be considered reliable if its precision stays high while recall increases, which means that predictions with lower confidence score can be considered good predictions.
 
@@ -99,14 +99,14 @@ Unless stated otherwise, the default setting for the convolutional layer is stri
 \label{sec:clsnets}
 A fundamental building block for a modern state-of-the-art image classification network is a convolutional layer. Accordingly, we call this type of networks a convolutional neural networks (CNN) \cite[ch.~9]{bib:dlbook}. CNN based classifier is a network that given the input image, extracts a feature map from this image and then applies classification layers to produce a confidence score for each possible class. Usually, the soft-max function is applied to the confidence score to get a probability distribution.
 
-We use this section to take a walk through the history of classification CNNs and outline some of the most important models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
+We use this section to take a walk through the history of classification CNNs and outline some of the most influential models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
 
 \subsection{AlexNet (2012)}
 AlexNet designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the ILSVRC challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. AlexNet is created from a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers and a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
 
 \subsection{VGG (2014)}
 \label{sec:VGG}
-The network architecture, mostly known as VGG, by \citeauthor{bib:vgg} \cite{bib:vgg}, is build onto the deep CNN concept behind AlexNet. It managed to prove the feasibility of even deeper network utilizing small convolution filters. 
+The network architecture, mostly known as VGG, by \citeauthor{bib:vgg} \cite{bib:vgg}, is built on the deep CNN concept behind AlexNet. It managed to prove the feasibility of even deeper network utilizing small convolution filters. 
 
 Each of the VGG's convolutional filters employs a 3$\times$3 kernel with the depth of the feature map gradually increasing through the network. The convolutions are followed by three fully connected layers and softmax layer, see \cref{tab:vggarch}. 
 
@@ -128,14 +128,14 @@ Today the VGG network is considered to be a general architecture for a classific
 \label{sec:inception}
 Predating architectures suggest that increasing the number of layers and layer size, leads to better precision. \citeauthor{bib:googlenet} introduced Inception v1 \cite{bib:googlenet}, also known as \textit{GoogLeNet}, with the goal of increasing precision while improving utilization of computing resources.
 
-Although stacking more convolutional layers increases the accuracy, a growing computational cost of those layers quickly overpowers the benefits. To avoid the aforementioned cost, Inception introduces the concept of sparsity in convolutional layers. The sparsity is achieved by using \textit{inception modules} that approximate a sparse structure by utilizing multiple convolutions with different kernel sizes and concatenating the outputs together (see \cref{fig:incept_mod}). 
+Although stacking more convolutional layers improves the accuracy, an increasing computational cost of those layers quickly overpowers the benefits. To avoid the aforementioned cost, Inception introduces the concept of sparsity in convolutional layers. The sparsity is achieved by using \textit{inception modules} that approximate a sparse structure by utilizing multiple convolutions with different kernel sizes and concatenating the outputs together (see \cref{fig:incept_mod}). 
 
 To reduce the computational cost further, each convolution is preceded with additional 1$\times$1 convolution, used for a dimensionality reduction. An alternate path in the \textit{inception module} is provided by max-pooling operation and concatenating it to the output.
 
 Inception begins with a sequence of convolution, pooling, and local response normalization operations. This 'stem' is followed by a chain of nine \textit{inception modules}, topped by a fully connected soft-max classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularization during the training.
 
 \subsubsection{Inception v2, v3 (2015)}
-A set of improvements to the Inception network is introduced in later versions of the network. Most notably a factorization of convolution layers in Inception v2 and v3, \citeauthor{bib:inception2} \cite{bib:inception2}. Factorization replaces larger convolutions with a network of multiple smaller ones. They found this method very effective, e.g., replacing a 5$\times$5 convolution with two layers of 3$\times$3 results in a relative gain of 28\% and replacing 3$\times$3 layer with 3$\times$1 and subsequent 1$\times$3 layer is 33\% cheaper.
+A set of improvements to the Inception network is introduced in later versions of the network. Most notably a factorization of convolution layers in Inception v2 and v3, \citeauthor{bib:inception2} \cite{bib:inception2}. Factorization replaces larger convolutions with a network of many smaller ones. They found this method very effective, e.g., replacing a 5$\times$5 convolution with two layers of 3$\times$3 results in a relative gain of 28\% and replacing 3$\times$3 layer with 3$\times$1 and subsequent 1$\times$3 layer is 33\% cheaper.
 
 \begin{figure}
     \includegraphics[width=\textwidth]{img/inception}
@@ -162,7 +162,7 @@ We can see the high level architecture of this model in \cref{fig:resnet_arch} (
 
 
 \subsection{Xception (2017)}
-\label{sec:xception} Xception architecture by \citeauthor{bib:xception} \cite{bib:xception}, is heavily inspired by previous architectures, mainly Inception and ResNet. It is built on the hypothesis claiming: "the mapping of cross-channel correlations and spatial correlations in the feature maps of convolutional neural networks can be entirely decoupled". This hypothesis expands upon the hypothesis underlying Inception architectures. Therefore the name 'Extreme Inception'. 
+\label{sec:xception} Xception architecture by \citeauthor{bib:xception} \cite{bib:xception}, is heavily inspired by previous architectures, mainly Inception and ResNet. It is built on the hypothesis claiming: "the mapping of cross-channel correlations and spatial correlations in the feature maps of convolutional neural networks can be entirely decoupled." This hypothesis expands upon the hypothesis underlying Inception architectures. Therefore the name 'Extreme Inception.' 
 
 The hypothesis is realized in the form of \textit{depthwise separable convolution} layers (shortly separable convolution). Depthwise separable convolution consists of two steps: a \textit{depthwise convolution} and \textit{pointwise convolution}. A depthwise convolution is a convolution performed independently over each channel, i.e., a convolution without changing the number of channels. The second step is a pointwise convolution that uses 1$\times$1 kernel to map the output of depthwise convolution into new channel space.
 
@@ -205,7 +205,7 @@ Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
 
 \section{Detection networks}
 \label{sec:detnets}
-The goal of the detection network is to localize all objects of chosen categories. There is a simple logical step from classification task to detection. It is to classify selected regions in the image as one of the classes or as a background. Classification applied to every possible box in the image would undoubtedly produce great detection results but at the extreme computational cost. This section describes a family of algorithms based on this simple idea while managing limited computational resources.
+The goal of the detection network is to localize all objects of chosen categories. There is a simple logical step from classification task to detection. It is to classify selected regions in the image as one of the classes or as a background. A classification applied to every possible box in the image would undoubtedly produce great detection results but at the extreme computational cost. This section describes a family of algorithms based on this simple idea while managing limited computational resources.
 
 We will see that this family of so-called \textit{region based} approaches can reach state-of-the-art results, with increasing efficiency by each generation. Considering precision, Faster R-CNN is still used as one of the most reliable detectors. However, although it can process a few frames per second, we do not consider it to be a truly real-time detector and applicable for demanding tasks, such as video surveillance. We devote \cref{sec:rltm} to detection networks performing in real-time constraints.
 
@@ -225,7 +225,7 @@ Each region is processed separately by a CNN into a feature map (the original ar
 \end{figure}
 
 \subsection{Fast R-CNN (2015)}
-Even though R-CNN was a major step in the right direction, its performance is far from real-time. \citeauthor{bib:fastrcnn} \cite{bib:fastrcnn} introduces Fast R-CNN with a series of innovations to its predecessor, aimed at improving speed and accuracy. Provided benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using R-CNN with VGG16 feature extractor, to 320 milliseconds with Fast R-CNN using the same feature extractor (not including a time for SS proposals). 
+Even though R-CNN was a major step in the right direction, its performance is far from real-time. \citeauthor{bib:fastrcnn} \cite{bib:fastrcnn} introduces Fast R-CNN with a series of innovations to its predecessor, aimed at improving speed and accuracy. Provided benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using R-CNN with VGG16 feature extractor, to 320 milliseconds with Fast R-CNN using the same feature extractor (not including time for SS proposals). 
 
 Similarly to R-CNN, this architecture also utilizes region proposal algorithm and a CNN to produce a feature map. A significant drawback of R-CNN was computing feature map for each region, despite overlaps. Fast R-CNN processes whole input image into a feature map, and then, using a \textit{region of interest (RoI) pooling layers}, extracts a feature vector for each region. All extracted feature vectors are pooled to the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
 
@@ -239,7 +239,7 @@ Similarly to R-CNN, this architecture also utilizes region proposal algorithm an
 
 \subsection{Faster R-CNN (2015)}
  
-Faster R-CNN by \citeauthor{bib:fasterrcnn} \cite{bib:fasterrcnn} expands on the Fast R-CNN with the aspiration to achieve a real-time performance. Fast R-CNN managed to build a fast feature extraction and subsequent classification usable in a real-time environment. However, it is heavily slowed down by a region proposal SS algorithm. Faster R-CNN expands on the idea of sharing resources and replaces SS with \textit{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can find limited use in a real-time environment. Whole architecture can be seen on \cref{fig:fasterrcnn}. 
+Faster R-CNN by \citeauthor{bib:fasterrcnn} \cite{bib:fasterrcnn} expands on the Fast R-CNN with the aspiration to achieve real-time performance. Fast R-CNN managed to build a fast feature extraction and subsequent classification usable in a real-time environment. However, it is heavily slowed down by a region proposal SS algorithm. Faster R-CNN expands on the idea of sharing resources and replaces SS with \textit{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can find limited use in a real-time environment. Whole architecture can be seen on \cref{fig:fasterrcnn}. 
  
  \paragraph{Region proposal network} is designed as a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs determines whether proposed region contains an object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textit{anchors} (the anchor is a predefined box centered at a location of sliding-window). Assuming \textit{k} anchors with different sizes and aspect ratios are used, regression produces 4k relative parameters and classifier 2k scores. Regression parameters are used to modify the position and size of their corresponding anchor. The number of regions is then reduced by eliminating proposals with high overlap using a \textit{non-maximum suppression} (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
  
