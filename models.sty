@@ -94,7 +94,7 @@
 
     \tikzstyle{line} = [draw, -latex]
     \tikzstyle{fline} = [draw, -latex, line width=0.8pt]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\convcol]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\convcol, node distance=1.15cm]
     \tikzstyle{rect} = [rectangle, draw, text centered, minimum height=2em, fill=\blockcol]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\inputcol]
     \tikzstyle{pool} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\poolcol]
@@ -110,7 +110,7 @@
          \node [conv, below of=p1] (ext-1) {Conv. 3$\times$3$\times$1024};
          \node [conv, below of=ext-1] (ext0) {Conv. 1$\times$1$\times$1024};
     
-        \draw[blue,line width=0.6mm,] ($(block1.north west)+(-0.2,0.2)$)  rectangle ($(block2.south east)+(0.2,-3.8)$);
+        \draw[blue,line width=0.6mm,] ($(block1.north west)+(-0.2,0.2)$)  rectangle ($(block2.south east)+(0.2,-3.65)$);
         \node [text=blue, font=\bfseries] at ($(input.east)+(+3.2,-0.8)$) (resnet) {\Large VGG-16};
         
         % \node [text=black, font=\bfseries] at ($(input.west)+(-3.5,0.4)$) (header) {\LARGE ResNet-SSD};

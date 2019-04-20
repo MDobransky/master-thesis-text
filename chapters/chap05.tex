@@ -41,7 +41,7 @@ After determining the layers for feature extraction, we implemented the rest of 
 
 \paragraph{ResNet-SSD} Different sizes of ResNet network can be created by parameterizing its high level, four \textit{Layer} architecture. Ideally, we wanted a single ResNet-SSD architecture that would support 34, 50 and 101 layer version without alterations. Thankfully, this is exactly how the ResNet is designed, with consistent spatial feature map sizes between high-level \textit{Layers}. Those sizes are [75\x75], [38\x38], [19\x19] and [10\x10]. The latter three are exactly matching the VGG16-SSD prototype. 
 
-After being provided with three feature maps by the network, we removed poolings and fully connected classifier and replaced it with appropriate set of \textit{extra layers} to produce the other three maps. The architecture of ResNet34-SSD, with highlighted detection feature maps is illustrated on \cref{fig:resnet_xception_SSD}.
+After being provided with three feature maps by the network, we removed poolings and fully connected classifier and replaced it with an appropriate set of \textit{extra layers} to produce the other three maps. The architecture of ResNet34-SSD, with highlighted detection feature maps is illustrated on \cref{fig:resnet_xception_SSD}.
 
 \paragraph{XceptionA-SSD} Similarly to ResNet, Xception can also be viewed in multiple layers of abstraction, the highest-level structure with \textit{entry}, \textit{middle} and \textit{exit flow}, or lower-level twelve \textit{block} structure with preceding and tailing convolutional layers (see \cref{fig:xception}). After we removed the classifier from the \textit{exit flow}, the three parts of the network provided feature maps of [19\x19], [19\x19] and [10\x10] sizes. The latter two feature maps met our expectations. However, we had to dive deeper inside \textit{entry flow} to find larger feature map, analogous to the original [38\x38] map. The best option was to select the feature map produced by the second \textit{block} of the network, with the [37\x37] size. 
 
@@ -68,7 +68,7 @@ Nevertheless, the input size was not the only problem. Since the mobile version 
     \centering
     \nasnetSSD
     \caption[NASNet-SSD]%
-    {NASNet-SSD based on NASNet-A-Mobile. For detailed description of cells see \cref{sec:nasnet}. Extra layers are highlighted with a red dashed rectangle.}
+    {NASNet-SSD based on NASNet-A-Mobile. For detailed description of cells see \cref{sec:nasnet}. \textit{Extra layers} are highlighted with a red dashed rectangle.}
     \label{fig:nasnetSSD}
 \end{figure}
 
@@ -82,7 +82,7 @@ Although the results of the XceptionA-SSD were disappointing, we believed that t
 \begin{figure}
     \centering
     \includegraphics[width=0.975\textwidth]{img/fps_map_c}
-    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks with mAP@[0.5]. Circle radii demonstrate relative difference of network parameter counts. }
+    \caption[Performance of SSD with multiple base networks on COCO dataset]{Performance of SSD detector on multiple base networks. Circle radii demonstrate relative difference of network parameter counts. }
     \label{fig:cocoperf}
 \end{figure}
 
@@ -111,11 +111,11 @@ Before we get to the comparison of the training results, we will explain our hyp
 
 The problem we describe is, of course, part of a broader difficulty with non-exhaustive datasets. Our question is, therefore: If we have an available set of annotations for the classes we are not interested in, but that can be present in our input images and share similarities with detected classes, would it not be better to learn to detect those classes?
 
-\paragraph{The results} in \cref{tab:ssdcocosurv} show that in our case, it is possible to remove unnecessary classes from the dataset without impacting the performance. It is worth mentioning that we tried to precautiously counter-measure our hypothesis by creating the surveillance dataset by only filtering the annotations and keeping all images of the original dataset.
+\paragraph{The results} in \cref{tab:ssdcocosurv} show that in our case, it is possible to remove unnecessary classes from the dataset without impacting the performance. It is worth mentioning that we tried to precautiously counter-measure our hypothesis by creating the Surveillance dataset by only filtering the annotations and keeping all images of the original dataset.
 
 We tested the approach on multiple architectures, and the results do not conclusively favor one dataset over the other. However, based on this experiment, we are not able to conclusively confirm or deny our hypothesis. Even if we wanted to make a conclusion for the COCO dataset using the provided training and validation data, the experiment is still dependant on the choice of classes.
 
-\begin{table}[]
+\begin{table}
     \centering
     \begin{tabular}{c|c|c}
          & COCO & Surveillance  \\
@@ -126,12 +126,12 @@ We tested the approach on multiple architectures, and the results do not conclus
         XceptionA & 39.4 & 37.8 \\
         NASNet & 36.4 & 36.9 
     \end{tabular}
-    \caption[SSD's precision comparison between COCO and surveillance datasets]{Mean average precision of surveillance classes at IoU 0.5. Comparing networks trained on all 80 classes of COCO dataset and surveillance subset of COCO.}
+    \caption[SSD's precision comparison between COCO and Surveillance datasets]{Mean average precision of Surveillance classes. Comparing networks trained on all 80 classes of COCO dataset and Surveillance subset of COCO.}
     \label{tab:ssdcocosurv}
 \end{table}
 
 \subsection{Performance impact}
-We expected a proportional increase in performance with the elimination of unwanted classes. We saw in \cref{fig:VGGSSD} that the depth of the classification layers in SSD is dependent on the number of classes. Shallower classification layers are not only processed faster in the neural network but also produce less data that will result in faster post-processing, mainly, non-maximum suppression.
+We expected a proportional increase in performance with the elimination of unwanted classes. We saw in \cref{fig:VGGSSD} that the channel depth of the classification layers in SSD is dependent on the number of classes. Shallower classification layers are not only processed faster in the neural network but also produce less data that will result in faster post-processing, mainly, non-maximum suppression.
 
 We illustrate the effect that the number of detected classes has on performance in \cref{fig:fpscls}. Although the relationship of frames per second and classes is hyperbolic, on the interval between 7 and 80 classes, we approximate the loss of 0.8fps with each additional class on ResNet50-SSD. Considering the dataset can contain tens or hundreds of classes, we showed that the filtering out the unwanted classes could produce significant performance benefit.
 
@@ -145,18 +145,18 @@ We illustrate the effect that the number of detected classes has on performance 
 
 \section{Modifying Xception}
 \label{sec:fixxception}
-We managed to successfully re-implement SSD on other architectures and boost the speed of surveillance by removing unnecessary classes. We can confidently say that ResNet50-SSD with 48.7\% mAP@[0.5] and 108fps or ResNet34-SSD with 47.3\% mAP@[0.5] and 125fps outperform original SSD on VGG16 with 46.1\% mAP@[0.5] and 42fps. However, we believed that the underwhelming result of XceptionA-SSD could be used as a stepping stone and the results could be pushed further with modifications to the Xception architecture. 
+We managed to successfully re-implement SSD on other architectures and boost the speed of surveillance by removing unnecessary classes. We can confidently say that ResNet50-SSD with 48.7\% mAP and 108fps or ResNet34-SSD with 47.3\% mAP and 125fps outperform original SSD on VGG16 with 46.1\% mAP and 42fps. However, we believed that the underwhelming result of XceptionA-SSD could be used as a stepping stone and the results could be pushed further with modifications to the Xception architecture. 
 
 We already mentioned the hypothesis that the major factor limiting the precision of XceptionA-SSD is the extraction of [37\x37] feature map after the second block of the network. To rectify this problem, we decided to make adjustments to the network, in such a way that we could extract [37\x37] feature map after \textit{block 7}, and keep the [19\x19] map after \textit{block 11} as previously dictated by network architecture. The reasoning behind choosing \textit{block 7} was that it is deep enough in the network and leaves four blocks between the feature map extractions. It is perhaps a bit arbitrary decision and blocks 6 or 8 would do just as well, or better.  In order to achieve the correct sizes of feature maps, we moved the max-pooling with stride 2 from \textit{block 3} to \textit{block 8}. This resulted in outputs of the \textit{block 2-7} to be the [37\x37] size and \textit{block 8} to output [19\x19] feature map. 
 
 The proposed change to the pooling, and thus feature map sizes results in the increased complexity of the network as the [19\x19\x728] features now grew to the [37\x37\x728] size. To remedy this, we decreased the number of channels for concerned blocks to 256. We also decided to continue with trimming layers in the rest of the network. In the end, we got the [37\x37] map with 256 channels, [19\x19] map with 512 channels and [10\x10] map with 1024 channels. The architecture with highlighted changes is illustrated on \cref{fig:xceptionH_SSD}. 
 
-Our modification not only helped to improve Xception-SSD to overcome VGG16, but we also outperformed ResNet50-SSD's 48.7\% mean average precision with 49.8 \% mAP. However, despite our best efforts to save computation, we managed to outperform XceptionA only slightly, by achieving 92fps. \todo{check data} The relative performance of XceptionH based SSD to other SSDs using the surveillance dataset can be seen on \cref{fig:surv_perf}.
+Our modification not only helped to improve Xception-SSD to overcome VGG16, but we also outperformed ResNet50-SSD's 48.7\% mean average precision with 49.8 \% mAP. However, despite our best efforts to save computation, we managed to outperform XceptionA only slightly, by achieving 92fps. \todo{check data} The relative performance of XceptionH based SSD to other SSDs using the Surveillance dataset can be seen on \cref{fig:surv_perf}.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/fps_map_s}
-    \caption[Performance of SSD with multiple base networks on Surveillance dataset]{Performance of SSD detectors on multiple base networks on \textit{surveillance} dataset. Circle radii demonstrate relative difference of network parameter counts.} 
+    \caption[Performance of SSD with multiple base networks on Surveillance dataset]{Performance of SSD detectors on multiple base networks on Surveillance dataset. Circle radii demonstrate relative difference of network parameter counts.} 
     \label{fig:surv_perf}
 \end{figure}
 
@@ -164,16 +164,16 @@ Our modification not only helped to improve Xception-SSD to overcome VGG16, but 
     \centering
     \xceptionSSD
     \caption[XceptionH-SSD]%
-    {XceptionH architecture (right) compared to XceptionA (left). Changes are highlighted with bold font. Connection to SSD's detection layers are indicated by the arrows on the sides, extra layers are appended to the bottom of the network.  \textit{S} represents stride of the block, implemented using max-pooling. Blocks are also color-coded based on the feature map size. Extra, classification and localization layers are unchanged from \cref{fig:resnet_xception_SSD}. For details on \textit{Blocks} see \cref{fig:xception}.} 
+    {XceptionH architecture (right) compared to XceptionA (left). Changes are highlighted with bold font. Connection to SSD's detection layers are indicated by the arrows on the sides, \textit{extra layers} are appended to the bottom of the network.  \textit{S} represents stride of the block, implemented using max-pooling. Blocks are also color-coded based on the feature map size. Extra, classification and localization layers are unchanged from \cref{fig:resnet_xception_SSD}. For details on \textit{Blocks} see \cref{fig:xception}.} 
     \label{fig:xceptionH_SSD}
 \end{figure}
 
 
 \section{SSD-TC: SSD with temporal convolution}
 \label{sec:ssdtc}
-Since our main priority is video surveillance, we wanted to explore the options of video detection, exploiting the additional information the video can provide over still images. In \cref{sec:video_det} we have already examined two approaches of utilizing the continuity of video frames to achieve higher precisions. One approach used architecture similar to Faster R-CNN with use of temporal tubes-of-interest. The other one used modified SSD with convolutional LSTM cells to harness the temporal information. However, the major drawback of both approaches was their inference speed. 
+Since our main priority is video surveillance, we wanted to explore the options of video detection, exploiting the additional information a video can provide over still images. In \cref{sec:video_det} we have already examined two approaches of utilizing the continuity of video frames to achieve higher precisions. One approach used architecture similar to Faster R-CNN with use of temporal tubes-of-interest. The other one used convolutional LSTM cells to harness the temporal information inside a modified SSD. However, the major drawback of both approaches was their inference speed. 
 
-Inspired by the two approaches, we decided to implement our take on video detector with temporal information. To this end, we chose to expand on the SSD. We already have an understanding of the model, and the single-stage detectors are currently the only relevant choice considering speed. We also wanted to avoid adding complex, time-consuming structures like LSTM cells used in TSSD. Instead, we decided to use three-dimensional convolutional layers (conv3d), to aggregate the information from multiple images. We named our approach \textit{Single Shot Detector with Temporal Convolution} (SSDTC).
+Inspired by the two approaches, we decided to implement our version of video detector with temporal information. To this end, we chose to expand on the SSD. We already have an understanding of the model, and the single-stage detectors are currently the only relevant choice considering speed. We also wanted to avoid adding complex, time-consuming structures like LSTM cells used in TSSD. Instead, we decided to use three-dimensional convolutional layers (conv3d), to aggregate the information from multiple images. We named our approach \textit{Single Shot Detector with Temporal Convolution} (SSDTC).
 
 Of course, we need to prove our concept by training it on some data and comparing it to unmodified SSD. Since we require a dataset with consecutive frames, we decided to start with the HollywoodHeads dataset. This set annotates heads in sections of movies. Considering that dataset has only one class and previous results of SSD testing suggests ResNet34-SSD would be more than sufficient for this task, we trained it as a baseline. Consequently, we also based SSDTC on ResNet34-SSD.
 
@@ -202,10 +202,12 @@ In simple terms, we add temporal information from neighboring frames to each fea
 A previously mentioned, ResNet34-SSD was trained on the same dataset to serve as s baseline for comparison. This SSD achieved the precision of 81.16\% while performing at 156 frames per second. 
 
 Our SSDTC architecture managed to reach the precision of 86.73\% with processing speed of 148 fps. However, considering that detection is not performed for every processed frame, the effective speed of the network is 111 frames per second with the chunk size of 16 frames. 
-\todo{caption and ref}
+
+In \cref{fig:ssdssdtccomp}, we can see that SSDTC helped to remove many false detections and stabilized the detections.
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/ssdt_ssdtc_comp}
-    \caption{Caption}
+    \caption[Comparison of detections by SSDTC and SSD]{Comparison of detections by SSDTC (top) and SSD (bottom). Performed on the sequence of nine frames, ordered from left to right, top to bottom. Frames were cropped after detection.}
     \label{fig:ssdssdtccomp}
 \end{figure}
