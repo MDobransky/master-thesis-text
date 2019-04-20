@@ -1,29 +1,5 @@
 \chapter{TMP}
 
-\subsection{Xception-B-SSD and Xception-C-SSD }
-\begin{figure}
-\centering
-    \xceptionBSSD
-     \caption{TODO For details on extra layers, classification and location layers see \cref{fig:resnet_xception_SSD}}
-    \label{fig:xceptionBSSD}
-\end{figure}
-
-\subsection{Train results}
-\begin{table}
-    \begin{tabular}{c|c|c}
-                            & coco      & small \\
-        Resnet34-SSD        & 32.4      & 47.3  \\
-        Resnet50-SSD        & 32.7      & 48.7  \\
-        Resnet101-SSD       & 32.8      & 45.7  \\
-        Xception-A-SSD      & 26.8      & 37.8  \\
-        Xception-B-SSD      & -         & 48.4  \\
-        Xception-C-SSD      & -         & x     \\
-        NASNet-mobile-SSD   & -         & 36.9  \\
-    \end{tabular}
-    \caption{mean average precision, conf thr 0.2, IoU 0.5,  (400 epochs), 300x300 scaled random crops}
-    \label{tab:map}
-\end{table}
-
 
 \begin{table}
     \begin{tabular}{c|c|c}
