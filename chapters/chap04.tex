@@ -1,172 +1,245 @@
-\chapter{Experiments}
-In this chapter, we provide details on the techniques used to gather the data presented in the previous chapter. We also present additional experimental results.
+\chapter{Related work}
+\label{chap:related}
+
+In this chapter, we provide an overview of the methods used for detections in the video. There are two types of approaches that can be used for video detection, a high-speed single frame detector, or a detector designed for a sequence of frames. Although there is no standardized definition of how many fps are real-time, we can consider 25fps as a minimum. However, in practice, we need as much fps as possible not only to keep up with one video stream but to process multiple video streams on one GPU. 
+
+Currently, the detectors designed for image detection hold an edge over detectors with temporal information, mostly because available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
+
+\section{Detection explained}
+\todo{explain how conv produces predictions}
+
+\section{Real-time detectors}
+\label{sec:rltm}
+In \cref{sec:detnets} we took a look on a series of two-stage detectors, with separate region proposals and classification. A few years later, a new type of detectors has been developed, with faster single-stage design. Single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also, the trade-off between speed and precision is continually diminishing in favor of single-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.
+
+\subsection{YOLO: You Only Look Once (2016)}
+\label{sec:yolo}
+Building on the success of neural network detectors from R-CNN family. \citeauthor{bib:yolo} \cite{bib:yolo} introduced a new approach to object detection. They unify networks for localization and classification into a new single network that predicts both bounding box positions and class probabilities in a single evaluation. This approach also simplifies the training process, as YOLO can be directly trained end-to-end. 
+
+Thanks to straightforward single-pass architecture YOLO claims to perform at 45 frames per second on Titan X GPU. Although it has to sacrifice some precision compared to region proposal methods, it out-performs other real-time systems of its time \cite{bib:overfeat}.
 
 
-\section{SSD training}
-\citeauthor{bib:ssd} implemented \footnote{\url{https://github.com/weiliu89/caffe/tree/ssd}} SSD model from their research research paper in the \textit{Caffe} \footnote{\url{http://caffe.berkeleyvision.org/}} deep learning framework. We decided against performing our experiments in this, by now outdated framework, and implemented our version in newer \textit{PyTorch} \footnote{\url{https://pytorch.org/}} framework. More detailed technical specification of used libraries is available in \cref{app:impl}.
+\subsubsection{Detection}
+Prediction in YOLO works in a grid-based system. It divides the image into \textit{S\x S} grid with each cell responsible for detecting the object centered in that cell.  Each cell produces predictions for \textit{B} bboxes and one set of class confidence predictions. 
 
-We started by implementing a common framework for SSD detectors, that would support SSD models with many modifications. Although SSDTC inference is possible in the same framework, we had to create a separate environment for the training. More on SSDTC in \cref{sec:ssdtcImpl}. 
+Bbox prediction is composed of four positional parameters and confidence score. Center coordinates relate to the grid cell while width and height are represented relative to the whole image. Confidence score reflects IoU with ground-truth box. Class confidence prediction represents the conditional probability of a said class, given the presence of the object in that cell. 
 
-The main characteristics of our framework are the use of \textit{SGD} optimizer and the loss function defined for SSD, also called MultiBox loss (\cref{sec:ssd}). Another essential element of the detection pipeline, used for inference, is the non-maximum suppression algorithm. The parametrization of these modules can be seen in \cref{tab:trainParams}. It is also worth mentioning that for the sake of consistency, all experimental models were trained for 401 epochs with a batch size of 32, using those default parameters.
+Final confidence for each box is the product of both conditional class probabilities and the individual box confidence predictions. We can see the illustration of this process on \cref{fig:yoloDet}.
 
-\begin{table}[]
+\begin{figure}
     \centering
-    \begin{tabular}{c c|c c| c c}
-        \multicolumn{2}{c|}{MultiBox loss} & \multicolumn{2}{c|}{SGD optimizer} & \multicolumn{2}{c}{NMS} \\
-        \hline
-        IoU threshold & 0.5 & learning rate &  \num{e-3} & IoU threshold & 0.5\\
-        \hline
-        \multirowcell{2}{positive/negative\\ sample ratio} & \multirowcell{2}{1:3} & \multirowcell{2}{momentum} & \multirowcell{2}{0.9} & \multirowcell{2}{confidence \\ threshold} & \multirowcell{2}{0.2} \\
-        & & & & & \\
-        \hline
-        & & weight decay & \num{5e-4} & & \\
-    \end{tabular}
-    \caption{A selection of default values for most important parameters in our framework. We used these values for training and evaluation in all experiments. Note that the learning rate decreases during the training.}
-    \label{tab:trainParams}
-\end{table}
+    \includegraphics[width=\textwidth]{img/yoloDet}
+    \caption[YOLO detection]%
+    {Detection process of YOLO. From \cite[fig. 2]{bib:yolo}.}
+    \label{fig:yoloDet} 
+\end{figure}
 
 
-\section{Measurements}
-To make our work comparable to other similar studies and future works, we explain methods used for both precision and performance measurements.
+\subsubsection{Architecture} 
+YOLO is designed as a single network that takes the input image and outputs bbox and class predictions. Design of the network is inspired by Inception classification network. Although it does not use inception modules, it relies on the 1\x1 reduction layers to speed up 3\x3 convolutions. YOLO uses 24 convolutional layers followed by two fully connected layers. Full architecture is shown on \cref{fig:yolo}. 
 
-\subsection{Precision}
-Rather than implementing a copy of the precision evaluation, our precision measurements were taken using an external tool. Using the external tool, independent on our implementation, allows us to easily compare our results with other works with little to no modifications. We used the implementation by \citet{bib:metricsgit} that mirrors the evaluation process of the PASCAL VOC Challenge. The test setup used default parameters, meaning that the interpolation of AP was calculated using all data points and the IoU threshold was set to 0.5. 
+Various other versions and modifications are possible. A smaller and faster version is called Fast YOLO. It has a similar architecture but uses only 9 convolutional layers. Another possibility to improve YOLO is to replace the custom architecture with a more common feature extractor from a classification network. YOLO build on top of a VGG16 achieves better precision at the cost of half of the frames per second.
 
-We present all the measurements taken on Surveillance dataset while performing multiple experiments described in this thesis in \cref{tab:ap}.
-
-
-\begin{table}[]
+\begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{img/ap}
-    \caption[Average precision of all tested networks on Surveillance classes]{Average precision of all tested networks on Surveillance classes. COCO indicates that the network was trained on COCO dataset, otherwise only Surveillance data were used for training.} 
-    \label{tab:ap}
-\end{table}
+    \includegraphics[width=\textwidth]{img/yoylo}
+    \caption[YOLO architecture]%
+    {YOLO architecture for evaluating PASCAL VOC. It uses 7 by 7 grid with 2 bboxes per cell. Detecting 20 categories, the output's shape is [7\x7\x30]. From \cite[fig. 3]{bib:yolo}.}
+    \label{fig:yolo} 
+\end{figure}
 
-\subsection{Inference speed}
-The absolute values of the inference speed measurement would not provide any information without the knowledge of the environment in which they have been taken. In this section, we provide the details of both software and hardware environments used for measurements.
+\subsubsection{Training}
+Although the network can be trained end-to-end, it is common for CNN to pre-train on ImageNet dataset. This is also the case for YOLO. First, convolutional layers are pre-trained on the ImageNet dataset, then the detection layers are added, and the whole network is trained for detection. The model is optimized using the sum-squared error between predictions and ground-truths. The loss function is a sum of three parts, classification loss, localization loss, and bbox confidence loss. 
 
-Testing was done by processing a total of 10 000 images in batches of 16. This process was timed, and the average \textit{fps} value was calculated.  Since we do not consider scaling and cropping the images to be part of the network, we did not need to include this process in the measurement. The set of [300\x300] pixel images was pre-loaded into memory before the timer was started. On the other hand, non-maximum suppression is a critical part of the algorithm and is included in the measurement. 
+\paragraph{Classification loss}
+\begin{align*}
+\mathbf{L_{cls}} = \sum_{i=0}^{S^2}\mathbbm{1}_i^{\text{obj}} \sum_{c\in \text{class}} (p_i(c) - \hat{p}_i(c))^2
+\end{align*}
 
-\paragraph{Hardware} All our testing was done on the following hardware:
+\paragraph{Localization loss}
+\begin{align*}
+\mathbf{L_{loc}} &= \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} \left[(x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2\right] \\
+ &+  \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} \left[(\sqrt{w_i} - \sqrt{\hat{w}_i})^2 + (\sqrt{h_i} - \sqrt{\hat{h}_i)^2}\right]
+\end{align*}
+
+\paragraph{Confidence loss}
+\begin{align*}
+\mathbf{L_{cnf}} &= \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{obj}} (C_i - \hat{C}_i)^2 
++ \lambda_{\text{noobj}} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbbm{1}_{ij}^{\text{noobj}} (C_i - \hat{C}_i)^2
+\end{align*}
+
+\noindent where $\mathbbm{1}^{\text{obj}}_i$ denotes if object appears in cell $i$ and $\mathbbm{1}^{\text{obj}}_{ij}$ denotes that the $j$th bounding box predictor in cell $i$ is responsible for that prediction.
+
+The gradient of cells that do contain the object can be overpowered with the cells that do not.  Therefore, the loss from negative confidence predictions is decreased by $\lambda_{\text{noobj}} = 0.5$. And to emphasize the bbox predictions, localization loss is increased using $\lambda_{\text{coord}} = 5$.In the localization loss, we can see that the center coordinates are handled differently to width and height. The square root of width and height is used to equalize the impact of the absolute value of error in small and large boxes.
+
+
+\subsubsection{Properties}
+A primary virtue of YOLO is its speed for real-time applications, and its simple architecture allows for easy training and end-to-end optimization. YOLO's detection layer is provided with context from the whole image which leads to less false detections than in region proposal methods. 
+
+On the other hand, a significant problem with YOLO's grid-based detection system is a limitation to one class per cell. This limitation results in the inability to detect multiple objects in close proximity, such as people in the crowd. 
+
+YOLO also suffers from multiple problems with precise localization. It learns to detect arbitrary shapes, which can be hard to generalize to objects in new and unusual aspect ratios. Also, it predicts the bboxes on the heavily down-sampled image which leads to further imprecision. 
+
+\subsubsection{YOLO v2 (2017)}
+The second version of YOLO architecture by \citeauthor{bib:yolo9000} \cite{bib:yolo9000}, implements a series of improvements to the original network. Compared to original 45fps on [448\x448] image, v2 achieves 59fps on [480\x480] images. 
+
+A selection of changes to YOLO architecture:
 \begin{itemize}
-    \item AMD EPYC 7401P CPU @ 2GHz \x 24
-    \item NVIDIA GeForce GTX 1080 Ti
-    \item 128GB DDR4 RAM
+    \item \textit{batch normalization} improves precision and helps regularization
+    \item \textit{fully convolutional architecture} shortens the inference time
+    \item class and confidence predictions are no longer tied to grid locations, instead five \textit{anchor boxes} are used
+    \item detection on \textit{multiple feature maps} with different sizes concatenated into channels
+    
 \end{itemize}
 
 
-\section{Improving the Xception-SSD}
-In \cref{sec:fixxception} we introduced a hypothesis about Xception\textit{A}-SSD. Based on this hypothesis, we presented the improved Xception\textit{H} model. However, as suggested by the name, it was not our first modification, and we needed some trial-and-error testing to achieve this result.
+\subsection{SSD: Single Shot MultiBox Detector (2016)}
+\label{sec:ssd}
+SSD is another real-time detector, aiming to outperform Faster R-CNN by using a single network with one-time evaluation. \citeauthor{bib:ssd} \cite{bib:ssd} presented this model just months after YOLO. Even though these networks are built on similar principles, there are multiple key differences. SSD manages to outperform Faster R-CNN and YOLO both in speed and precision.
 
-We will describe every iteration of the Xception-SSD model we trained and the reasoning behind the particular modifications. For clarity, we will refer to the Xception\textit{X} models in this section only by their version letters. The performance of mentioned models on Surveillance dataset is plotted on \cref{fig:xception_perf}, and more details on precision in \cref{tab:ap}. Also, the feature map sizes inside the models are shown in \cref{tab:xmods}.
+\subsubsection{Detection}
+One of the main features of SSD is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of a convolutional window. SSD adopts similar concept to Faster R-CNN's anchor boxes, this time called default or prior boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, six boxes are used. Contrary to YOLO, both bbox and classification predictions are made for each position and each prior box.
+
+Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. \todo{explain} There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B\x (C+5)] parameters on feature map of [m\x n] size.
+
+\textit{SSD} detects objects on multiple feature maps at different scales, to accommodate detection of different sized objects. Moreover, this allows detectors on each level to focus on predicting a smaller range of bbox sizes. For the illustration of this process see \cref{fig:ssddet}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/ssddet}
+    \caption[SSD detection]%
+    {SSD detection. (a) Input image with ground-truth boxes. (b) and (c) Predictions based on prior boxes on multiple scales of feature maps.}
+    \label{fig:ssddet}
+\end{figure}
+
+\subsubsection{Architecture}
+The SSD architecture can be described as a set of three modules. A base network, extra convolutional layers and detection layers.
+
+\begin{itemize}
+    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. SSD's base is built from VGG16 network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. Pool5 layer is also changed from 2\x2/2 to 3\x3/1 pooling. Technically, SSD does not force any constraints on the base network, and any CNN can replace VGG.
+    \item \textbf{Extra layers} serve the purpose of providing more feature maps on decreasing scale to the detector. Smaller feature maps aggregate more information to a smaller area and allow for the detection of larger objects with small convolutional window. On the other hand, information about small objects can be lost. Therefore the use of gradually decreasing series of feature maps. \textit{Extra layers} are implemented as a sequence of convolution layers connected to the end of the \textit{base}.
+    \item \textbf{Detection layers} are the final layers of the network. There is a pair of classification and localization convolutions for each feature map. Considering SSD300, where 300 stands for the width and height of input image. Detection is performed on 6 feature maps of sizes [38, 19, 10, 5, 3, 1], using [4, 6, 6, 6, 4, 4] prior boxes respectively, producing 8732 predictions per class. First, two of those feature maps are pulled from the VGG network, and the \textit{extra layers} provide the rest. All detection layers are implemented using 3\x3 convolutions with an appropriate number of filters, as seen on \cref{fig:VGGSSD}.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \VGGSSD
+    \caption[SSD architecture]%
+    {SSD architecture based on modified VGG16 network. VGG's three fully connected layers are replaced with two new convolutional layers, and Pool5 layer is changed from 2\x2/2 to 3\x3/1 pooling. Detection on the first and last two feature maps uses four prior boxes, while the rest uses six boxes. See more details on VGG in \cref{sec:VGG}.}
+    \label{fig:VGGSSD}
+\end{figure}
+
+
+\subsubsection{Training}
+SSD pre-trains the \textit{base network} on ImageNet dataset, and after that removes the classification layers and replaces them with \textit{extra} and \textit{detection} layers. The model is than trained for detection end-to-end. SSD utilizes \textit{smooth L1} loss for localization and \textit{cross-entropy} loss for classification. The final loss is the sum of those two components.
+
+Before the training, we need to figure out which prior boxes match the ground-truth annotations. For each ground-truth box, two criteria are used: a prior box with highest IoU is selected, and then, the ground-truth box is also matched to all prior-boxes with IoU higher than a threshold (0.5). Let the $x_{ij}^p = {0,1}$ be an indicator that $i$th prior box matches $j$th ground-truth box with class $p$.
+
+To keep the balance between positive and negative samples, \textit{hard negative mining} algorithm is employed. Only top negative samples, with the highest confidence score, are chosen. The goal is to keep the ratio of positives and negatives below 1:3.
+
+\paragraph{Localization loss} expresses the error between predicted boxes $(l)$ and ground-truths $(g)$. Predictions are generated in respect to corresponding prior boxes. Therefore, after matching the boxes, a ground-truths also need to be represented in respect to prior box $(d)$, with center $(c_x,c_y)$ and width $(w)$ and height $(h)$.
+
+\begin{align*}
+\mathbf{L_{\text{loc}}}(x,l,g) = \sum_{i\in Pos}^N \sum_{m\in(c_x, c_y, w, h)} &x_{ij}^k\text{smooth}_{L1}(l_i^m-\hat{g}_j^m) \\
+\hat{g}_j^{c_x} = (g_j^{c_x} - d_i^{c_x}) / d_i^{w} \qquad& \hat{g}_j^{c_y} = (g_j^{c_y} - d_i^{c_y}) / d_i^{h} \\
+\hat{g}_j^{w} = log(\frac{g_j^{w}}{d_i^w}) \qquad& \hat{g}_j^{h} = log(\frac{g_j^{h}}{d_i^h})
+\end{align*}
+
+\paragraph{Confidence loss} or classification loss, is the softmax loss over class confidences $(c)$.
+\begin{align*}
+\mathbf{L_{\text{cls}}}(x,c) = -\sum_{i\in Pos}^N x_{ij}^p log(\hat{c}_i^p) - \sum_{i \in Neg} log(\hat{c}_i^0) \quad\text{where} \quad\hat{c}_i^p = \frac{exp(c_i^p)}{\sum_p exp(c_i^p)}
+\end{align*}
+
+\noindent The final loss is then a weighted sum of both losses. The weight parameter $\alpha$ is set to 1. The loss is also divided by the number of matched prior boxes to keep it independent of the number of objects.
+
+\begin{align*}
+\mathbf{L}(x,c,l,g) = \frac{1}{N}(\mathbf{L_{\text{cls}}}(x,c) + \alpha\mathbf{L_{\text{loc}}}(x,l,g))
+\end{align*}
+
+\section{Detection with temporal information}
+\label{sec:video_det}
+In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
+
+A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
+
+However, adding another dimension to the detection model has a performance impact. It is also much harder to create a dataset suitable for training of detectors with a temporal dimension because a whole series of frames need to be precisely annotated. Of course we can find a few public datasets e.g. \textit{ImageNet VID}\footnote{\url{http://image-net.org/challenges/LSVRC/2017/\#vid}}, \textit{YouTube-8M}\footnote{\url{https://research.google.com/youtube8m}} and some smaller ones like \textit{HollywoodHeads}\footnote{\url{https://www.di.ens.fr/willow/research/headdetection}}.
+
+This section presents two approaches to adding temporal information to an object detector. First presented method adopts the approach of region proposal methods and the second one is based on a single-stage detector.
+
+
+\subsection{Tube-CNN (2018)}
+\label{sed:tubecnn}
+The architecture of this detector is very similar to Fast-RCNN with the added temporal dimension. The main idea is based on region/tube proposals and the following classification network for those regions. \citeauthor{bib:tubeCNN} \cite{bib:tubeCNN} proved that using a temporal information provided by continuous video frames enhances a precision of the detector. On the other hand, this approach adds more complexity to slower than real-time Faster-RCNN detector. The resulting network achieves only low single digit frame per second values, depending on the configuration. 
+
+\subsubsection{Tube proposal network}
+Tube proposal generation begins with a feature extraction on a chunk of video frames. After the processing of all frames individually, feature maps are stacked together in the temporal dimension. Then, volumetric convolutional layers (conv3d) are applied to produce a feature volume.
+
+Analogously to Faster-RCNN, each position in this feature volume is used to create tube proposals using \textit{K} anchor tubes. The proposal for each anchor consists of the \textit{objectness} and position parameters. The \textit{objectness} score reflects the probability of the presence of the same objects as opposed to a background. 
+
+IoU value for tubes is defined as a minimum of spatial IoU at the ends of tubes. The number of proposals is reduced by eliminating tubes with high overlap using a non-maximum suppression based on \textit{objectness} score. 
+
+A provided data for the training usually consists of a series of ground-truth boxes for individual frames. During the training of TPN, a series of ground-truth boxes is approximated by a ground-truth tube. Those tubes are then matched against the tube proposals using an IoU threshold. A tube proposal network is designed only to consider tubes corresponding to linear motion in order to limit the complexity. 
+
+\subsubsection{Detection network}
+Tube-CNN, as the name suggests, is a fully convolutional network with the task to extract feature maps from the incoming chunk of images, and using the given tube proposals, classify the tubes and refine the object positions. 
+
+Same as in TPN, the feature extraction is done independently on each frame using some general extractor, e.g., ResNet. Feature maps are then stacked to form a spatio-temporal feature volume. Unfortunately, the provided research paper does not clarify whether the proposal and detection networks share the same extraction layers or not.
+
+A Tube-of-Interest (ToI) pooling is employed on feature volume to select the sub-volume corresponding to each tube proposal. The selected volume is then max-pooled into a fixed-size feature and subsequently used as an input for a classifier. A general convolutional classifier with soft-max activation is used. 
+
+The regression branch of the network predicts the exact position of the object in the first and last frame of the tube. Both regressions begin with RoI pooling on the corresponding feature maps and continue with convolutional layers to produce the positional parameters. 
+
+The detection process is illustrated in \cref{fig:tubecnn}.
 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fps_map_x}
-    \caption[Performance of multiple Xception modification on Surveillance dataset]{Performance of multiple Xception modification on Surveillance dataset. Circle radii demonstrate relative difference of network parameter counts.} 
-    \label{fig:xception_perf}
+    \includegraphics[width=\textwidth]{img/tubecnn}
+    \caption[Tube-CNN architecture]%
+    {Architecture of Tube-CNN for object detection. Taken from \cite[fig.~2]{bib:tubeCNN}.}
+    \label{fig:tubecnn}
 \end{figure}
 
-\begin{table}[]
+
+\subsection{TSSD (2019)}
+\label{tssd}
+\citeauthor{bib:tssd} combine the SSD with recurrent networks \cite[chpt.~10]{bib:dlbook}, namely ConvLSTM cells introduced by \citeauthor{bib:convlstm} \cite{bib:convlstm}, to create a \textit{temporal single-shot detector} (TSSD) \cite{bib:tssd}. They also proposed a tracking module with \textit{Online Tubelet Analysis} working on top of the TSSD.
+Compared to SSD's 45fps, TSSD achieves 27fps on ImageNet VID dataset.  
+
+\subsubsection{Architecture}
+TSSD is based on a standard backbone of SSD implemented on fully convolutional VGG16 base with extra layers (see \cref{sec:ssd}). This base provides six feature maps that are used for classification and bbox regression in SSD. However, TSSD applies one more layer on the feature maps before detection. This is where the temporal information comes into effect, using the aforementioned convolutional LSTM cells. Two \textit{Attentional ConvLSTM} (AC-LSTM) cells are deployed, one for the bottom three feature maps and one for the top three. Only a small adjustment has been made to the underlying VGG network, that being lowering the number of channels in the second feature map to 512, to equalize the channels in all low-level feature maps. The outputs of both cells are then used for classification and regression in the same way the SSD would do. Details of TSSD implementation, including details on AC-LSTM, can be seen on \cref{fig:tssd}. 
+
+Features contributing to positive object detections are usually unevenly distributed in feature maps and through the scales. Authors proposed the Attentional ConvLSTM cell with the goal of background and scale suppression.  The temporal attention module in AC-LSTM provides the rest of the cell with object-aware features. 
+
+\begin{figure}
     \centering
-    \begin{tabular}{c|c|c|c|c|c}
-            &   A   &   B (C, D)   &   E (F, G)   &   H   &   J   \\
-        \hline
-        B1  &   [74\x128]   &   [74\x128]   &   [74\x128]   &   [74\x128]   &   [74\x128]   \\
-        B2  &   \textbf{[37\x256]}   &  [37\x256]   &   [37\x256]   &   [37\x256]   &   [37\x256]   \\
-        B3  &   [19\x728]   &   [19\x256]   &   [37\x256]   &   [37\x256]   &   [37\x256] \\
-        \hline
-        B4-6  &   [19\x728]   &   [19\x256]   &   [37\x256]   &   [37\x256]   &   [37\x256] \\
-        B7  &   [19\x728]   &   \textbf{[19\x256]}   &   \textbf{[37\x256]}   &   \textbf{[37\x256]}   &   \textbf{[37\x256]} \\
-        B8-10  &   [19\x728]   &   [19\x728]   &   [19\x728]   &   [19\x512]   &   [19\x512]\\
-        B11 &   \textbf{[19\x728]}   &   \textbf{[19\x728]}   &   \textbf{[19\x728]}   &   \textbf{[19\x512]}   &   \textbf{[19\x512]}\\
-        \hline
-        B12 &   [10\x1024]  &   [10\x1024]  &   [10\x1024]  &   [10\x728]  &   [10\x512]\\
-        S1  &   [10\x1536]  &   [10\x1536]  &   [10\x1536]  &   [10\x1024]  &   [10\x512]\\
-        S2  &   \textbf{[10\x2048]}  &   \textbf{[10\x2048]}  &  \textbf{[10\x2048]}   &  \textbf{[10\x1024]} &  \textbf{[10\x512]}\\
-    \end{tabular}
-    \caption{A table of feature map sizes on the output of layers of the Xception networks. Bx stand for Xception blocks, S1 and S2 stand for separable convolution layers that follow the block structure (see \cref{fig:xception}). The first number represents spatial dimensions of a square feature, expecting [300\x300] input, and the second one represents the number of channels. The highlighted feature maps are used for the detections. The versions C, D, and F, G share the feature maps sizes with their parent versions, if the given layers are present, but do not match the highlighted feature extraction.}
-    \label{tab:xmods}
-\end{table}
-
-\subsubsection{Versions B, C, D}
-We examine this trio at once,  since version \textit{C} adds modifications to version \textit{B}, and version \textit{D} further modifies version \textit{C}. Notably, we trained these models in parallel and therefore had no results from concurrent models to inform on the design.
-
-Starting with the assumption that the problem of the version \textit{A} is the position of the first feature extraction for detection, we moved the extraction from \textit{block 2} to \textit{block 7}. We also reduced the number of output filters on \textit{blocks 2 to 7} from 728 to 256. As a result, the first detection is performed on a [19\x19\x256] feature map as opposed to the [37\x37\x256] map of \textit{A}. The main factor here, it that the feature map is extracted after the data pass five additional blocks. 
-
-Due to a reduction of feature map size, we considered this modification a half-measure in our plan to move the first feature extraction deeper into the network. However, it proved to be a successful step in the right direction. The network has significantly gained in both speed and precision values. 
-
-Both \textit{C} and \textit{D} were designed for observation of the impact of the removal of parts of the network. We designed the modifications in such a way that they would not affect other layers. For clarity, the removals of blocks and layers do not alter the numbering scheme.
-
-Version \textit{C} omits \textit{blocks 5, 6 and 7} and extracts the [19\x19] feature map after \textit{block 10} instead of \textit{block 11}. However, we did not observe a satisfying performance boost to justify received loss of precision. 
-
-Version \textit{D} was designed to test the need for six detection layers, mainly the layers for detecting large objects. It is based on \textit{C} and removes the feature layers produced by \textit{extra layers}. Although the observed performance boost from \textit{C} to \textit{D} was more significant than the one from \textit{B} to \textit{C},  it was also coupled with a major precision penalty.
-
-\subsubsection{Versions E, F, G}
-Similarly to the previous trio, these versions are also based on each other, with the main architectural change being applied in \textit{E}. Versions \textit{F} and \textit{G} were designed to perform independent experiments. 
-
-Version \textit{E} is the one, where we finally implemented our original intention of moving the first extracted feature map of [37\x37] size to a deeper layer. Implementation-wise, the only difference between \textit{B} and \textit{E}, is the removal of max-pooling with stride 2 from \textit{block 2} and placing it to \textit{block 8}. This movement results in the increase of feature size to the desired [37\x37] map up to \textit{block 8}.
-
-We observed a noticeable drop-off in performance compared to version \textit{B} and a slight increase in precision. Although the number of parameters in the network is the same, the change from [19\x19] to [37\x37] requires about four times more computation per convolutional layer.
-
-Version \textit{F} modifies \textit{E} in the same way, \textit{C} modified \textit{B}. It skips the \textit{blocks 5, 6 and 7} and extracts the second feature map after \textit{block 10}. Although the received performance boost in relation to \textit{E} is significant, the precision is also significantly impacted in a negative way.
-
-Version \textit{G} repeated the experiment from version \textit{D}, but instead of removing the last three detection feature maps, we removed every other one, thus keeping the first, third and fifth ones. It is based on version \textit{F}, and again we see the precision loss we cannot justify by performance gain.
-
-\subsubsection{Version H}
-Since we managed to gain the best precision result with version \textit{E}, we decided to try and increase its performance, without impacting the precision. To this end, we designed the version \textit{H}. However, tests \textit{C},\textit{F}, \textit{D} and \textit{G} showed that the removal of blocks or detection layers from the network is detrimental for the result. Therefore we decided for a less radical solution of trimming the channel depth of the network. We ended up trimming the [19\x19] feature map to 512 channels and [10\x10] map to 1024 channels.
-
-Experiments show that this adjustment not only put the performance of the model halfway between \textit{E} and \textit{B} but also slightly boosted the precision.
-
-\subsubsection{Version J}
-After the success of version \textit{H}, we decided to try the limits of channel removal approach. We started with the setup of \textit{H}, and set the number of channels of every layer following \textit{block 7}, except extra layers, to 512. 
-
-Version \textit{J}, showed us, that this is also not a viable solution. The results are underwhelming in both, precision and performance.
+    \includegraphics[width=\textwidth]{img/tssd}
+    \caption[TSSD architecture and AC-LSTM cell]%
+    {Architecture of TSSD (left) and {AC-LSTM} cell (right). \textit{c} denotes concatenation; \textit{Chw-x}, \textit{Elw-x} represent channel-wise and element-wise multiplication, respectively; \textit{+} is element-wise summation. From \cite[fig.~2,~3]{bib:tssd}.}
+    \label{fig:tssd}
+\end{figure}
 
 
-\subsubsection{Conclusion}
-In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP@[0.5] on Surveillance dataset, meanwhile version \textit{H} achieved 49.8\% mAP@[0.5] on the same data, while keeping the performance equivalent.
+\subsubsection{Training}
+Similarly to SSD, the loss function of TSSD has multiple objectives weighted by $\alpha, \beta, \gamma$ and $\xi$ constants.
 
-\section{SSDTC implementation and training}
-\label{sec:ssdtcImpl}
-We have already described the architecture of SSDTC in \cref{sec:ssdtc}; however, the actual implementation and training process proved to be more complicated than SSD. In this section, we go through the challenges brought by SSDTC, without technical details. 
+\begin{align*}
+\mathbf{L} = \frac{1}{N}(\alpha\mathbf{L_{\text{loc}}} + \beta\mathbf{L_{\text{cls}}}) + \gamma\mathbf{L_{\text{att}}} + \xi\mathbf{L_{\text{asc}}}
+\end{align*}
 
-As mentioned, we based the SSDTC on ResnNet34-SSD. We used the SSD initialized by the weights we learned for the other experiment on Surveillance dataset. We did not need the detection layers of SSD, so we removed them from the model. The resulting ResNet34 with \textit{extra} layers served as a feature extractor for both SSDTC and also for training the baseline SSD on HollywoodHeads dataset. For training of both networks, we froze the weights in the extractor and trained only temporal and detection layers. It is important to note that every image processed by SSDTC, passes through the same extractor. 
 
-\todo{reused SSD framework.... }
+Where $\mathbf{L_{\text{cls}}}$ and $\mathbf{L_{\text{loc}}}$ are defined according to SSD (\cref{sec:ssd}) and \textit{N} is the number of matched boxes.
 
-The SSDTC design we created, has different input data requirements for training and inference. To properly train, it needs a large number of smallest possible chunks in a batch for the network. However, one large chunk is the most effective way for inference and the most natural way as we expect a continuous stream of video.
+Attention loss is calculated as a binary cross-entropy loss between ground-truth attention map $A_g$ and prediction maps $A_{_{sc}}$ for each scale $sc$. $A_g$ is a binary map with ones on positions inside ground-truth boxes. Each predicted attention map is up-scaled ($A^{up}_{p_{sc}}$) to match the dimensions of the $A_g$.
 
-This, however, poses conflicting requirements for the implementation of the network. Namely in the passing of data between the modules. For the purposes of explanation, lets call the ResNet34 network with \textit{extra} layers the \textit{Extractor}, the two conv3d layers the \textit{Temporal module}, and the localization and classification layers the \textit{Detection module}. We will also consider the detection process for only one of six feature map layers of the extractor. 
+\begin{align*}
+\mathbf{L_{\text{att}}} = \sum_{sc=1}^6 \mu (-A^{up}_{p_{sc}} log(A_g) - (1-A^{up}_{p_{sc}})log(1-A_g))
+\end{align*}
 
-During training, the networks start with feature extraction on seemingly independent \textit{n*c} frames in a batch (\textit{c} being the minimal possible chunk, in our case 5, and \textit{n} the batch size). Coming to the temporal layers, the feature maps need to be reshaped to represent \textit{n} chunks of size \textit{c} to allow for conv3d layers. After the temporal layers, the feature maps come out in the batch size of \textit{n}, but due to the nature of temporal layers, the chunk size is reduced to 1. This data then has to be reshaped again, to remove the temporal dimension, and create a batch of size \textit{n} for the detection layers.  
+Video frames are generally temporally consistent. Therefore we also expect consistency in detections on short sequences of frames. We can suppress fluctuations in temporal detections by defining association loss. We use class-discriminative score list ($sl$) to represent detection in a frame. $sl$ sums up top-k predictions after application of NMS.
 
-On the other hand, during inference, the input is a single chunk of consecutive frames, that is equivalent to a single batch. This batch can be simply passed thorough feature extraction layers, and the only modification needed for the temporal layers is to encapsulate the whole tensor in additional dimension to represent a temporal batch of size one. After the temporal convolution, we remove the encapsulation and continue with the detection; however, the batch size in this step is smaller than at the beginning. 
+\begin{align*}
+\mathbf{L_{\text{asc}}} = (\sum_{t=1}^{seq} sl_t - sl_{avg})/seq
+\end{align*}
 
-We can see the difference between training and inference feature sizes in \cref{tab:ssdtcFeatureSizes}. This behavior forced us into two separate implementations for inference and training. Although both implementations share the same network models, the differences are in the handling of the data between the modules. In the table, we can see that during training, it is the 'chunk dimension' that gets eliminated in temporal layers, and during the inference, it is the batch dimension. 
-
-Although it is possible to use both versions for training and inference, each has a significant disadvantage if not used as intended. The inference module does not allow for the use of the batch normalization in conv3d layers, because it operates with temporal volume in a single batch. The fact that the ability to use batch normalization is vital for the training was also experimentally tested. Without normalization, we were not able to over-perform standard SSD with the temporal version. There is a better chance for the training module to be modified for efficient inference, although with some performance hit inherent from our implementation. 
-
-\begin{table}[]
-    \centering
-    \begin{tabular}{c|c|c}
-        Module &  \multicolumn{2}{c}{Training}\\
-        \hline
-            & Input   & Output    \\
-        Extractor   &  [H$_0$\x W$_0$\x 3\x 5*N] & [H$_1$\x W$_1$\x F$_1$\x 5*N]  \\
-        Temporal   &  [H$_1$\x W$_1$\x F$_1$\x 5\x N] & [H$_2$\x W$_2$\x F$_2$\x1\x N] \\
-        Detector  &  [H$_2$\x W$_2$\x F$_2$\x N] &      \\
-        \hline
-        \multicolumn{1}{c}{} & \multicolumn{2}{c}{Inference}\\
-         \hline
-         & Input   & Output\\
-        Extractor   &   [H$_0$\x W$_0$\x 3\x C]  & [H$_1$\x W$_1$\x F$_1$\x C]\\
-        Temporal   &  [H$_1$\x W$_1$\x F$_1$\x C\x 1] & [H$_2$\x W$_2$\x F$_2$\x C-4\x 1]\\
-        Detector   & [H$_2$\x W$_2$\x F$_2$\x C-4] & \\
-        
-    \end{tabular}
-    \caption{Caption}
-    \label{tab:ssdtcFeatureSizes}
-\end{table}
-
+Where $sl_t$ denotes the score list in frame $t$, $sl_avg$ denotes the average list in a sequence and $seq$ represents the sequence length. 
