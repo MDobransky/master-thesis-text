@@ -1,17 +1,24 @@
-\chapter{Preliminary definitions}
-\todo{bla bla}
+\chapter{Application of Neural Networks for Object Detection}
+\label{chap:nns}
+In recent years, there has been an upsurge in the use of neural networks. We can partially attribute it to the evolution of hardware allowing for the implementation of network models with multiple layers. Deep neural networks (DNN) are now finding their use in many applications, e.g., classification, time series prediction, and optimization tasks, and are replacing many older machine learning methods. Some of the benefits of neural networks include their ability to find and learn complex non-linear relationships in provided data and subsequent generalization to unseen data. However, some applications do not allow for so-called 'black box' models and require logical reasoning behind the decisions.
+
+Image processing is one of the fields where DNNs are heavily utilized and outperform traditional machine learning approaches with big margins. Uses of DNNs for image processing vary from classification and object detection to auto-encoders for noise removal, and generative networks. A surge in DNN based image processing started in the 2010s with an implementation of a multi-layer convolutional network trained on GPU \cite{bib:deepOnGpu}. 
+
+In this chapter, we take a closer look at how are DNNs applied in object detection. The goal of such a detector is to localize and classify multiple objects of interest in the given image. There are multiple ways of localization, such as semantic segmentation, which categorizes individual pixels, or key-point and skeleton detections. However, we are interested in a more straightforward, axis-aligned bounding box (bbox) predictions. Each of the predicted bounding boxes needs a corresponding class prediction.
+
+Considering the importance of classification in object detection, we dedicate a significant portion of this chapter to describing multiple classification network models. Many detection models directly utilize or are inspired by those classification networks. We also define metrics used to compare the performance of DNN models used for image processing.
 
 \section{Metrics}
 In order to evaluate and compare multiple approaches, we require clearly defined metrics. A state-of-the-art model presented without full specification of used evaluation metrics makes comparing multiple results impossible. Thankfully, there are competitions and challenges with precisely defined rules that are often used to make such comparisons. 
 
-The \textit{ImageNet Large Scale Visual Recognition Challenge }(ILSVRC)\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{PASCAL VOC}, and \textit{COCO} respectively.
+The \textit{ImageNet Large Scale Visual Recognition Challenge }(ILSVRC)\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{http://cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{PASCAL VOC}, and \textit{COCO} respectively.
 
 In this section, we define metrics used to evaluate those challenges, but also other, not considered qualities. Most notably, none of the mentioned challenges is evaluated based on the speed of the model. Since our work is focused on real-time video analysis, we are interested in finding a balance between accuracy and the number of images processed per second (fps). One more factor to consider would be the physical size of the model, usually represented by the number of parameters and directly impacting the amount of needed memory.
 
 \subsection{Classification}
 The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textit{classification accuracy}. However, a complement to the accuracy, \textit{top-1 error}, is also often used. In ILSVRC,  alongside top-1 error, a \textit{top-5 error} is used as another major criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
 
-\subsection{Object detection}
+\subsection{Object Detection}
 Evaluating a localization and classification of multiple objects in an image is a more complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
 
 Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is usually done by computing \textit{intersection over union} (IoU) value for each pair of ground-truth and predicted boxes, and then selecting positive detections based on predetermined threshold.
@@ -23,7 +30,7 @@ $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}}$$
 
 Now we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
-\subsubsection{Precision-Recall curve (PRC)}
+\subsubsection{Precision-Recall Curve (PRC)}
 PRC is simply a plot showing the relationship between values of precision and recall. It is plotted separately for each class and reveals how a change in confidence influences the precision and recall values. 
 
 Every point on PRC represents a chosen confidence threshold used for determining positive predictions for a given class. The curve does not show this threshold. Instead, it shows precision and recall received by applying this threshold.
@@ -44,10 +51,10 @@ Comparing two models class by class is impractical, especially with the classifi
 
 Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] denotes the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
-\subsection{Inference time}
+\subsection{Inference Time}
 Inference time is a significant factor to consider for the model in real-time application use. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to comprehend. Therefore a more intuitive metric is used. That being the number of processed \textit{frames per second} (fps). However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment are suitable for comparison.
 
-\section{Notation and convention}
+\section{Notation and Convention}
 \label{sec:notation}
 To avoid any confusion, we define the standard notation used throughout this thesis. We tried to follow the convention, but there can be some variance compared to other works.
 
@@ -78,7 +85,7 @@ Unless stated otherwise, the default setting for the convolutional layer is stri
     \item \textbf{Conv3d. k$_1$\x k$_2$\x k$_3$\x c} : 3d convolutional layer with kernel size \textit{k$_1$\x k$_2$ \x k$_3$} and output channel depth of \textit{c}. 
 \end{itemize}
 
-\subsubsection*{Other layers}
+\subsubsection*{Other Layers}
 \begin{itemize}
     \item \textbf{Max-pool. k$_1$\x k$_2$ /s} : maximum pooling with kernel size \textit{k$_1$\x k$_2$} and stride \textit{s}.
     
@@ -87,3 +94,190 @@ Unless stated otherwise, the default setting for the convolutional layer is stri
  
     \item \textbf{Fully connected / FC - N} : fully connected layer with \textit{N} neurons
 \end{itemize}
+
+\section{Classification Networks}
+\label{sec:clsnets}
+A fundamental building block for a modern state-of-the-art image classification network is a convolutional layer. Accordingly, we call this type of networks a convolutional neural networks (CNN) \cite[ch.~9]{bib:dlbook}. CNN based classifier is a network that given the input image, extracts a feature map from this image and then applies classification layers to produce a confidence score for each possible class. Usually, the soft-max function is applied to the confidence score to get a probability distribution.
+
+We use this section to take a walk through the history of classification CNNs and outline some of the most influential models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
+
+\subsection{AlexNet (2012)}
+AlexNet designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the ILSVRC challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. AlexNet is created from a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers and a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
+
+\subsection{VGG (2014)}
+\label{sec:VGG}
+The network architecture, mostly known as VGG, by \citeauthor{bib:vgg} \cite{bib:vgg}, is built on the deep CNN concept behind AlexNet. It managed to prove the feasibility of even deeper network utilizing small convolution filters. 
+
+Each of the VGG's convolutional filters employs a 3$\times$3 kernel with the depth of the feature map gradually increasing through the network. The convolutions are followed by three fully connected layers and softmax layer, see \cref{tab:vggarch}. 
+
+Multiple versions of the VGG architecture can be constructed, depending on the number of convolutional layers. The most popular is the 16 layer version, titled VGG16.
+
+Today the VGG network is considered to be a general architecture for a classification network due to its linear architecture with a decreasing area of the features, and an increasing number of channels. 
+
+\begin{figure}
+    \centering
+    \rotatebox{90}{
+        \vggArch
+    }
+    \caption[VGG-16 architecture]%
+    {Architecture of VGG network version D, commonly called VGG-16. Other versions in \cite[table 1]{bib:vgg}.}
+    \label{tab:vggarch}
+\end{figure}
+
+\subsection{Inception (2014)}
+\label{sec:inception}
+Predating architectures suggest that increasing the number of layers and layer size, leads to better precision. \citeauthor{bib:googlenet} introduced Inception v1 \cite{bib:googlenet}, also known as \textit{GoogLeNet}, with the goal of increasing precision while improving utilization of computing resources.
+
+Although stacking more convolutional layers improves the accuracy, an increasing computational cost of those layers quickly overpowers the benefits. To avoid the aforementioned cost, Inception introduces the concept of sparsity in convolutional layers. The sparsity is achieved by using \textit{inception modules} that approximate a sparse structure by utilizing multiple convolutions with different kernel sizes and concatenating the outputs together (see \cref{fig:incept_mod}). 
+
+To reduce the computational cost further, each convolution is preceded with additional 1$\times$1 convolution, used for a dimensionality reduction. An alternate path in the \textit{inception module} is provided by max-pooling operation and concatenating it to the output.
+
+Inception begins with a sequence of convolution, pooling, and local response normalization operations. This 'stem' is followed by a chain of nine \textit{inception modules}, topped by a fully connected soft-max classifier. Two auxiliary classifiers are added to intermediate layers of the network to help propagate gradients and provide regularization during the training.
+
+\subsubsection{Inception v2, v3 (2015)}
+A set of improvements to the Inception network is introduced in later versions of the network. Most notably a factorization of convolution layers in Inception v2 and v3, \citeauthor{bib:inception2} \cite{bib:inception2}. Factorization replaces larger convolutions with a network of many smaller ones. They found this method very effective, e.g., replacing a 5$\times$5 convolution with two layers of 3$\times$3 results in a relative gain of 28\% and replacing 3$\times$3 layer with 3$\times$1 and subsequent 1$\times$3 layer is 33\% cheaper.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{img/inception}
+    \caption[Inception module]%
+    {Inception module, picture from \cite[figure 2]{bib:googlenet}.}
+    \label{fig:incept_mod}
+\end{figure}
+
+\subsection{ResNet (2015)}
+\label{sec:resnet}
+A trend of adding more layers to CNNs to achieve better accuracy has pushed the limit towards networks with hundred or more layers.  Theoretically, adding more layers to a model should produce equal or better results, based on the fact that shallow model is the subspace of the deeper one. Therefore, additional layers can learn to forward the data. In practice, however, observations suggest that this is not the case, and very deep networks can experience eventual degradation. A solution to this problem was proposed by \citeauthor{bib:resnet} \cite{bib:resnet} in the ResNet architecture by directly introducing identity functions to the network.
+
+Basic principles of ResNet are directly inspired by the VGG. Most of the convolutional layers use 3$\times$3 filters and follow two simple rules: keep the number of filters the same, unless changing the output size and double the filters if the feature size if halved. A newly introduced residual connection bypasses each pair of the convolutional layers and forms a \textit{residual blocks}. This connection can be an identity function or a 1$\times$1 convolution to match the increased number of filters.
+
+\begin{figure}
+    \resnetArch
+    \caption[ResNet architecture]%
+    {Architecture of the ResNet network and residual blocks. Each of the four \textit{Layers} is created by stacking multiple residual blocks.}
+    \label{fig:resnet_arch}
+\end{figure}
+
+We can see the high level architecture of this model in \cref{fig:resnet_arch} (left). Each of four \textit{Layers} represents a sequence of multiple residual blocks, exact numbers of blocks can be found in \cite[table 1]{bib:resnet}. Previously described \textit{residual block} with two convolutional layers, known as \textit{Basic block}, is used for smaller ResNet models (ResNet18, ResNet34). Deeper ResNet models (ResNet50, ResNet101, ResNet152) use the \textit{Bottleneck block} with three convolutional layers. In \textit{Bottleneck block}, the 1$\times$1 layers are responsible for reducing and then restoring dimensions, allowing for faster 3$\times$3 layer with reduced input and output dimensions. Thanks to the efficient architecture, the 152-layer ResNet has lower computational complexity than the 16-layer VGG network.
+
+
+
+\subsection{Xception (2017)}
+\label{sec:xception} Xception architecture by \citeauthor{bib:xception} \cite{bib:xception}, is heavily inspired by previous architectures, mainly Inception and ResNet. It is built on the hypothesis claiming: "the mapping of cross-channel correlations and spatial correlations in the feature maps of convolutional neural networks can be entirely decoupled." This hypothesis expands upon the hypothesis underlying Inception architectures. Therefore the name 'Extreme Inception.' 
+
+The hypothesis is realized in the form of \textit{depthwise separable convolution} layers (shortly separable convolution). Depthwise separable convolution consists of two steps: a \textit{depthwise convolution} and \textit{pointwise convolution}. A depthwise convolution is a convolution performed independently over each channel, i.e., a convolution without changing the number of channels. The second step is a pointwise convolution that uses 1$\times$1 kernel to map the output of depthwise convolution into new channel space.
+
+The model is formed by linearly stacking separable convolution layers with the addition of residual connections as seen on \cref{fig:xception}. Convolutional layers, non-linearity, and poolings are structured into residual blocks similarly to ResNet architecture.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{img/xception}
+    \caption[Xception architecture]%
+    {Structure of \textit{Xception} architecture. Taken from \cite[fig. 5]{bib:xception}.}
+    \label{fig:xception}
+\end{figure}
+
+
+\subsection{NASNet (2017)}
+\label{sec:nasnet}
+This architecture stands out from others mentioned because \citeauthor{bib:nasnet} \cite{bib:nasnet} used a machine learning algorithm to design the network. It is a result of a \textit{AutoML}\footnote{\url{https://ai.googleblog.com/2017/05/using-machine-learning-to-explore.html}} project. Unlike manually designing the network by trial and error, AutoML searches the space of all possible models, e.g., using reinforcement learning and evolutionary algorithms. This approach is limited by the computational cost and therefore limited to small datasets.
+
+NASNet is a result of taking an architecture designed for small \textit{CIFAR-10}\footnote{\url{https://www.cs.toronto.edu/~kriz/cifar.html}} dataset by AutoML and using it to create larger model for ImageNet dataset. The model is composed of two types of learned cells, a \textit{Normal Cell} and \textit{Reduction Cell} (see \cref{fig:nasnet}). A general structure of the network is then created by alternating a Reduction Cell and \textit{N} Normal Cells.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{img/nasnet}
+    \caption[NASNet-A modules]
+    {Modules used in \textit{NASNet-A}, designed by AutoML. Image from \url{ai.googleblog.com/2017/11/automl-for-large-scale-image}.}
+    \label{fig:nasnet}
+\end{figure}
+
+\subsection{Classifier Comparison}
+\label{sec:cnncomp}
+At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the ImageNet dataset. Newer models, like Xception, NASNet, and modifications of ResNet reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide an overview of fps--accuracy relationship taken from an independent benchmark by \citeauthor{bib:cnnbenchmark} \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of fps with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{img/fps_comp}
+    \caption[Benchmark of classification CNNs]%
+    {Benchmark of state-of-the-art classification deep neural networks on \textit{ILSVRC} dataset. Performed on NVIDIA
+Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
+    \label{fig:cnnbenchmark}
+\end{figure}
+
+
+
+\section{Detection Networks}
+\label{sec:detnets}
+The goal of the detection network is to localize all objects of chosen categories. There is a simple logical step from classification task to detection. It is to classify selected regions in the image as one of the classes or as a background. A classification applied to every possible box in the image would undoubtedly produce great detection results but at the extreme computational cost. This section describes a family of algorithms based on this simple idea while managing limited computational resources.
+
+We will see that this family of so-called \textit{region based} approaches can reach state-of-the-art results, with increasing efficiency by each generation. Considering precision, Faster R-CNN is still used as one of the most reliable detectors. However, although it can process a few frames per second, we do not consider it to be a truly real-time detector and applicable for demanding tasks, such as video surveillance. We devote \cref{sec:rltm} to detection networks performing in real-time constraints.
+
+\subsection{R-CNN (2014)}
+Region-based Convolutional Network (R-CNN) by \citeauthor{bib:rcnn} \cite{bib:rcnn} is the first member of the family of region-based detection models. The foundation idea is simple: select regions in the picture and classify each region. This approach leads to a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and subsequent classification. 
+
+A naive approach would use a sliding window and classify each cutout of the image. However, examining all the windows for different sizes and aspect ratios of possible objects would be extremely slow. R-CNN solves this problem by applying a region proposal algorithm that selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} (SS) \cite{bib:selectivesearch} algorithm and serve as a candidates for bbox predictions. In addition, bounding box regression can be trained to improve bbox prediction accuracy.
+
+Each region is processed separately by a CNN into a feature map (the original architecture uses Alexnet, but any classification network can be substituted). Finally, each feature map can be scored. R-CNN uses class specific linear support-vector machines instead of a soft-max classification provided by CNNs. \Cref{fig:rcnn} illustrates the architecture.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/rcnn}
+    \caption[R-CNN architecture]%
+    {R-CNN architecture. Taken from \cite[fig. 1]{bib:rcnn}.}
+    \label{fig:rcnn}
+\end{figure}
+
+\subsection{Fast R-CNN (2015)}
+Even though R-CNN was a major step in the right direction, its performance is far from real-time. \citeauthor{bib:fastrcnn} \cite{bib:fastrcnn} introduces Fast R-CNN with a series of innovations to its predecessor, aimed at improving speed and accuracy. Provided benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using R-CNN with VGG16 feature extractor, to 320 milliseconds with Fast R-CNN using the same feature extractor (not including time for SS proposals). 
+
+Similarly to R-CNN, this architecture also utilizes region proposal algorithm and a CNN to produce a feature map. A significant drawback of R-CNN was computing feature map for each region, despite overlaps. Fast R-CNN processes whole input image into a feature map, and then, using a \textit{region of interest (RoI) pooling layers}, extracts a feature vector for each region. All extracted feature vectors are pooled to the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/fastrcnn}
+    \caption[Fast R-CNN architecture]%
+    {Fast R-CNN architecture. Taken from \cite[fig. 1]{bib:fastrcnn}}
+    \label{fig:fastrcnn}
+\end{figure}
+
+\subsection{Faster R-CNN (2015)}
+ 
+Faster R-CNN by \citeauthor{bib:fasterrcnn} \cite{bib:fasterrcnn} expands on the Fast R-CNN with the aspiration to achieve real-time performance. Fast R-CNN managed to build a fast feature extraction and subsequent classification usable in a real-time environment. However, it is heavily slowed down by a region proposal SS algorithm. Faster R-CNN expands on the idea of sharing resources and replaces SS with \textit{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can find limited use in a real-time environment. Whole architecture can be seen on \cref{fig:fasterrcnn}. 
+ 
+ \subsubsection{Region Proposal Network} 
+ RPN is designed as a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs determines whether proposed region contains an object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textit{anchors} (the anchor is a predefined box centered at a location of sliding-window). Assuming \textit{k} anchors with different sizes and aspect ratios are used, regression produces 4k relative parameters and classifier 2k scores. Regression parameters are used to modify the position and size of their corresponding anchor. The number of regions is then reduced by eliminating proposals with high overlap using a \textit{non-maximum suppression} (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
+ 
+ To calculate loss and train RPN, a matching between ground-truth boxes and generated region proposals needs to be determined. A positive label is assigned to two kinds of regions: the one with the highest IoU overlap with ground-truth box; regions that have IoU higher than 0.7 with any ground-truth box. A negative label is assigned to a non-positive box if its IoU is lower than 0.3 for all ground-truth boxes. Rest of the boxes do not contribute to training. 
+ 
+ \paragraph{4-step alternating training:}
+ 
+ \begin{enumerate}
+     \item train RPN with feature extractor initialized by ImageNet pre-trained model
+     \item train separate Fast R-CNN using proposals generated by RPN from step 1
+     \item train RPN with feature extractor initialized by weights learned by the detector in step 2, fine-tune only layers unique to RPN
+     \item using the model from step 3, fine-tune layers unique to Fast R-CNN
+ \end{enumerate}
+
+\noindent Thanks to the modular architecture, R-CNN family networks can exploit any CNN as a feature extractor.  Therefore Faster R-CNN can achieve state-of-the-art detection results exploiting the latest advances in classification networks and is often used as a benchmark of their performance.
+     
+
+ \begin{figure}
+     \centering
+     \includegraphics[width=\textwidth]{img/fasterrcnn}
+     \caption[Faster R-CNN architecture]%
+     {The architecture of Faster R-CNN. From \url{https://researchgate.net/figure/The-architecture-of-Faster-R-CNN\_fig2\_324903264}.}
+     \label{fig:fasterrcnn}
+ \end{figure}
+
+ \subsection{Mask R-CNN (2017)}
+Previous R-CNN based architectures used bounding boxes to localize individual objects. \citeauthor{bib:maskrcnn} \cite{bib:maskrcnn} adds a localization based on semantic segmentation, where the goal is to classify each pixel into a category. 
+
+Mask R-CNN is built upon Faster R-CNN and combines both bounding box localization and semantic segmentation by predicting segmentation masks for each RoI. The product of this approach is a bounding box and class for each object, together with a binary segmentation mask. Unlike the semantic segmentation on whole input, applying it on RoIs allows for \textit{instantiated segmentation} where selected pixels corresponds to a given instance of a class.
+
+Implementation and architecture are very similar to Faster R-CNN, with two exceptions. One of them is already described, fully convolutional segmentation branch which works in parallel with classification and bounding box regression heads. The other difference is a replacement of RoI pooling layer with \textit{RoI alignment layer}. The problem of RoI pooling for this purpose is quantization of floating-number RoI to discrete feature map grid and consequent imprecision. RoI alignment mitigates this problem by using bi-linear interpolation to compute exact values of features at four sampled location in each of RoIs locations and aggregating the results. High-level architecture and the RoI alignment layer are visualized on \cref{fig:maskrcnn}.
+
+ \begin{figure}
+     \centering
+     \includegraphics[width=\textwidth]{img/maskrcnn}
+     \caption[Mask R-CNN architecture and RoI alignment layer]%
+     {Left: The architecture of Mask R-CNN. Right: RoI align, grid represents feature map, solid lines an RoI and the dost are the sampling points. From \cite[fig. 1, 3]{bib:maskrcnn}}
+     \label{fig:maskrcnn}
+ \end{figure}
+
