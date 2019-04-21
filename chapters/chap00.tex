@@ -1,29 +1,17 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-In recent years, the video surveillance has become the most widely used security measure. Surveillance cameras can be found in many environments and used for multiple purposes such as traffic monitoring and marketing, but the primary reason is the security. As the more and more public space is covered by the surveillance, it has become more difficult to monitor all those video streams in real-time. A development in artificial intelligence and availability of computing power has created an obvious solution for this problem. Instead of constant monitoring of video streams by people, we can process the video data with the help of artificial intelligence and then output the desired notifications and statistics. 
+In recent years, video surveillance has become the most widely used security measure. Surveillance cameras can be found in many environments and used for multiple purposes such as traffic monitoring and marketing, but the primary reason is security. As the surveillance covers the more and more public space, it has become more challenging to monitor all those video streams in real-time. A development in artificial intelligence and the availability of computing power has created an obvious solution for this problem. Instead of constant monitoring of video streams by people, we can process the video data with the help of artificial intelligence and then output the desired notifications and statistics. 
 
-Simple approaches like motion detection provide information about a whole video frame. These are relatively simple tasks and nowadays can be found implemented directly into the camera itself. However we need information about every object in the frame to be able to define exclusion zones, create heat maps, track the objects and observe their speed and direction. The last breakthrough in this area came with the application of artificial neural networks.
+The technology in the area of automatization in video surveillance has been rapidly changing. The most straightforward approaches like motion detection are based on the principle of frame difference. Frame difference methods either compare successive frames with each other or use a background subtraction. It is a fast and simple method for detection of moving objects and is nowadays commonly embedded directly in the security cameras. However, frame difference is prone to false detections as it detects every movement independently on the object type. 
 
-Given the set of pictures with annotations, the neural network can be trained to search for similar objects and categorize them properly. Current cutting edge detectors use convolutional neural network architectures and produce either set of bounding boxes or a pixel by pixel categorization of the desired objects. These detections can be then used and processed by other applications to produce desired statistics or notifications. 
+Object detectors with classification are historically based on feature descriptors. The first such algorithm with competitive results was a face detector by \citeauthor{bib:viola}. A few years later, another breakthrough in detection came from \citeauthor{bib:hog} using the histogram of oriented gradients for human detection. The last major leap in the detection, the deep learning, has become the dominant approach in the current decade. In \textit{ImageNet Large Scale Visual Recognition Challenge} deep learning approaches has been consistently winning since 2012 and eventually surpassed human performance in 2015.
 
-The goal of this thesis is to review current techniques used to detect objects in video frames, implement and train a neural network designed for this purpose and measure its results in terms of precision and speed. We will also perform a series of experiments designed to boost the performance of our network with regards to our criteria. 
+\subsubsection{Goals}
+Current cutting edge deep learning detectors use convolutional neural network architectures. Such networks produce either set of bounding boxes or a pixel by pixel categorization of the desired objects. These detection data can be then used and processed by other applications to produce desired statistics or notifications.
 
+The goal of this thesis is to review the current deep learning models used for object detection and implement a selected model. We aim to improve this model for purposes of surveillance by formulating hypotheses based on reviewed techniques and test them experimentally. We have the ambition to design and implement a real-time video detector with the use of temporal information.
 
-\begin{figure}
-    \centering
-    \pipeline
-    \caption[General video detection pipeline]%
-    {General video detection pipeline.}
-    \label{fig:pipeline}
-\end{figure}
-% \todo{ccv pipeline, datasets - augmentation problem}
+Our focus is limited to the detector component of a more extensive detection pipeline, and we are not concerned with the pre- and post-processing operations.  Although many interesting tasks are based on object detection, e.g., tracking and re-identification,  they are not in the scope of this thesis.
 
-% \paragraph{Related work}
-% bla
-
-% \paragraph{Approach}
-% bla
-
-\paragraph{Thesis structure}
-This thesis is structured into five chapters. First chapter provides quick overview of methods used for video detection, without the use of neural networks. In the second chapter we take a look at a history of convolutional networks, eventually leading into development of object detectors. The third chapter takes a deeper dive into networks used for video detection that are closely related to our research. The forth chapter shows off our contributions, supported by the experiments described in the fifth chapter.
+\subsubsection{Thesis structure}
