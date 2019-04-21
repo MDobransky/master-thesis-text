@@ -18,7 +18,7 @@ In this section, we define metrics used to evaluate those challenges, but also o
 \subsection{Classification}
 The most common and intuitive evaluation metric for classification problems is the number of correctly classified samples as a ratio of all samples. This ratio is referred to as a \textit{classification accuracy}. However, a complement to the accuracy, \textit{top-1 error}, is also often used. In ILSVRC,  alongside top-1 error, a \textit{top-5 error} is used as another major criterion. The top-5 error represents the fraction of test samples in which the correct label does not appear in the top 5 predicted results.
 
-\subsection{Object detection}
+\subsection{Object Detection}
 Evaluating a localization and classification of multiple objects in an image is a more complex task than simple classification, mainly because there is no simple one-to-one mapping between ground-truths and predictions. A ground-truth data are a set of \textit{N} boxes with labels, and detector generates a set of \textit{M} boxes with labels and class confidence values.
 
 Because predicted boxes do not perfectly match ground-truths, a matching algorithm is needed to decide whether a prediction is true positive or false positive. Matching is usually done by computing \textit{intersection over union} (IoU) value for each pair of ground-truth and predicted boxes, and then selecting positive detections based on predetermined threshold.
@@ -30,7 +30,7 @@ $$\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}}$$
 
 Now we can define the first metrics used for object detection. Note that all following metrics depend on precision and recall, and therefore depend on the IoU threshold.
 
-\subsubsection{Precision-Recall curve (PRC)}
+\subsubsection{Precision-Recall Curve (PRC)}
 PRC is simply a plot showing the relationship between values of precision and recall. It is plotted separately for each class and reveals how a change in confidence influences the precision and recall values. 
 
 Every point on PRC represents a chosen confidence threshold used for determining positive predictions for a given class. The curve does not show this threshold. Instead, it shows precision and recall received by applying this threshold.
@@ -51,10 +51,10 @@ Comparing two models class by class is impractical, especially with the classifi
 
 Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] denotes the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
-\subsection{Inference time}
+\subsection{Inference Time}
 Inference time is a significant factor to consider for the model in real-time application use. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to comprehend. Therefore a more intuitive metric is used. That being the number of processed \textit{frames per second} (fps). However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment are suitable for comparison.
 
-\section{Notation and convention}
+\section{Notation and Convention}
 \label{sec:notation}
 To avoid any confusion, we define the standard notation used throughout this thesis. We tried to follow the convention, but there can be some variance compared to other works.
 
@@ -85,7 +85,7 @@ Unless stated otherwise, the default setting for the convolutional layer is stri
     \item \textbf{Conv3d. k$_1$\x k$_2$\x k$_3$\x c} : 3d convolutional layer with kernel size \textit{k$_1$\x k$_2$ \x k$_3$} and output channel depth of \textit{c}. 
 \end{itemize}
 
-\subsubsection*{Other layers}
+\subsubsection*{Other Layers}
 \begin{itemize}
     \item \textbf{Max-pool. k$_1$\x k$_2$ /s} : maximum pooling with kernel size \textit{k$_1$\x k$_2$} and stride \textit{s}.
     
@@ -95,7 +95,7 @@ Unless stated otherwise, the default setting for the convolutional layer is stri
     \item \textbf{Fully connected / FC - N} : fully connected layer with \textit{N} neurons
 \end{itemize}
 
-\section{Classification networks}
+\section{Classification Networks}
 \label{sec:clsnets}
 A fundamental building block for a modern state-of-the-art image classification network is a convolutional layer. Accordingly, we call this type of networks a convolutional neural networks (CNN) \cite[ch.~9]{bib:dlbook}. CNN based classifier is a network that given the input image, extracts a feature map from this image and then applies classification layers to produce a confidence score for each possible class. Usually, the soft-max function is applied to the confidence score to get a probability distribution.
 
@@ -189,7 +189,7 @@ NASNet is a result of taking an architecture designed for small \textit{CIFAR-10
     \label{fig:nasnet}
 \end{figure}
 
-\subsection{Comparing the classifiers}
+\subsection{Classifier Comparison}
 \label{sec:cnncomp}
 At the beginning of this chapter, we mentioned that the classification networks are often compared based on performance on the ImageNet dataset. Newer models, like Xception, NASNet, and modifications of ResNet reach excellent accuracy. However, there is a large discrepancy in their performance considering inference speed. In \cref{fig:cnnbenchmark} we provide an overview of fps--accuracy relationship taken from an independent benchmark by \citeauthor{bib:cnnbenchmark} \cite{bib:cnnbenchmark}. Although the experiment was performed with batch size 1, we expect a universal increase of fps with a bigger batch and only small changes to the relative performance of different models. We can observe a clear trade-off between speed and accuracy for the classification task.
 
@@ -203,7 +203,7 @@ Titan X GPU with batch size 1. Taken from \cite[fig. 3]{bib:cnnbenchmark}}
 
 
 
-\section{Detection networks}
+\section{Detection Networks}
 \label{sec:detnets}
 The goal of the detection network is to localize all objects of chosen categories. There is a simple logical step from classification task to detection. It is to classify selected regions in the image as one of the classes or as a background. A classification applied to every possible box in the image would undoubtedly produce great detection results but at the extreme computational cost. This section describes a family of algorithms based on this simple idea while managing limited computational resources.
 
@@ -241,7 +241,8 @@ Similarly to R-CNN, this architecture also utilizes region proposal algorithm an
  
 Faster R-CNN by \citeauthor{bib:fasterrcnn} \cite{bib:fasterrcnn} expands on the Fast R-CNN with the aspiration to achieve real-time performance. Fast R-CNN managed to build a fast feature extraction and subsequent classification usable in a real-time environment. However, it is heavily slowed down by a region proposal SS algorithm. Faster R-CNN expands on the idea of sharing resources and replaces SS with \textit{region proposal network} (RPN). RPN is built on top of a feature map generated by the feature extractor. As suggested, the feature map is shared between RPN and object detection. This approach is able to achieve 5 fps, which can find limited use in a real-time environment. Whole architecture can be seen on \cref{fig:fasterrcnn}. 
  
- \paragraph{Region proposal network} is designed as a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs determines whether proposed region contains an object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textit{anchors} (the anchor is a predefined box centered at a location of sliding-window). Assuming \textit{k} anchors with different sizes and aspect ratios are used, regression produces 4k relative parameters and classifier 2k scores. Regression parameters are used to modify the position and size of their corresponding anchor. The number of regions is then reduced by eliminating proposals with high overlap using a \textit{non-maximum suppression} (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
+ \subsubsection{Region Proposal Network} 
+ RPN is designed as a small, sliding-window network, with negligible cost compared to the feature extractor. It is composed of 3$\times$3 convolutional layer with 512 filters and two sibling 1$\times$1 convolutional layers for region regression and classification. Classification in RPNs determines whether proposed region contains an object or a background (\textit{cls} score). Region regression part of the network is tied to the concept of \textit{anchors} (the anchor is a predefined box centered at a location of sliding-window). Assuming \textit{k} anchors with different sizes and aspect ratios are used, regression produces 4k relative parameters and classifier 2k scores. Regression parameters are used to modify the position and size of their corresponding anchor. The number of regions is then reduced by eliminating proposals with high overlap using a \textit{non-maximum suppression} (NMS) based on \textit{cls} score. After NMS, top-N ranked proposal regions are used for detection.
  
  To calculate loss and train RPN, a matching between ground-truth boxes and generated region proposals needs to be determined. A positive label is assigned to two kinds of regions: the one with the highest IoU overlap with ground-truth box; regions that have IoU higher than 0.7 with any ground-truth box. A negative label is assigned to a non-positive box if its IoU is lower than 0.3 for all ground-truth boxes. Rest of the boxes do not contribute to training. 
  

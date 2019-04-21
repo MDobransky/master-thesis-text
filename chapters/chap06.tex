@@ -1,8 +1,10 @@
 \chapter{Experiments}
+\label{chap:exp}
+
 In this chapter, we provide details on the techniques used to gather the data presented in the previous chapter. We also present additional experimental results.
 
 
-\section{SSD training}
+\section{SSD Training}
 \citeauthor{bib:ssd} implemented \footnote{\url{https://github.com/weiliu89/caffe/tree/ssd}} SSD model from their research paper in the \textit{Caffe} \footnote{\url{http://caffe.berkeleyvision.org/}} deep learning framework. We decided against performing our experiments in this, by now outdated framework, and implemented our version in newer \textit{PyTorch} \footnote{\url{https://pytorch.org/}} framework (more detailed technical specification of used libraries is available in \cref{app:impl}).
 
 We started by implementing a common framework for SSD detectors, that would support SSD models with many modifications. Although SSDTC inference is possible in the same framework, we had to create a separate environment for the training (more on SSDTC in \cref{sec:ssdtcImpl}). 
@@ -42,7 +44,7 @@ We present all the measurements taken on Surveillance dataset while performing m
     \label{tab:ap}
 \end{table}
 
-\subsection{Inference speed}
+\subsection{Inference Speed}
 The absolute values of the inference speed measurement would not provide any information without the knowledge of the environment in which they have been taken. In this section, we provide the details of both software and hardware environments used for measurements.
 
 Testing was done by processing a total of 10 000 images in batches of 16. This process was timed, and the average \textit{fps} value was calculated.  Since we do not consider scaling and cropping the images to be part of the network, we did not need to include this process in the measurement. The set of [300\x300] pixel images was pre-loaded into memory before the timer was started. On the other hand, non-maximum suppression is a critical part of the algorithm and is included in the measurement. 
@@ -129,7 +131,7 @@ Version \textit{J}, showed us, that this is also not a viable solution. The resu
 \subsubsection{Conclusion}
 In conclusion, we managed to receive the best precision results from the version \textit{H}. Our first implementation, \textit{A}, managed only 37.8\% mAP on Surveillance dataset. Meanwhile version \textit{H} achieved 49.8\% mA on the same data while keeping the performance equivalent.
 
-\section{SSDTC implementation and training}
+\section{SSDTC Implementation and Training}
 \label{sec:ssdtcImpl}
 We have already described the architecture of SSDTC in \cref{sec:ssdtc}; however, the actual implementation and training process proved to be more complicated than SSD. In this section, we go through the challenges brought by SSDTC. 
 

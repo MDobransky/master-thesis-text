@@ -1,14 +1,14 @@
-\chapter{Related work}
+\chapter{Related Work}
 \label{chap:related}
 
 In this chapter, we provide an overview of the methods used for detections in the video. There are two types of approaches that can be used for video detection, a high-speed single frame detector, or a detector designed for a sequence of frames. Although there is no standardized definition of how many fps are real-time, we can consider 25fps as a minimum. However, in practice, we need as much fps as possible not only to keep up with one video stream but to process multiple video streams on one GPU. 
 
 Currently, the detectors designed for image detection hold an edge over detectors with temporal information, mostly because available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
 
-\section{Detection explained}
+\section{Detection Explained}
 \todo{explain how conv produces predictions}
 
-\section{Real-time detectors}
+\section{Real-time Detectors}
 \label{sec:rltm}
 In \cref{sec:detnets} we took a look on a series of two-stage detectors, with separate region proposals and classification. A few years later, a new type of detectors has been developed, with faster single-stage design. Single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also, the trade-off between speed and precision is continually diminishing in favor of single-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.
 
@@ -150,13 +150,13 @@ To keep the balance between positive and negative samples, \textit{hard negative
 \mathbf{L_{\text{cls}}}(x,c) = -\sum_{i\in Pos}^N x_{ij}^p log(\hat{c}_i^p) - \sum_{i \in Neg} log(\hat{c}_i^0) \quad\text{where} \quad\hat{c}_i^p = \frac{exp(c_i^p)}{\sum_p exp(c_i^p)}
 \end{align*}
 
-\noindent The final loss is then a weighted sum of both losses. The weight parameter $\alpha$ is set to 1. The loss is also divided by the number of matched prior boxes to keep it independent of the number of objects.
+\paragraph{Total loss} is then a weighted sum of both losses. The weight parameter $\alpha$ is set to 1. The loss is also divided by the number of matched prior boxes to keep it independent of the number of objects.
 
 \begin{align*}
 \mathbf{L}(x,c,l,g) = \frac{1}{N}(\mathbf{L_{\text{cls}}}(x,c) + \alpha\mathbf{L_{\text{loc}}}(x,l,g))
 \end{align*}
 
-\section{Detection with temporal information}
+\section{Detection with Temporal Information}
 \label{sec:video_det}
 In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
 
@@ -171,7 +171,7 @@ This section presents two approaches to adding temporal information to an object
 \label{sed:tubecnn}
 The architecture of this detector is very similar to Fast-RCNN with the added temporal dimension. The main idea is based on region/tube proposals and the following classification network for those regions. \citeauthor{bib:tubeCNN} \cite{bib:tubeCNN} proved that using a temporal information provided by continuous video frames enhances a precision of the detector. On the other hand, this approach adds more complexity to slower than real-time Faster-RCNN detector. The resulting network achieves only low single digit frame per second values, depending on the configuration. 
 
-\subsubsection{Tube proposal network}
+\subsubsection{Tube Proposal Network}
 Tube proposal generation begins with a feature extraction on a chunk of video frames. After the processing of all frames individually, feature maps are stacked together in the temporal dimension. Then, volumetric convolutional layers (conv3d) are applied to produce a feature volume.
 
 Analogously to Faster-RCNN, each position in this feature volume is used to create tube proposals using \textit{K} anchor tubes. The proposal for each anchor consists of the \textit{objectness} and position parameters. The \textit{objectness} score reflects the probability of the presence of the same objects as opposed to a background. 
@@ -180,7 +180,7 @@ IoU value for tubes is defined as a minimum of spatial IoU at the ends of tubes.
 
 A provided data for the training usually consists of a series of ground-truth boxes for individual frames. During the training of TPN, a series of ground-truth boxes is approximated by a ground-truth tube. Those tubes are then matched against the tube proposals using an IoU threshold. A tube proposal network is designed only to consider tubes corresponding to linear motion in order to limit the complexity. 
 
-\subsubsection{Detection network}
+\subsubsection{Detection Network}
 Tube-CNN, as the name suggests, is a fully convolutional network with the task to extract feature maps from the incoming chunk of images, and using the given tube proposals, classify the tubes and refine the object positions. 
 
 Same as in TPN, the feature extraction is done independently on each frame using some general extractor, e.g., ResNet. Feature maps are then stacked to form a spatio-temporal feature volume. Unfortunately, the provided research paper does not clarify whether the proposal and detection networks share the same extraction layers or not.
