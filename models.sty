@@ -94,7 +94,7 @@
 
     \tikzstyle{line} = [draw, -latex]
     \tikzstyle{fline} = [draw, -latex, line width=0.8pt]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\convcol, node distance=1.15cm]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\convcol, node distance=1.15cm ]
     \tikzstyle{rect} = [rectangle, draw, text centered, minimum height=2em, fill=\blockcol]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\inputcol]
     \tikzstyle{pool} = [rectangle, draw,  text centered, rounded corners, minimum height=2em, fill=\poolcol]
@@ -105,9 +105,9 @@
         \node [input] (input) {Input};
         \node [rect, below of=input] (block1) {Conv1\_1 - Conv4\_3};
         \node [rect, below of=block1] (block2) {Conv5\_1 - Conv5\_3};
-        \node [pool, below of=block2] (p1) {Max pool. 3$\times$3 p:1};
+        \node [pool, below of=block2] (p1) {Max pool. 3$\times$3 P:1};
         
-         \node [conv, below of=p1] (ext-1) {Conv. 3$\times$3$\times$1024};
+         \node [conv, below of=p1,text width=33mm,] (ext-1) {Conv. 3$\times$3$\times$1024 P:6 D:6};
          \node [conv, below of=ext-1] (ext0) {Conv. 1$\times$1$\times$1024};
     
         \draw[blue,line width=0.6mm,] ($(block1.north west)+(-0.2,0.2)$)  rectangle ($(block2.south east)+(0.2,-3.65)$);
@@ -115,14 +115,14 @@
         
         % \node [text=black, font=\bfseries] at ($(input.west)+(-3.5,0.4)$) (header) {\LARGE ResNet-SSD};
         
-        \node [conv, below= of ext0] (ext1) {Conv. 1$\times$1$\times$256};
+        \node [conv, below= of ext0] (ext1) {Conv. 1$\times$1$\times$256 P:0};
         \node [conv, below of=ext1] (ext2) {Conv. 3$\times$3$\times$512 /2};
-        \node [conv, below of=ext2] (ext3) {Conv. 1$\times$1$\times$128};
+        \node [conv, below of=ext2] (ext3) {Conv. 1$\times$1$\times$128 P:0};
         \node [conv, below of=ext3] (ext4) {Conv. 3$\times$3$\times$256 /2};
-        \node [conv, below of=ext4] (ext5) {Conv. 1$\times$1$\times$128};
-        \node [conv, below of=ext5] (ext6) {Conv. 3$\times$3$\times$256};
-        \node [conv, below of=ext6] (ext7) {Conv. 1$\times$1$\times$128};
-        \node [conv, below of=ext7] (ext8) {Conv. 3$\times$3$\times$256};
+        \node [conv, below of=ext4] (ext5) {Conv. 1$\times$1$\times$128 P:0};
+        \node [conv, below of=ext5] (ext6) {Conv. 3$\times$3$\times$256 P:0};
+        \node [conv, below of=ext6] (ext7) {Conv. 1$\times$1$\times$128 P:0};
+        \node [conv, below of=ext7] (ext8) {Conv. 3$\times$3$\times$256 P:0};
         \draw[red,line width=0.6mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.4,0.2)$) rectangle ($(ext8.south east)+(0.4,-0.2)$);
         \node [text=red, font=\bfseries] at ($(ext1.north)+(+0.0,0.6)$) (extra) {\Large Extra layers};
         
