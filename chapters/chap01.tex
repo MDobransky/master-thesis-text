@@ -1,8 +1,10 @@
 \chapter{Preliminaries}
 \label{chap:prelim}
-\todo{todo}
+In the last few years, there has been a rapid development in the field of deep learning application to computer vision and object detection. With each model being an iterative improvement on its predecessors we review a broad spectrum of neural networks to properly understand the structure and the reasoning behind current state-of-the-art models. This amount of information compels us to leave an explanation of the inner workings of neural networks out of the scope of this thesis. We, therefore, expect prior knowledge from the reader in the area of deep learning, namely in understanding standard modules such as fully connected, convolutional and pooling layers, activation functions, soft-max classifier, batch normalization and principle behind backpropagation and loss functions. All required knowledge can be obtained from the book by \citet{bib:dlbook}.
 
-\section{Evaluation criteria}
+A large part of this thesis is focused on describing and comparing classification and object detection models, in order to do so, this chapter is dedicated to describing used evaluation metrics and notations.
+
+\section{Evaluation metrics}
 In order to evaluate and compare multiple approaches, we require clearly defined evaluation metrics. A state-of-the-art model presented without full specification of used evaluation metrics makes comparing multiple results impossible. Thankfully, there are competitions and challenges with precisely defined rules that are often used to make such comparisons. 
 
 The \textit{ImageNet Large Scale Visual Recognition Challenge }(ILSVRC)\footnote{\url{http://www.image-net.org/challenges/LSVRC/}} is most often used to benchmark classification. Object detection is commonly evaluated in two challenges: the \textit{PASCAL Visual Object Classes Challenge}\footnote{\url{http://host.robots.ox.ac.uk/pascal/VOC/}}, and the \textit{COCO Object Detection Task}\footnote{\url{http://cocodataset.org/}}. Each challenge also provides a public dataset, \textit{ImageNet}, \textit{PASCAL VOC}, and \textit{COCO} respectively.
@@ -34,7 +36,7 @@ An object detector of a particular class can be considered reliable if its preci
 \subsubsection{Average Precision (AP)}
 Comparing curves is not an easy task, particularly if they cross each other frequently, as it often happens with PR curves. However, we can use the area under the PR curve as numerical metrics, called average precision. It is usually calculated by interpolation, either on all data points or a small number of equally spaced points (earlier versions of PASCAL VOC Challenge use 11).
 
-Interpolation equation for all points \footnote{\url{https://medium.com/@jonathan\_hui/map-mean-average-precision-for-object-detection-45c121a31173}}:
+Interpolation equation for all points:
 $$\sum_{r=0}^1 (r_{n+1} - r_n ) p_{interp}(r_{n+1})$$
 with
 $$p_{interp}(r_{n+1}) = \max_{\Tilde{r} \geq r_{n+1}} p(\Tilde{r})$$
@@ -74,21 +76,23 @@ Unless stated otherwise, the default parameters for the convolutional layer is s
 \begin{itemize}
     \item \textbf{Conv. k\x k\x c} : 2d convolutional layer with kernel size \textit{k\x k} and output channel depth of \textit{c}, while using default values for padding, stride and dilation.
     
-    \item \textbf{Conv. k\x k\x c /s P:p D:d} : 2d convolutional layer with kernel size \textit{k\x k} and output channel depth of \textit{c}, stride \textit{s}, padding \textit{p} and dilation \textit{d}. 
+    \item \textbf{Conv. k\x k\x c /s P:p D:d} : 2d convolutional layer with stride \textit{s}, padding \textit{p} and dilation \textit{d}. 
     
-    \item \textbf{Conv3d. k$_1$\x k$_2$\x k$_3$\x c} : 3d convolutional layer with kernel spatial size \textit{k$_1$\x k$_2$} and temporal size \textit{k$_3$}, and output channel depth of \textit{c}. 
+    \item \textbf{Conv3d. k\x k\x k$_3$\x c P:0} : 3d convolutional layer with kernel spatial size \textit{k\x k} and temporal size \textit{k$_3$}, and output channel depth of \textit{c} and zero padding in all dimensions. 
+    
+    \item \textbf{Conv3d. k\x k\x k$_3$\x c P:p,p,p$_3$} : 3d convolutional layer with spatial dimensions padded by \textit{p} elements on all sides and third dimension padded by \textit{p$_3$} elements on both sides.
 \end{itemize}
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/convolutions}
-    \caption[Parametrization of convolutional layer]{Effect of padding, stride and dilation on two-dimensional convolutional layer (left to right). Blue maps represent inputs, and cyan maps outputs. Images by \citet{bib:convolution}.}
+    \caption[Parametrization of convolutional layer]{Effect of padding, stride and dilation on two-dimensional convolutional layer (left to right). Blue maps represent inputs, and cyan maps outputs. Images adopted from \citet{bib:convolution}.}
     \label{fig:convolutions}
 \end{figure}
 
 \subsubsection*{Other Layers}
 \begin{itemize}
-    \item \textbf{Max-pool. k$_1$\x k$_2$ /s P:p} : maximum pooling with kernel size \textit{k$_1$\x k$_2$}, stride \textit{s} and padding \textit{p}. Default value for stride and padding is 1.
+    \item \textbf{Max-pool. k\x k /s P:p} : maximum pooling with kernel size \textit{k\x k}, stride \textit{s} and padding \textit{p}. Default value for stride and padding is 1.
     
     \item \textbf{Fully connected / FC - N} : fully connected layer with \textit{N} neurons
 \end{itemize}

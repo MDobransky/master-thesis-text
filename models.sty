@@ -115,15 +115,15 @@
         
         % \node [text=black, font=\bfseries] at ($(input.west)+(-3.5,0.4)$) (header) {\LARGE ResNet-SSD};
         
-        \node [conv, below= of ext0] (ext1) {Conv. 1$\times$1$\times$256 P:0};
+        \node [conv, below= of ext0] (ext1) {Conv. 1$\times$1$\times$256 };
         \node [conv, below of=ext1] (ext2) {Conv. 3$\times$3$\times$512 /2};
-        \node [conv, below of=ext2] (ext3) {Conv. 1$\times$1$\times$128 P:0};
+        \node [conv, below of=ext2] (ext3) {Conv. 1$\times$1$\times$128};
         \node [conv, below of=ext3] (ext4) {Conv. 3$\times$3$\times$256 /2};
-        \node [conv, below of=ext4] (ext5) {Conv. 1$\times$1$\times$128 P:0};
+        \node [conv, below of=ext4] (ext5) {Conv. 1$\times$1$\times$128};
         \node [conv, below of=ext5] (ext6) {Conv. 3$\times$3$\times$256 P:0};
-        \node [conv, below of=ext6] (ext7) {Conv. 1$\times$1$\times$128 P:0};
+        \node [conv, below of=ext6] (ext7) {Conv. 1$\times$1$\times$128};
         \node [conv, below of=ext7] (ext8) {Conv. 3$\times$3$\times$256 P:0};
-        \draw[red,line width=0.6mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.4,0.2)$) rectangle ($(ext8.south east)+(0.4,-0.2)$);
+        \draw[red,line width=0.6mm, dash pattern=on 6pt off 5pt,] ($(ext1.north west)+(-0.5,0.2)$) rectangle ($(ext8.south east)+(0.2,-0.2)$);
         \node [text=red, font=\bfseries] at ($(ext1.north)+(+0.0,0.6)$) (extra) {\Large Extra layers};
         
         \node [conv, left= of ext3] (cls4) {Conv. 3$\times$3$\times$6*C};
@@ -199,7 +199,7 @@
         \subsection*{ResNet}
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
             \node [input] (input) {Input};
-            \node [conv, below of=input] (conv1) {Conv. 7$\times$7$\times$64 /2};
+            \node [conv, below of=input] (conv1) {Conv. 7$\times$7$\times$64 /2 P:3};
             \node [bnorm, below of=conv1] (bn) {BatchNorm.};
             \node [relu, below of=bn] (relu) {ReLU};
             \node [pool, below of=relu] (maxpool) {Max pool. 3$\times$3 /2};
@@ -287,9 +287,9 @@
 
     \tikzstyle{line} = [draw, -latex]
     \tikzstyle{fline} = [draw, -latex, line width=0.8pt]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=40mm, node distance= 0.25cm]
-    \tikzstyle{sepconv} = [rectangle, draw,  text centered, rounded corners, fill=\sepconvcol, text width=40mm, node distance= 0.25cm]
-    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.25cm, text width=30mm]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=43mm, node distance= 0.25cm]
+    \tikzstyle{sepconv} = [rectangle, draw,  text centered, rounded corners, fill=\sepconvcol, text width=43mm, node distance= 0.25cm]
+    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.25cm, text width=33mm]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.3cm, text width=30mm]
     
@@ -298,7 +298,7 @@
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
         
             \node [input] (input) {Input [300\x 300]};
-            \node [conv, below=of input] (conv1) {Conv. 7$\times$7$\times$64 /2};
+            \node [conv, below=of input] (conv1) {Conv. 7$\times$7$\times$64 /2 P:3};
             \node [rect, below=of conv1] (block1) {Layer 1};
             \node [rect, below=of block1] (block2) {Layer 2 \textbf{[38\x 38\x 128]}};
             \node [rect, below=of block2] (block3) {Layer 3 \textbf{[19\x 19\x 256]}};
@@ -308,7 +308,7 @@
             \node [conv, below=of ext2] (ext3) {Conv. 1$\times$1$\times$128};
             \node [conv, below=of ext3] (ext4) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
             \node [conv, below=of ext4] (ext5) {Conv. 1$\times$1$\times$128};
-            \node [conv, below=of ext5] (ext6) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+            \node [conv, below=of ext5] (ext6) {Conv. 3$\times$3$\times$256~P:0 \textbf{[1\x 1\x 256]}};
             \node [box, below=of ext6] (cls) {Classification};
             \node [box, below=of cls] (loc) {Localization};
             
@@ -359,8 +359,8 @@
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
         
             \node [input] (input) {Input [300\x 300]};
-            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2};
-            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64};
+            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2 P:0};
+            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64 P:0};
     
             \node [rect, below=of conv2] (block2) {Blocks 1, 2 \textbf{[37\x 37 \x 256]}};
             \node [rect, below=of block2] (block4) {Blocks~3-11 \textbf{[19\x 19 \x 728]}};
@@ -372,7 +372,7 @@
             \node [conv, below=of ext2] (ext3) {Conv. 1$\times$1$\times$128};
             \node [conv, below=of ext3] (ext4) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
             \node [conv, below=of ext4] (ext5) {Conv. 1$\times$1$\times$128};
-            \node [conv, below=of ext5] (ext6) {Conv. 3$\times$3$\times$256  \textbf{[1\x 1\x 256]}};
+            \node [conv, below=of ext5] (ext6) {Conv. 3$\times$3$\times$256~P:0  \textbf{[1\x 1\x 256]}};
             \node [box, below=of ext6] (cls) {Classification};
             \node [box, below=of cls] (loc) {Localization};
             
@@ -700,9 +700,9 @@
 
     \tikzstyle{line} = [draw, -latex]
     \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=0.7cm]
-    \tikzstyle{convl} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=36mm, node distance= 0.45cm, minimum height=1.3cm]
+    \tikzstyle{convl} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=37mm, node distance= 0.45cm, minimum height=1.3cm]
     \tikzstyle{convd} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=33mm, node distance= 0.25cm, minimum height=0.7cm]
-\tikzstyle{det} = [rectangle, draw, text centered, rounded corners, fill=\convtdcol, text width=15mm, node distance= 0.8cm, minimum height=1.7cm]
+\tikzstyle{det} = [rectangle, draw, text centered, rounded corners, fill=\convtdcol, text width=28mm, node distance= 1.8cm,]
     \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.45cm, text width=30mm, minimum height=1.3cm]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol, minimum height=0.7cm, text width=30mm]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.3cm, text width=30mm]
@@ -711,7 +711,7 @@
     \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
     
         \node [input] (input) {};
-        \node [conv, below=of input] (conv1) {};
+        \node [conv, below=of input, text width=43mm] (conv1) {};
         \node [rect, minimum height=0.7cm, below=of conv1] (block1) {};
         \node [rect, below=of block1] (block2) {};
         \node [rect, below=of block2] (block3) {};
@@ -736,19 +736,19 @@
         \path[line] (ext5) -- (ext6);
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \node [det]  at ($(ext3.east)+(2.1,+0.5)$)  (d34) {Conv3d 1\x 1\x 3 \x 256};
-        \node [det, below= of d34] (d35) {Conv3d 1\x 1\x 3 \x 256};
-        \node [det, below= of d35] (d36) {Conv3d 1\x 1\x 3 \x 256};
-        \node [det, above= of d34] (d33) {Conv3d 1\x 1\x 3 \x 128};
-        \node [det, above= of d33] (d32) {Conv3d 1\x 1\x 3 \x 128};
-        \node [det, above= of d32] (d31) {Conv3d 1\x 1\x 3 \x 128};
+    \node [det]  at ($(ext3.east)+(2.5,+0.5)$)  (d34) {Conv3d P:0 1\x 1\x 3\x 256};
+        \node [det, below= of d34] (d35) {Conv3d P:0 1\x 1\x 3\x 256};
+        \node [det, below= of d35] (d36) {Conv3d P:0 1\x 1\x 3\x 256};
+        \node [det, above= of d34] (d33) {Conv3d P:0 1\x 1\x 3\x 128};
+        \node [det, above= of d33] (d32) {Conv3d P:0 1\x 1\x 3\x 128};
+        \node [det, above= of d32] (d31) {Conv3d P:0 1\x 1\x 3\x 128};
         
-        \node [det]  at ($(d34.east)+(1.2,+0.4)$)  (d341) {Conv3d 3\x 3\x 3 \x 512};
-        \node [det, below= of d341] (d351) {Conv3d 3\x 3\x 3 \x 512};
-        \node [det, below= of d351] (d361) {Conv3d 3\x 3\x 3 \x 512};
-        \node [det, above= of d341] (d331) {Conv3d 3\x 3\x 3 \x 256};
-        \node [det, above= of d331] (d321) {Conv3d 3\x 3\x 3 \x 256};
-        \node [det, above= of d321] (d311) {Conv3d 3\x 3\x 3 \x 256};
+        \node [det]  at ($(d34.east)+(-0.3,+1.4)$)  (d341) {Conv3d P:1,1,0 3\x 3\x 3\x 512};
+        \node [det, below= of d341] (d351) {Conv3d P:1,1,0 3\x 3\x 3\x 512};
+        \node [det, below= of d351] (d361) {Conv3d P:1,1,0 3\x 3\x 3\x 512};
+        \node [det, above= of d341] (d331) {Conv3d P:1,1,0 3\x 3\x 3\x 256};
+        \node [det, above= of d331] (d321) {Conv3d P:1,1,0 3\x 3\x 3\x 256};
+        \node [det, above= of d321] (d311) {Conv3d P:1,1,0 3\x 3\x 3\x 256};
         
         \path[line] (d34) -- (d341);
         \path[line] (d35) -- (d351);
@@ -786,8 +786,8 @@
         \path[line] (d361) -- (loc6);
         \path[line] (d361) -- (cls6);
 
-        \draw[purple,line width=0.6mm,] ($(d31.north west)+(-0.3,0.6)$)  rectangle ($(d361.south east)+(0.2,-0.6)$);
-\node [text=purple, font=\bfseries] at ($(d31.north)+(+1.0,1.0)$) (class) {\Large Temporal layers};
+        \draw[purple,line width=0.6mm,] ($(d31.north west)+(-0.3,1.6)$)  rectangle ($(d361.south east)+(0.2,-1.6)$);
+\node [text=purple, font=\bfseries] at ($(d31.north)+(+0.7,2.0)$) (class) {\Large Temporal layers};
         
         %%%%%%%%%%%%%
         
@@ -801,7 +801,7 @@
         %%%%%%%%%%%%%%%%
         
         \node [input] at ($(input.south)+(0.1,0.2)$) (input2) {};
-        \node [conv, below=of input2] (conv12) {};
+        \node [conv, below=of input2, text width=43mm] (conv12) {};
         \node [rect, minimum height=0.7cm, below=of conv12] (block12) {};
         \node [rect, below=of block12] (block22) {};
         \node [rect, below=of block22] (block32) {};
@@ -837,7 +837,7 @@
         %%%%%%%%%%%%%%%%%%%%%%%
         
         \node [input]  at ($(input2.south)+(0.1,0.2)$)  (input3) {};
-        \node [conv, below=of input3] (conv13) {};
+        \node [conv, below=of input3, text width=43mm] (conv13) {};
         \node [rect, minimum height=0.7cm, below=of conv13] (block13) {};
         \node [rect, below=of block13] (block23) {};
         \node [rect, below=of block23] (block33) {};
@@ -872,7 +872,7 @@
         %%%%%%%%%%%%%
         
         \node [input]  at ($(input3.south)+(0.1,0.2)$)  (input4) {};
-        \node [conv, below=of input4] (conv14) {};
+        \node [conv, below=of input4, text width=43mm] (conv14) {};
         \node [rect, minimum height=0.7cm, below=of conv14] (block14) {};
         \node [rect, below=of block14] (block24) {};
         \node [rect, below=of block24] (block34) {};
@@ -909,7 +909,7 @@
         %%%%%%%%%%%%%
         
         \node [input]  at ($(input4.south)+(0.1,0.2)$)  (input5) {Input [300\x 300]};
-        \node [conv, below=of input5] (conv15) {Conv. 7$\times$7$\times$64 /2};
+        \node [conv, below=of input5, text width=43mm] (conv15) {Conv. 7$\times$7$\times$64 /2 P:3};
         \node [rect, minimum height=0.7cm, below=of conv15] (block15) {Layer 1};
         \node [rect, below=of block15] (block25) {Layer 2 \textbf{[38\x 38\x 128]}};
         \node [rect, below=of block25] (block35) {Layer 3 \textbf{[19\x 19\x 256]}};
@@ -919,7 +919,7 @@
         \node [conv, below=of ext25] (ext35) {Conv. 1$\times$1$\times$128};
         \node [convl, below=of ext35] (ext45) {Conv. 3$\times$3$\times$256~/2 \textbf{[3\x 3\x 256]}};
         \node [conv, below=of ext45] (ext55) {Conv. 1$\times$1$\times$128};
-        \node [convl, below=of ext55] (ext65) {Conv. 3$\times$3$\times$256 \textbf{[1\x 1\x 256]}};
+        \node [convl, below=of ext55] (ext65) {Conv. 3$\times$3$\times$256~P:0 \textbf{[1\x 1\x 256]}};
 
         \path[line] (input5) -- (conv15);
         \path[line] (conv15) -- (block15);
@@ -949,9 +949,9 @@
 
     \tikzstyle{line} = [draw, -latex]
     \tikzstyle{fline} = [draw, -latex, line width=0.8pt]
-    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=40mm, node distance= 0.25cm]
+    \tikzstyle{conv} = [rectangle, draw,  text centered, rounded corners, fill=\convcol, text width=43mm, node distance= 0.25cm]
     \tikzstyle{sepconv} = [rectangle, draw,  text centered, rounded corners, fill=\sepconvcol, text width=40mm, node distance= 0.25cm]
-    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.20cm, text width=40mm]
+    \tikzstyle{rect} = [rectangle, draw, text centered, fill=\blockcol, minimum height=1em, node distance=0.20cm, text width=43mm]
     \tikzstyle{input} = [rectangle, draw,  text centered, rounded corners,  fill=\inputcol]
     \tikzstyle{box} = [rectangle, draw, text centered, fill=Orchid!60, node distance=0.25cm, text width=30mm]
     
@@ -960,8 +960,8 @@
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
         
             \node [input] (input) {Input [300\x 300]};
-            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2};
-            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64};
+            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2 P:0};
+            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64 P:0};
     
             \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74\x 128]};
             \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37\x 256]};
@@ -1001,8 +1001,8 @@
         \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
         
             \node [input] (input) {Input [300\x 300]};
-            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2};
-            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64};
+            \node [conv, below=of input] (conv1) {Conv. 3$\times$3$\times$32~/2 P:0};
+            \node [conv, below=of conv1] (conv2) {Conv. 3$\times$3$\times$64 P:0};
     
             \node [rect, below=of conv2, fill=\blockcol!0] (block1) {Block 1 $\vert$ S:2 [74\x 74\x 128]};
             \node [rect, below=of block1, fill=\blockcol!30] (block2) {Block 2 $\vert$ S:2 [37\x 37\x 256]};

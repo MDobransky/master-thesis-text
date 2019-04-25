@@ -7,6 +7,19 @@ Currently, the detectors designed for image detection hold an edge over detector
 
 \section{Detection Explained}
 \todo{explain how conv produces predictions}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/fc_vs_conv}
+    \caption[Comparing fully connected and convolutional classifier]{A convolutional layer with kernel size equal to feature map size and no padding performs an equivalent operation as fully connected (FC) layer. While the FC layer is parametrized by the number of neurons and produces the output of size [N], convolution is parametrized by the number of output channels and therefore produces [1\x1\x N] shaped tensor. Kernels are color-coded to match the produced channel.}
+    \label{fig:fc_vs_conv}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/conv_pred}
+    \caption[Class and location predictions by convolutional layer]{A single convolutional layer can generate multiple class and location predictions. For every convolutional window it predicts \textit{N = 2} classified bounding boxes. Each prediction composes of four location parameters (height \textit{H}, width \textit{W} and center position \textit{X, Y}) and predictions for \textit{C = 2} classes (\textit{A} and \textit{B}). Kernels of convolution are color-coded to match the produced channel.}
+    \label{fig:conv_pred}
+\end{figure}
 
 \section{Real-time Detectors}
 \label{sec:rltm}
