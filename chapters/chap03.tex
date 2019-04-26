@@ -5,8 +5,38 @@ In this chapter, we provide an overview of the methods used for detections in th
 
 Currently, the detectors designed for image detection hold an edge over detectors with temporal information, mostly because available methods for image detection are faster than temporal methods. However single-frame detectors are unstable and require a lot of post-processing for smooth tracking in video. 
 
-\section{Detection Explained}
-\todo{explain how conv produces predictions}
+\section{One-Stage Detection}
+
+From our experience, the step from the region-based networks to one-stage detectors can be hard to comprehend. To bridge the gap between the two approaches, this section offers a thorough explanation of one-stage detector building process. 
+
+At this point we do not concern ourselves with optimal model but rather present general ideas.
+
+\subsection*{Detection Input}
+Similarly to \cref{fig:fasterrcnn}, we start by processing the input image into a feature map. This process can be done by any extraction network, e.g., a classification network up to the fully connected layer, that outputs a feature map of [n\x n\x c] size. 
+To perform a detection, we first need a 
+Lets start by defining an input of such model. The ussual input for detection is a RGB image with [m\x m\x 3] shape (for convenience we will work only with square inputs). To keep in line with tied and tested methods, this image gets processed by a feature  We will build our detector on this feature map.
+
+\subsection*{Desired Output}
+To perform a bounding-box localization, we first need to parametrize the bounding-box. Since bbox is a rectangle, it can be specified by four parameters: a center position \textit{(X,Y)}, width \textit{W} and height \textit{H}. These can be either relative values in respect to predefined anchor boxes, or a absolute values. 
+
+A predicted bbox also needs to be classified. To perform a standard soft-max classification, we require a confidence score for each of \textit{C} classes. However, the networks also needs to be able to classify the bbox as a background. This can be achieved by additional parameter with object/background confidence score \textit{B}.
+
+We ended up with a set of C+5 parameters [c$_1$, ..., c$_C$, B, X, Y, W, H]. Were we in the region-based network, this is everything needed for one region. However, there are no given regions in one-stage detector, or should we say, every position is a region. Given the feature map [n\x n\x c], we expect to predict described vector of C+5 parameters for every cell of [n\x n] map. This gives us an expected tensor of [n\x n\x C+5] size. 
+
+\subsubsection{Anchor Boxes}
+In \cref{fig:fasterrcnn}, we saw the use of multiple anchor boxes in region proposal network. Experiments show that it is easier for the network to accept a set of suggested boxes and refine their position and scale, rather than regress values by itself. It is also better for the generalization if the network can associate boxes with certain aspect rations with certain classes.
+
+There are multiple options to include this aspect in our model. We can either predict \textit{K} bounding-box parameters and one set of confidence scores per each region, or to predict a separate classification for each box. In the first case we get the prediction tensor of [n\x n\x K*4+C+1] shape and in the latter case of [n\x n\x K*(C+5)] shape.
+
+\subsection*{Detection}
+
+\subsubsection{Fully Connected Classifier}
+
+\subsubsection{Convolutional Classifier}
+
+
+
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/fc_vs_conv}
@@ -17,13 +47,13 @@ Currently, the detectors designed for image detection hold an edge over detector
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/conv_pred}
-    \caption[Class and location predictions by convolutional layer]{A single convolutional layer can generate multiple class and location predictions. For every convolutional window it predicts \textit{N = 2} classified bounding boxes. Each prediction composes of four location parameters (height \textit{H}, width \textit{W} and center position \textit{X, Y}) and predictions for \textit{C = 2} classes (\textit{A} and \textit{B}). Kernels of convolution are color-coded to match the produced channel.}
+    \caption[Class and location predictions by convolutional layer]{A single convolutional layer can generate multiple class and location predictions. For every convolutional window it predicts \textit{K = 2} classified bounding boxes. Each prediction composes of four location parameters (height \textit{H}, width \textit{W} and center position \textit{X, Y}), predictions for \textit{C = 1} class  (\textit{A}) and object confidence score (\textit{B}). Kernels of convolution are color-coded to match the produced channel.}
     \label{fig:conv_pred}
 \end{figure}
 
-\section{Real-time Detectors}
+\section{Real-Time Detectors}
 \label{sec:rltm}
-In \cref{sec:detnets} we took a look on a series of two-stage detectors, with separate region proposals and classification. A few years later, a new type of detectors has been developed, with faster single-stage design. Single-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also, the trade-off between speed and precision is continually diminishing in favor of single-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.
+In \cref{sec:detnets} we took a look on a series of two-stage detectors, with separate region proposals and classification. A few years later, a new type of detectors has been developed, with faster one-stage design. One-stage detectors combine classification and bbox regression into a single pass of the network and are able to achieve real-time performance without problems. Also, the trade-off between speed and precision is continually diminishing in favor of one-stage approach. In this section, we show off two popular approaches \textit{You Only Look Once} and \textit{Single Shot MultiBox Detector}.
 
 \subsection{YOLO: You Only Look Once (2016)}
 \label{sec:yolo}
