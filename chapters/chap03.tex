@@ -35,9 +35,6 @@ The simplest means of getting from [n\x n\x c] map to [n\x n\x P] values using a
 
 Notice that this detector is not only unaware of the order of \textit{P} parameters, but the association of parameters with the feature map position is also not present. A a matter of fact, each predicted parameter is calculated with the information from the entire feature map, and it is only via the training process that the spatial relations are formed.
 
-\subsubsection{Convolutional Detector}
-Before we start with a convolutional detector, we need to demonstrate the concept by showing the possibility of using a convolutional layer as a classifier equivalent to a fully connected layer. In a classification network with \textit{C} classes, a layer with \textit{C} neurons is connected to the last feature map with [n\x n\x c] shape. This layer takes an input of all $n^2c$ values and outputs a class distribution. On the other hand, let's deploy a convolutional layer with a kernel size of \textit{n\x n} and \textit{C} output channels. From the definition, we know that the actual size of the kernel includes the channel depth equal to the depth of input data and the output number of channels specify the number of such kernels. Now we can see that the application of one convolutional kernel, is in this case equal to one fully connected neuron. The only difference in both approaches is the shape of input and output data. This comparison is illustrated on \cref{fig:fc_vs_conv}.
-
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/fc_vs_conv}
@@ -45,18 +42,23 @@ Before we start with a convolutional detector, we need to demonstrate the concep
     \label{fig:fc_vs_conv}
 \end{figure}
 
-Now that we know that the convolution can perform the same tasks as a fully connected layer, no matter whether it is classification or regression, we can change the naive fully connected detector to a naive convolutional detector. Of course, this has no benefits other than proving the point.
-
-However, if we decrease the size of the convolutional filter to \textit{k\x k}, where $k < n$, we can use the convolution as a spatially localized detector. The resulting convolutional operation performs detection equivalent to a fully connected detector for each of [n\x n] positions on a feature map, using only local information and producing the \textit{P} parameters for each position. We illustrate the convolutional detector on \cref{fig:conv_pred}.
-
-Thanks to the convolution, we reduced the number of trainable parametrs from $n^4cP$ in naive approach to $k^2cP$, where \textit{k} is ussually a small number, i.e. \textit{k = 3}, and number of multiplications to $n^2k^2cP$.
-
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/conv_pred}
     \caption[Class and location predictions by convolutional layer]{A single convolutional layer can generate multiple class and location predictions. For every convolutional window it predicts \textit{K = 2} classified bounding boxes. Each prediction composes of four location parameters (height \textit{H}, width \textit{W} and center position \textit{X, Y}), predictions for \textit{C = 1} class  (\textit{A}) and object confidence score (\textit{B}). Kernels of convolution are color-coded to match the produced channel.}
     \label{fig:conv_pred}
 \end{figure}
+
+\subsubsection{Convolutional Detector}
+Before we start with a convolutional detector, we need to demonstrate the concept by showing the possibility of using a convolutional layer as a classifier equivalent to a fully connected layer. In a classification network with \textit{C} classes, a layer with \textit{C} neurons is connected to the last feature map with [n\x n\x c] shape. This layer takes an input of all $n^2c$ values and outputs a class distribution. On the other hand, let us deploy a convolutional layer with a kernel size of \textit{n\x n} and \textit{C} output channels. From the definition, we know that the actual size of the kernel includes the channel depth equal to the depth of input data and the output number of channels specify the number of such kernels. Now we can see that the application of one convolutional kernel, is in this case equal to one fully connected neuron. The only difference in both approaches is the shape of input and output data. This comparison is illustrated on \cref{fig:fc_vs_conv}.
+
+Now that we know that the convolution can perform the same tasks as a fully connected layer, no matter whether it is classification or regression, we can change the naive fully connected detector to a naive convolutional detector. Of course, this has no benefits other than proving the point.
+
+However, if we decrease the size of the convolutional filter to \textit{k\x k}, where $k < n$, we can use the convolution as a spatially localized detector. The resulting convolutional operation performs detection equivalent to a fully connected detector for each of [n\x n] positions on a feature map, using only local information and producing the \textit{P} parameters for each position. We illustrate the convolutional detector on \cref{fig:conv_pred}.
+
+Thanks to the convolution, we reduced the number of trainable parameters from $n^4cP$ in naive approach to $k^2cP$, where \textit{k} is usually a small number, i.e. \textit{k = 3}, and number of multiplications to $n^2k^2cP$. The other benefit is that convolution performs equivalent detection at each position on the image, where a fully connected detector can acquire some positional biases.
+
+
 
 \section{Real-Time Detectors}
 \label{sec:rltm}
