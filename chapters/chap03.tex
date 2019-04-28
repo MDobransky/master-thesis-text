@@ -54,7 +54,7 @@ Before we start with a convolutional detector, we need to demonstrate the concep
 
 Now that we know that the convolution can perform the same tasks as a fully connected layer, no matter whether it is classification or regression, we can change the naive fully connected detector to a naive convolutional detector. Of course, this has no benefits other than proving the point.
 
-However, if we decrease the size of the convolutional filter to \textit{k\x k}, where $k < n$, we can use the convolution as a spatially localized detector. The resulting convolutional operation performs detection equivalent to a fully connected detector for each of [n\x n] positions on a feature map, using only local information and producing the \textit{P} parameters for each position. We illustrate the convolutional detector on \cref{fig:conv_pred}.
+However, if we decrease the size of the convolutional filter to \textit{k\x k}, where $k \ll n$, we can use the convolution as a spatially localized detector. The resulting convolutional operation performs detection equivalent to a fully connected detector for each of [n\x n] positions on a feature map, using only local information and producing the \textit{P} parameters for each position. We illustrate the convolutional detector on \cref{fig:conv_pred}.
 
 Thanks to the convolution, we reduced the number of trainable parameters from $n^4cP$ in naive approach to $k^2cP$, where \textit{k} is usually a small number, i.e. \textit{k = 3}, and number of multiplications to $n^2k^2cP$. The other benefit is that convolution performs equivalent detection at each position on the image, where a fully connected detector can acquire some positional biases.
 
@@ -152,7 +152,7 @@ SSD is another real-time detector, aiming to outperform Faster R-CNN by using a 
 \subsubsection{Detection}
 One of the main features of SSD is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of a convolutional window. SSD adopts similar concept to Faster R-CNN's anchor boxes, this time called default or prior boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, six boxes are used. Contrary to YOLO, both bbox and classification predictions are made for each position and each prior box.
 
-Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. \todo{explain} There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B\x (C+5)] parameters on feature map of [m\x n] size.
+Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B\x (C+5)] parameters on feature map of [m\x n] size.
 
 \textit{SSD} detects objects on multiple feature maps at different scales, to accommodate detection of different sized objects. Moreover, this allows detectors on each level to focus on predicting a smaller range of bbox sizes. For the illustration of this process see \cref{fig:ssddet}.
 
