@@ -1,20 +1,40 @@
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
-This thesis began by briefly summarizing the history of classification networks. We presented a selection of models while describing their architecture and historical significance. With the bases covered, we moved on to the next step towards real-time object detection, region-based networks, and compiled a brief overview of R-CNN family of networks.
 
-Since the focus of this thesis is to optimize the SSD detector for video surveillance, we presented an in-depth examination of this detector. However, it would not be right to present SSD without mentioning its contemporary counterpart, YOLO real-time detection. In order to gain wider knowledge about video detection and get some inspiration for our work, we also examined a pair of video detectors working with temporal information in the video.
+Our work can be summarized in five segments. We started by reviewing related work and other relevant image processing deep learning models. We continued by weighting the options for improving SSD and decided to replace VGG feature extractor by more modern network. Then we tool a look at relationship between detected classes and detector performance. In the forth part, we returned to improving the SSD, this time we picked one base network and instead of using the classification network as is, we make a series of adjustments aimed at improving the performance. We dedicated the final part of this work to designing and implementing a version of SSD detector with the use of temporal information from video continuity.
 
-From the research paper introducing SSD we know, that the precision of the model can be improved by implementing a sophisticated data augmentation algorithm. Since augmentation algorithms slow down the training process, we decided to start with a fast and straightforward augmentation and focus on the relative comparison of the network performances. We started our work by re-implementing SSD in PyTorch framework and trained in on COCO dataset to serve as our benchmark baseline. 
+\subsubsection*{Model review}
+We began by briefly summarizing a development of classification networks by presenting a selection of models while describing their architecture and historical significance. With the bases of image processing covered, we moved on to a region-based object detection and compiled a brief overview of R-CNN family of networks.
 
-Our first steps towards optimizing SSD lead to searching for a replacement for the outdated VGG classifier. We tried out ResNet networks, Xception and NASNet. Our finding showed that all tested versions of ResNet were capable of outperforming VGG16, and Xception and NASNet only outperformed VGG in terms of speed. This preliminary result suggested ResNet as a clear choice. However, we were not satisfied with the Xception result and decided to pursue its improvement. 
+Since the focus of this thesis is to optimize the SSD detector for video surveillance, we presented an in-depth examination of this detector. However, it would not be right to present SSD without mentioning its contemporary counterpart, YOLO. Because both SSD and YOLO are one-stage detectors and our experience shows that one-stage approach can be difficult to comprehend, we compiled a detailed examination of such detector.
 
-Before we continued with testing any other architecture modifications, we decided to take a side-step toward the training data. As stated before, our baseline is SSD trained on COCO dataset. However, we are not interested in every class contained in COCO. As a matter of fact, we are only interested in seven of those eighty classes. Before jumping straight to training with only those selected classes, we formulated the hypothesis, according to which the precision of the detector can be negatively impacted by the removal of the unwanted classes from the training process. We performed two tests concerning limiting the number of detected classes, one experiment to test our hypothesis and therefore precision, and second test to observe the relationship between the number of detected classes and speed of the network. The performance test was inconclusive and did not favor one dataset over the other. However, the inference speed test clearly shows the benefits of a lower number of classes. With ResNet50-SSD, we managed to speed up the network from 50 fps on 80 classes to 123 fps on 7 classes. Based on the results of those tests, we decided to continue with all further experiments with this limited dataset.
+In order to gain wider knowledge about video detection and inspiration for our work, we also examined a pair of video detectors exploiting the temporal information in the video.
 
-With training dataset taken care of, we returned to the Xception-SSD and its disappointing precision. As it usually goes with neural networks, we took an experimental approach and designed multiple versions of Xception to test. After a few iterations, we arrived at the Xception version H, that met our expectations. This version managed to perform on par with ResNet50-SSD, reaching over 49\% mAP on surveillance data, however still under-performing it in terms of speed. 
+\subsubsection*{SSD's Base Network}
+We know, from the research paper introducing SSD, that the precision of the model can be improved by implementing a sophisticated data augmentation algorithm. Since augmentation algorithms slow down the training process, we decided to advance with a fast and straightforward training and focus on the relative comparison of the network performances. To obtain a benchmark baseline, we began our work by re-implementing SSD in PyTorch framework and trained it on COCO dataset.
+
+Our first steps towards optimizing SSD lead to a search for a replacement for the outdated VGG classifier. We tried out ResNet networks, Xception and NASNet-Mobile. The testing revealed that all versions of SSD based on ResNet are capable of outperforming VGG16-SSD, but Xception and NASNet only outperform VGG in terms of speed. This result suggested ResNet as a clear winner. However, we were not satisfied with all the results and further pursued the possibilities for improvement, mainly for the Xception-SSD. 
+
+\subsubsection*{Classes}
+Before we continued with testing of architecture modifications, we decided to take a side-step toward the training data. As stated before, our baseline is SSD trained on COCO dataset. However, we are not really interested in every class provided by COCO. As a matter of fact, we are only interested in seven of those eighty classes.
+
+Instead of just training with only those selected classes, we took this opportunity to test a couple of hypothesis. 
+
+formulated the hypothesis, according to which the precision of the detector can be negatively impacted by the removal of the unwanted classes from the training process. 
+
+We performed two tests concerning limiting the number of detected classes, one experiment to test our hypothesis and therefore precision, and second test to observe the relationship between the number of detected classes and speed of the network.
+
+The performance test was inconclusive and did not favor one dataset over the other. However, the inference speed test clearly shows the benefits of a lower number of classes. With ResNet50-SSD, we managed to speed up the network from 50 fps on 80 classes to 123 fps on 7 classes. Based on the results of those tests, we decided to continue with all further experiments with this limited dataset.
+
+\subsubsection*{Architecture}
+With training dataset taken care of, we returned to the Xception-SSD and its disappointing precision. As it usually goes with neural networks, we took an experimental approach and designed multiple versions of Xception to test. After a few iterations, we arrived at the Xception version H, that met our expectations. This version managed to perform on par with ResNet50-SSD, reaching over 49\% mAP on surveillance data and trailing by a few fps. 
+
+\subsubsection*{TSSD}
+TSSD
 
 
 
-\section{Future Work}
+\section*{Future Work}
 
 
 

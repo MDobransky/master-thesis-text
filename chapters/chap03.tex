@@ -56,7 +56,7 @@ Now that we know that the convolution can perform the same tasks as a fully conn
 
 However, if we decrease the size of the convolutional filter to \textit{k\x k}, where $k \ll n$, we can use the convolution as a spatially localized detector. The resulting convolutional operation performs detection equivalent to a fully connected detector for each of [n\x n] positions on a feature map, using only local information and producing the \textit{P} parameters for each position. We illustrate the convolutional detector on \cref{fig:conv_pred}.
 
-Thanks to the convolution, we reduced the number of trainable parameters from $n^4cP$ in naive approach to $k^2cP$, where \textit{k} is usually a small number, i.e. \textit{k = 3}, and number of multiplications to $n^2k^2cP$. The other benefit is that convolution performs equivalent detection at each position on the image, where a fully connected detector can acquire some positional biases.
+Thanks to the convolution, we reduced the number of trainable parameters from $n^4cP$ in naive approach to $k^2cP$, where \textit{k} is usually a small number, e.g. \textit{k = 3}, and number of multiplications to $n^2k^2cP$. The other benefit is that convolution performs equivalent detection at each position on the image, where a fully connected detector can acquire some positional biases.
 
 
 

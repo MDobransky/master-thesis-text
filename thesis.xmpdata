@@ -1,7 +1,7 @@
 % Metadata to be stored in PDF, see documentation of the pdfx package for more details.
 
 \Author{Marek Dobransky}
-\Title{Object detection for video surveillance}
-\Keywords{TODO todo}
+\Title{Object detection for video surveillance using the SSD approach}
+\Keywords{object detection, video surveillance, deep neural networks, SSD architecture}
 \Subject{TODO abstract here}
 \Publisher{Charles University}
