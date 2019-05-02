@@ -1039,3 +1039,57 @@
         \end{tikzpicture}
     \end{multicols}
 }
+
+
+
+\newcommand{\modules}{
+    \usetikzlibrary{shapes,arrows}
+
+    \tikzstyle{line} = [draw, -latex]
+    \tikzstyle{shared} = [rectangle, draw,  text centered, rounded corners,  fill=\sepconvcol]
+    \tikzstyle{train} = [rectangle, draw,  text centered, rounded corners,  fill=\convcol]
+    \tikzstyle{infer} = [rectangle, draw,  text centered, rounded corners,  fill=\convtdcol]
+    
+    % \subsection*{XceptionA}
+    \begin{tikzpicture}[every text node part/.style={align=center}, node distance=1.2cm]
+    
+        \node [shared] (ssd) {\textbf{SSD} \\ {\tt ssd.py}};
+        \node [shared] at ($(ssd)+(0.0,-2.0)$) (model) {\textbf{Network Model} \\ {\tt models/*}};
+        \path[line] (ssd) -- (model);
+        
+        \node [train] at ($(ssd)+(-5.0,-2.0)$) (match) {\textbf{Ground-Truth Matching} \\ {\tt box\_utils.py}};
+        \path[line] (ssd) -- (match);
+        
+        \node [train] at ($(ssd)+(-2.5,-4.0)$) (loss) {\textbf{Loss} \\ {\tt multibox\_loss.py}};
+        \path[line] (model) -- (loss);
+        \path[line] (match) -- (loss);
+        
+        \node [train] at ($(loss)+(-0,-2.0)$) (optim) {\textbf{Optimizer} \\ torch.optim.SGD};
+        \path[line] (loss) -- (optim);
+        
+        \node [infer] at ($(ssd)+(+2.5,-4.0)$) (nms) {\textbf{Non Maximum} \\ \textbf{Suppression} \\ {\tt detection.py}};
+        \path[line] (model) -- (nms);
+        
+        ------
+        
+        \node [infer] at ($(ssd)+(+2.5,2.0)$) (inp) {\textbf{Input images}};
+        \path[line] (inp) -- (ssd);
+        
+        \node [train] at ($(ssd)+(-2.5,2.0)$) (load) {\textbf{Data Loader} \\ torch.utils.data.DataLoader};
+        \path[line] (load) -- (ssd);
+        
+        \node [train] at ($(load)+(0,2.0)$) (aug) {\textbf{Augmentation} \\ {\tt data/preprocess.py}};
+        \path[line] (aug) -- (load);
+        
+        \node [train] at ($(aug)+(0,2.0)$) (data) {\textbf{Dataset} \\ {\tt data/coco\_detection.py}};
+        \path[line] (data) -- (aug);
+        
+        
+        
+        
+    \end{tikzpicture}
+}
+
+
+
+

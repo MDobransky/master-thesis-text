@@ -1,11 +1,47 @@
 \chapter{Implementation}
 \label{app:impl}
 
-environment
-PyTorch 0.4.1
-Python 3.5
-CUDA Toolkit 9.2
-cuDNN 7
-NVIDIAs nvidia/cuda:9.2-cudnn7-devel docker container
-opencv 3.4.3.18
-Ubuntu 16.04
+This section provides overview of the implementation used for the experiments. We preview the division of the source code into modules and provide a short guide into the environment requirements.
+
+
+\section{Code structure}
+The logical structure of the implementation is illustrated on \cref{fig:logcode}. We can see the different modules used for training and inference, with the shared core. This structure is common to both SSD and SSDTC, with the exception of SSDTC training, where the {\tt ssd.py} file is replaced by the {\tt ssdtc.py} file.
+
+Physically, the code is organized in {\tt ssd} folder as follows:
+\begin{description}
+\item[lib/] Folder containing both SSD and SSDTC implementations. 
+\item[lib/data/] Contains the dataset classes for loading the data and annotations for both COCO and HollywoodHeads datasets, and an augmentation module.
+\item[lib/models/] Neural network models of the detectors.
+\item[train/] Training scripts
+\item[test/] Inference and evaluation scripts.
+\end{description}
+
+
+
+\begin{figure}
+    \centering
+    \modules
+    \caption[Implementation pipeline of SSD modules]{Implementation pipeline of SSD modules. Training pipeline (green) and inference pipeline (purple) with shared core elements (orange).}
+    \label{fig:logcode}
+\end{figure}
+
+
+\section{Runtime Environment}
+We trained and tested our networks on a remote server and used a \textit{docker}\footnote{\url{https://www.docker.com/}} environment for the deployment. We also require a \textit{nvidia-docker}\footnote{\url{https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)}} to allow for GPU pass-through into \textit{docker} container. However, \textit{nvidia-docker} is currently supported only on Linux platforms, we tested \textit{Ubuntu 16.04} and \textit{18.04}. 
+
+
+
+We specify the tested environment
+NVIDIA GPU with 3GB of RAM
+Ubuntu 16.04 or newer
+nvidia driver >=396
+docker-ce
+nvidia-docker2
+
+docker run -it --ipc=host --runtime=nvidia -v dataset\_location:/data ssd:v1.0 /bin/zsh
+
+
+\section{Training}
+
+
+\section{Evaluation}
