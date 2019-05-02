@@ -76,6 +76,12 @@ Evaluation script is run very similarly to the training one, except for the need
 \begin{lstlisting}[breaklines, frame=single, language=Bash, basicstyle=\ttfamily]
   python3 -m ssd.test.eval --net resnet --size 50 --loc /data/ --resume weights --batch 16
 \end{lstlisting}
+The evaluation is not set up to calculate the precision by itself, but instead to export detections and ground-truth boxes into {\tt detections} and {\tt groundtruths} folders. The exported data are then evaluated by external algorithm (\url{https://github.com/rafaelpadilla/Object-Detection-Metrics}).
+
+\subsubsection{Inference}
+To 
+
+
 
 
 
