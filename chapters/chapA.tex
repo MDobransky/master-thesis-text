@@ -1,17 +1,16 @@
 \chapter{Implementation}
 \label{app:impl}
 
-This section provides overview of the implementation used for the experiments. We preview the division of the source code into modules and provide a short guide into the environment requirements.
-
+This appendix provides an overview of the implementation used for the experiments. We describe the division of the source code into modules and specify the environment requirements. We also provide a short guide into running the code and training the network.
 
 \section{Code structure}
-The logical structure of the implementation is illustrated on \cref{fig:logcode}. We can see the different modules used for training and inference, with the shared core. This structure is common to both SSD and SSDTC, with the exception of SSDTC training, where the {\tt ssd.py} file is replaced by the {\tt ssdtc.py} file.
+We illustrate the logical structure of the implementation in \cref{fig:logcode}. We can see the different modules used for training and inference, including the shared core. The entire structure is common to both SSD and SSDTC, except for SSDTC training, where the {\tt ssdtc.py} replaces the {\tt ssd.py} file.
 
-Physically, the code is organized in {\tt ssd} folder as follows:
+Physically, the code is organized in the {\tt ssd/} folder as follows:
 \begin{description}
-\item[lib/] Folder containing both SSD and SSDTC implementations. 
-\item[lib/data/] Contains the dataset classes for loading the data and annotations for both COCO and HollywoodHeads datasets, and an augmentation module.
-\item[lib/models/] Neural network models of the detectors.
+\item[lib/] SSD and SSDTC implementations with loss function, prior box generation module and other utility functions.
+\item[lib/data/] Dataset classes for loading the data and annotations for both COCO and HollywoodHeads datasets and an augmentation module.
+\item[lib/models/] Detector neural network models.
 \item[train/] Training scripts
 \item[test/] Inference and evaluation scripts.
 \end{description}
@@ -27,21 +26,56 @@ Physically, the code is organized in {\tt ssd} folder as follows:
 
 
 \section{Runtime Environment}
-We trained and tested our networks on a remote server and used a \textit{docker}\footnote{\url{https://www.docker.com/}} environment for the deployment. We also require a \textit{nvidia-docker}\footnote{\url{https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)}} to allow for GPU pass-through into \textit{docker} container. However, \textit{nvidia-docker} is currently supported only on Linux platforms, we tested \textit{Ubuntu 16.04} and \textit{18.04}. 
+We performed our experiments on a remote server with the use of \textit{Docker}\footnote{\url{https://www.docker.com/}} containers for deployment. The use of the GPUs requires an addition of the \textit{nvidia-docker}\footnote{\url{https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)}}. Unfortunatelly, \textit{nvidia-docker} is currently supported only on Linux platforms, of which we tested \textit{Ubuntu 16.04} and \textit{18.04}.
+
+The following list of the software requirements is stringent because of the \textit{nvidia-docker} limitations. On the other hand, the hardware limitations are hard to specify, the faster the GPU and CPU the better. CPU is responsible for feeding the data into the network and their augmentation. The speed of the storage medium then limits the CPU and so on. Nonetheless, the optimal setup should be bottlenecked by the GPU. The size of the GPU memory also limits the model size and the batch size.
+
+\begin{multicols}{2}
+\begin{tabular}{l l}
+    \multicolumn{2}{c}{\textbf{Software requirements}} \\
+    NVIDIA driver & $>=$396\\
+    docker-ce & 18.06.1 \\
+    nvidia-docker & 2.0 \\
+\end{tabular}
+
+\begin{tabular}{l l}
+    \multicolumn{2}{c}{\textbf{Minimal HW requirements}} \\
+    NVIDIA GPU & 6 GB  \\
+    RAM & 16 GB\\
+    CPU & 8 threads \\
+     \\
+\end{tabular}
+\end{multicols}
+
+We strongly recommend using this project via a Docker container, however, it is possible to follow the steps inside provided Docker files to set up the native environment ({\tt docker/ssd} and {\tt docker/pytorch}). The unavoidable fact is the need for compatible versions of \textit{PyTorch}, \textit{CUDA Toolkit}\footnote{\url{https://developer.nvidia.com/cuda-toolkit}}, \textit{cuDDN} library\footnote{\url{https://developer.nvidia.com/cudnn}} and operating system. Our implementation uses \textit{PyTorch 0.4.1} with \textit{CUDA 9.2}, \textit{cuDDN 7} in a \textit{Ubuntu 16.04} based Docker image.
+
+We streamlined the process of building the Docker container into a running single {\tt docker\_build.sh} script. With the image built, we can start the container:
+
+\begin{lstlisting}[breaklines, frame=single, language=Bash, basicstyle=\ttfamily]
+  docker run -it --ipc=host --runtime=nvidia -v data_loc:/data -v save_loc:/save ssd:v1.0
+\end{lstlisting}
+
+It is important to mount the directory with training or input data and the directory for output data into the Docker container.
+
+
+\section{Training and Evaluation}
+
+In {\tt ssd/train/} and {ssd/test/}, we provide all scripts used to get the results in this thesis and a few additional inference modules. 
+
+\subsubsection{Training}
+Assuming the previous steps were followed, we can change into a \textit{SSD} directory inside the running Docker container and train the network by executing the following:
+
+\begin{lstlisting}[breaklines, frame=single, language=Bash, basicstyle=\ttfamily]
+  python3 -m ssd.train.train_resnet_small --size 50 --export /save/ --loc /data/ --resume imgnet
+\end{lstlisting}
+
+Separate scripts are provided for each model and each dataset with almost identical parameters. The most important is to specify {\tt --loc} dataset location, {\tt --export} location for saving the trained weights and {\tt --resume} the loaded checkpoint. The ResNet models are further specified by {\tt --size} parameter and Xception by {\tt --type} parameter. It is also important to set batch size ({\tt --batch}) depending on the available memory. 
+
+\subsubsection{Evaluation}
+Evaluation script is run very similarly to the training one, except for the need to specify the network type as the parameter:
+\begin{lstlisting}[breaklines, frame=single, language=Bash, basicstyle=\ttfamily]
+  python3 -m ssd.test.eval --net resnet --size 50 --loc /data/ --resume weights --batch 16
+\end{lstlisting}
 
 
 
-We specify the tested environment
-NVIDIA GPU with 3GB of RAM
-Ubuntu 16.04 or newer
-nvidia driver >=396
-docker-ce
-nvidia-docker2
-
-docker run -it --ipc=host --runtime=nvidia -v dataset\_location:/data ssd:v1.0 /bin/zsh
-
-
-\section{Training}
-
-
-\section{Evaluation}
