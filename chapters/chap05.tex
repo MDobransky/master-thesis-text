@@ -5,7 +5,7 @@ In this chapter, we provide details on the techniques used to gather the data pr
 
 
 \section{SSD Training}
-\citeauthor{bib:ssd} implemented \footnote{\url{https://github.com/weiliu89/caffe/tree/ssd}} SSD model from their research paper in the \textit{Caffe} \footnote{\url{http://caffe.berkeleyvision.org/}} deep learning framework. We decided against performing our experiments in this, by now outdated framework, and implemented our version in newer \textit{PyTorch} \footnote{\url{https://pytorch.org/}} framework (more detailed technical specification of used libraries is available in \cref{app:impl}).
+\citeauthor{bib:ssd} implemented SSD model\footnote{\url{https://github.com/weiliu89/caffe/tree/ssd}} from their research paper using the \textit{Caffe}\footnote{\url{http://caffe.berkeleyvision.org/}} deep learning framework. We decided against performing our experiments in this, by now outdated framework, and implemented our version in newer \textit{PyTorch}\footnote{\url{https://pytorch.org/}} framework (more detailed technical specification of used libraries is available in \cref{app:impl}).
 
 We started by implementing a common framework for SSD detectors, that would support SSD models with many modifications. Although SSDTC inference is possible in the same framework, we had to create a separate environment for the training (more on SSDTC in \cref{sec:ssdtcImpl}). 
 
@@ -118,7 +118,7 @@ Version \textit{F} modifies \textit{E} in the same way, \textit{C} modified \tex
 Version \textit{G} repeated the experiment from version \textit{D}, but instead of removing the last three detection feature maps, we removed every other one, thus keeping the first, third and fifth ones. It is based on version \textit{F}, and again we see the precision loss we cannot justify by performance gain.
 
 \subsubsection{Version H}
-Since we managed to gain the best precision result with version \textit{E}, we decided to try and increase its performance. To this end, we designed the version \textit{H}. However, tests \textit{C},\textit{F}, \textit{D} and \textit{G} showed that the removal of blocks or detection layers from the network is detrimental for the result. Therefore we decided for a less radical solution of trimming the channel depth of the network. We ended up trimming the [19\x19] feature map to 512 channels and [10\x10] map to 1024 channels.
+Since we managed to gain the best precision result with version \textit{E}, we decided to try and increase its performance. To this end, we designed the version \textit{H}. However, tests \textit{C}, \textit{F}, \textit{D} and \textit{G} showed that the removal of blocks or detection layers from the network is detrimental for the result. Therefore we decided for a less radical solution of trimming the channel depth of the network. We ended up trimming the [19\x19] feature map to 512 channels and [10\x10] map to 1024 channels.
 
 Experiments show that this adjustment not only put the performance of the model halfway between \textit{E} and \textit{B} but also slightly boosted the precision.
 

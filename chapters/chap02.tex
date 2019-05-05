@@ -6,7 +6,7 @@ Image processing is one of the fields where DNNs are heavily utilized and outper
 
 In this chapter, we take a closer look at how are DNNs applied in object detection. The goal of such a detector is to localize and classify multiple objects of interest in the given image. There are multiple ways of localization, such as semantic segmentation, which categorizes individual pixels, or key-point and skeleton detections. However, we are interested in a more straightforward, axis-aligned bounding box (bbox) predictions. Each of the predicted bounding boxes needs a corresponding class prediction.
 
-Considering the importance of classification in object detection, we dedicate a significant portion of this chapter to describing multiple classification network models. Many detection models directly utilize or are inspired by those classification networks. We also define metrics used to compare the performance of DNN models used for image processing.
+Considering the importance of classification in object detection, we dedicate a significant portion of this chapter to describing multiple classification network models. Many detection models directly utilize or are inspired by those classification networks.
 
 
 \section{Classification Networks}
@@ -16,7 +16,7 @@ A fundamental building block for a modern state-of-the-art image classification 
 We use this section to take a walk through the history of classification CNNs and outline some of the most influential models. Some of those models are still used, and others are responsible for inspiring the next generations of even better networks.
 
 \subsection{AlexNet (2012)}
-AlexNet designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the ILSVRC challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. AlexNet is created from a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers and a softmax layer. It also popularized the use of ReLU non-linearity in CNNs.
+AlexNet designed by \citeauthor{bib:alexnet} \cite{bib:alexnet} is the first CNN that won the ILSVRC challenge over traditional computer vision and machine learning approaches. It created a foundation on which today's state-of-the-art models are built, and set a new standard for image recognition. AlexNet is created from a stack of five convolutional layers interleaved by max-pooling layers, followed by two fully connected layers and a softmax layer. A local response normalization \cite[section 3.3]{bib:alexnet} is applied after first two convolutional layers. AlexNet also popularized the use of ReLU non-linearity in CNNs.
 
 \subsection{VGG (2014)}
 \label{sec:VGG}
@@ -62,7 +62,9 @@ A set of improvements to the Inception network is introduced in later versions o
 \label{sec:resnet}
 A trend of adding more layers to CNNs to achieve better accuracy has pushed the limit towards networks with hundred or more layers.  Theoretically, adding more layers to a model should produce equal or better results, based on the fact that shallow model is the subspace of the deeper one. Therefore, additional layers can learn to forward the data. In practice, however, observations suggest that this is not the case, and very deep networks can experience eventual degradation. A solution to this problem was proposed by \citeauthor{bib:resnet} \cite{bib:resnet} in the ResNet architecture by directly introducing identity functions to the network.
 
-Basic principles of ResNet are directly inspired by the VGG. Most of the convolutional layers use 3$\times$3 filters and follow two simple rules: keep the number of filters the same, unless changing the output size and double the filters if the feature size if halved. A newly introduced residual connection bypasses each pair of the convolutional layers and forms a \textit{residual blocks}. This connection can be an identity function or a 1$\times$1 convolution to match the increased number of filters.
+Basic principles of ResNet are directly inspired by the VGG. Most of the convolutional layers use 3$\times$3 filters and follow two simple rules: keep the number of filters the same, unless changing the output size and double the filters if the feature size is halved. 
+
+Newly introduced residual connections bypass each pair of the convolutional layers and forms \textit{residual blocks}. These connections can be an identity function or, if the input and output feature map depths of the residual block do not match, a 1\x1 convolution can be used.
 
 \begin{figure}
     \resnetArch
@@ -126,7 +128,7 @@ We will see that this family of so-called \textit{region based} approaches can r
 \subsection{R-CNN (2014)}
 Region-based Convolutional Network (R-CNN) by \citeauthor{bib:rcnn} \cite{bib:rcnn} is the first member of the family of region-based detection models. The foundation idea is simple: select regions in the picture and classify each region. This approach leads to a combination of three modules: region proposal algorithm, feature extraction using CNNs on those regions and subsequent classification. 
 
-A naive approach would use a sliding window and classify each cutout of the image. However, examining all the windows for different sizes and aspect ratios of possible objects would be extremely slow. R-CNN solves this problem by applying a region proposal algorithm that selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} (SS) \cite{bib:selectivesearch} algorithm and serve as a candidates for bbox predictions. In addition, bounding box regression can be trained to improve bbox prediction accuracy.
+A naive approach would use a sliding window and classify each cutout of the image. However, examining all the windows for different sizes and aspect ratios of possible objects would be extremely slow. R-CNN solves this problem by applying a region proposal algorithm that selects about 2000 most likely locations of objects. Regions are selected using the \textit{Selective search} (SS) \cite{bib:selectivesearch} algorithm and serve as candidates for bbox predictions. In addition, bounding box regression can be trained to improve bbox prediction accuracy.
 
 Each region is processed separately by a CNN into a feature map (the original architecture uses Alexnet, but any classification network can be substituted). Finally, each feature map can be scored. R-CNN uses class specific linear support-vector machines instead of a soft-max classification provided by CNNs. \Cref{fig:rcnn} illustrates the architecture.
 
@@ -141,7 +143,7 @@ Each region is processed separately by a CNN into a feature map (the original ar
 \subsection{Fast R-CNN (2015)}
 Even though R-CNN was a major step in the right direction, its performance is far from real-time. \citeauthor{bib:fastrcnn} \cite{bib:fastrcnn} introduces Fast R-CNN with a series of innovations to its predecessor, aimed at improving speed and accuracy. Provided benchmark on the NVIDIA K40 GPU suggests improvements from 47 seconds per image using R-CNN with VGG16 feature extractor, to 320 milliseconds with Fast R-CNN using the same feature extractor (not including time for SS proposals). 
 
-Similarly to R-CNN, this architecture also utilizes region proposal algorithm and a CNN to produce a feature map. A significant drawback of R-CNN was computing feature map for each region, despite overlaps. Fast R-CNN processes whole input image into a feature map, and then, using a \textit{region of interest (RoI) pooling layers}, extracts a feature vector for each region. All extracted feature vectors are pooled to the same size and are passed through a series of fully connected layers, leading to softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
+Similarly to R-CNN, this architecture also utilizes region proposal algorithm and a CNN to produce a feature map. A significant drawback of R-CNN was computing feature map for each region, despite overlaps. Fast R-CNN processes whole input image into a feature map, and then, using a \textit{region of interest (RoI) pooling layers}, extracts a feature vector for each region. All extracted feature vectors are pooled to the same size and are passed through a series of fully connected layers, leading to the softmax classifier and bounding box regression layer. An illustration of this process can be seen on \cref{fig:fastrcnn}.
 
 \begin{figure}
     \centering
@@ -183,9 +185,9 @@ Faster R-CNN by \citeauthor{bib:fasterrcnn} \cite{bib:fasterrcnn} expands on the
  \subsection{Mask R-CNN (2017)}
 Previous R-CNN based architectures used bounding boxes to localize individual objects. \citeauthor{bib:maskrcnn} \cite{bib:maskrcnn} adds a localization based on semantic segmentation, where the goal is to classify each pixel into a category. 
 
-Mask R-CNN is built upon Faster R-CNN and combines both bounding box localization and semantic segmentation by predicting segmentation masks for each RoI. The product of this approach is a bounding box and class for each object, together with a binary segmentation mask. Unlike the semantic segmentation on whole input, applying it on RoIs allows for \textit{instantiated segmentation} where selected pixels corresponds to a given instance of a class.
+Mask R-CNN is built upon Faster R-CNN and combines both bounding box localization and semantic segmentation by predicting segmentation masks for each RoI. The product of this approach is a bounding box and class for each object, together with a binary segmentation mask. Unlike the semantic segmentation on whole input, applying it on RoIs allows for \textit{instantiated segmentation} where selected pixels correspond to a given instance of a class.
 
-Implementation and architecture are very similar to Faster R-CNN, with two exceptions. One of them is already described, fully convolutional segmentation branch which works in parallel with classification and bounding box regression heads. The other difference is a replacement of RoI pooling layer with \textit{RoI alignment layer}. The problem of RoI pooling for this purpose is quantization of floating-number RoI to discrete feature map grid and consequent imprecision. RoI alignment mitigates this problem by using bi-linear interpolation to compute exact values of features at four sampled location in each of RoIs locations and aggregating the results. High-level architecture and the RoI alignment layer are visualized on \cref{fig:maskrcnn}.
+Implementation and architecture are very similar to Faster R-CNN, with two exceptions. One of them is already described, fully convolutional segmentation branch which works in parallel with classification and bounding box regression heads. The other difference is a replacement of RoI pooling layer with \textit{RoI alignment layer}. The problem of RoI pooling for this purpose is quantization of floating-number RoI to discrete feature map grid and consequent imprecision. RoI alignment mitigates this problem by using bi-linear interpolation to compute exact values of features at four sampled locations in each of RoIs locations and aggregating the results. High-level architecture and the RoI alignment layer are visualized on \cref{fig:maskrcnn}.
 
  \begin{figure}
      \centering

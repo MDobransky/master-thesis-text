@@ -14,7 +14,7 @@ At this point, we do not concern ourselves with the optimal model but rather pre
 Similarly to Faster R-CNN, we start by processing the input image into a feature map. This process can be done by any feature extraction network, e.g., a classification network up to the fully connected layer. Such a network produces a feature map of [n\x n\x c] size that will serve as a base for our detector.
 
 \subsection*{Desired Output}
-To perform a bounding-box detection, we need a parametric representation of both bbox and classification. Since bbox is a rectangle, it can be specified by four parameters: a center position \textit{(X,Y)}, width \textit{W} and height \textit{H}. These values can be either relative in respect to predefined anchor boxes or absolute values.
+To perform a bounding-box detection, we need a parametric representation of both bbox and classification. Since bbox is a rectangle, it can be specified by four parameters: a center position \textit{(X,Y)}, width \textit{W} and height \textit{H}. These values can be either relative with respect to predefined anchor boxes or absolute values.
 
 For a standard soft-max classification, a confidence score for each of the \textit{C} classes is required. However, the network also needs the ability to classify the bbox as a background. An additional parameter with background confidence score \textit{B} can provide the means by being either viewed as a boolean value deciding the presence of an object, or a part of a soft-max classification.
 
@@ -33,7 +33,7 @@ Before we start, however, we feel the need to emphasize, that the detector does 
 \subsubsection{Fully Connected Detector}
 The simplest means of getting from [n\x n\x c] map to [n\x n\x P] values using a fully connected layer is to connect each input value to each output value. It is a functional but clearly a very inefficient solution that requires training of $n^4cP$ parameters. An improvement can be made using an additional fully connected layer with a smaller number of neurons (\textit{b}) and reducing the number of trainable parameters to $n^2b(c+P)$.
 
-Notice that this detector is not only unaware of the order of \textit{P} parameters, but the association of parameters with the feature map position is also not present. A a matter of fact, each predicted parameter is calculated with the information from the entire feature map, and it is only via the training process that the spatial relations are formed.
+Notice that this detector is not only unaware of the order of \textit{P} parameters, but the association of parameters with the feature map position is also not present. As a matter of fact, each predicted parameter is calculated with the information from the entire feature map, and it is only via the training process that the spatial relations are formed.
 
 \begin{figure}
     \centering
@@ -90,7 +90,7 @@ Final confidence for each box is the product of both conditional class probabili
 \subsubsection{Architecture} 
 YOLO is designed as a single network that takes the input image and outputs bbox and class predictions. Design of the network is inspired by Inception classification network. Although it does not use inception modules, it relies on the 1\x1 reduction layers to speed up 3\x3 convolutions. YOLO uses 24 convolutional layers followed by two fully connected layers. Full architecture is shown on \cref{fig:yolo}. 
 
-Various other versions and modifications are possible. A smaller and faster version is called Fast YOLO. It has a similar architecture but uses only 9 convolutional layers. Another possibility to improve YOLO is to replace the custom architecture with a more common feature extractor from a classification network. YOLO build on top of a VGG16 achieves better precision at the cost of half of the frames per second.
+Various other versions and modifications are possible. A smaller and faster version, called Fast YOLO, has a similar architecture but uses only 9 convolutional layers. Another possibility to improve YOLO is to replace the custom architecture with a more common feature extractor from a classification network. YOLO build on top of a VGG16 achieves better precision at the cost of half of the frames per second.
 
 \begin{figure}
     \centering
@@ -122,7 +122,7 @@ Although the network can be trained end-to-end, it is common for CNN to pre-trai
 
 \noindent where $\mathbbm{1}^{\text{obj}}_i$ denotes if object appears in cell $i$ and $\mathbbm{1}^{\text{obj}}_{ij}$ denotes that the $j$th bounding box predictor in cell $i$ is responsible for that prediction.
 
-The gradient of cells that do contain the object can be overpowered with the cells that do not.  Therefore, the loss from negative confidence predictions is decreased by $\lambda_{\text{noobj}} = 0.5$. And to emphasize the bbox predictions, localization loss is increased using $\lambda_{\text{coord}} = 5$.In the localization loss, we can see that the center coordinates are handled differently to width and height. The square root of width and height is used to equalize the impact of the absolute value of error in small and large boxes.
+The gradient of cells that do contain the object can be overpowered with the cells that do not.  Therefore, the loss from negative confidence predictions is decreased by $\lambda_{\text{noobj}} = 0.5$. And to emphasize the bbox predictions, localization loss is increased using $\lambda_{\text{coord}} = 5$. In the localization loss, we can see that the center coordinates are handled differently to width and height. The square root of width and height is used to equalize the impact of the absolute value of error in small and large boxes.
 
 
 \subsubsection{Properties}
@@ -133,7 +133,7 @@ On the other hand, a significant problem with YOLO's grid-based detection system
 YOLO also suffers from multiple problems with precise localization. It learns to detect arbitrary shapes, which can be hard to generalize to objects in new and unusual aspect ratios. Also, it predicts the bboxes on the heavily down-sampled image which leads to further imprecision. 
 
 \subsubsection{YOLO v2 (2017)}
-The second version of YOLO architecture by \citeauthor{bib:yolo9000} \cite{bib:yolo9000}, implements a series of improvements to the original network. Compared to original 45fps on [448\x448] image, v2 achieves 59fps on [480\x480] images. 
+The second version of YOLO architecture by \citeauthor{bib:yolo9000} \cite{bib:yolo9000}, introduces a series of improvements to the original network. Compared to original 45fps on [448\x448] image, v2 achieves 59fps on [480\x480] images. 
 
 A selection of changes to YOLO architecture:
 \begin{itemize}
@@ -152,7 +152,7 @@ SSD is another real-time detector, aiming to outperform Faster R-CNN by using a 
 \subsubsection{Detection}
 One of the main features of SSD is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of a convolutional window. SSD adopts similar concept to Faster R-CNN's anchor boxes, this time called default or prior boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, six boxes are used. Contrary to YOLO, both bbox and classification predictions are made for each position and each prior box.
 
-Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B\x (C+5)] parameters on feature map of [m\x n] size.
+Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B*(C+5)] parameters on feature map of [m\x n] size.
 
 \textit{SSD} detects objects on multiple feature maps at different scales, to accommodate detection of different sized objects. Moreover, this allows detectors on each level to focus on predicting a smaller range of bbox sizes. For the illustration of this process see \cref{fig:ssddet}.
 
@@ -168,7 +168,7 @@ Bboxes are predicted relative to prior box locations which are themselves relati
 The SSD architecture can be described as a set of three modules. A base network, extra convolutional layers and detection layers.
 
 \begin{itemize}
-    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. SSD's base is built from VGG16 network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. Pool5 layer is also changed from 2\x2/2 to 3\x3/1 pooling. Technically, SSD does not force any constraints on the base network, and any CNN can replace VGG.
+    \item \textbf{Base network}'s task is to take the input image and produce a feature map. To this end, a feature extractor build from classification network is an ideal candidate. SSD's base is built from VGG16 network with some modifications. First of all, all fully connected layers are removed and replaced with another pair of convolution layers. Pool5 layer is also changed from 2\x2/2 to 3\x3/1 pooling.
     \item \textbf{Extra layers} serve the purpose of providing more feature maps on decreasing scale to the detector. Smaller feature maps aggregate more information to a smaller area and allow for the detection of larger objects with small convolutional window. On the other hand, information about small objects can be lost. Therefore the use of gradually decreasing series of feature maps. \textit{Extra layers} are implemented as a sequence of convolution layers connected to the end of the \textit{base}.
     \item \textbf{Detection layers} are the final layers of the network. There is a pair of classification and localization convolutions for each feature map. Considering SSD300, where 300 stands for the width and height of input image. Detection is performed on 6 feature maps of sizes [38, 19, 10, 5, 3, 1], using [4, 6, 6, 6, 4, 4] prior boxes respectively, producing 8732 predictions per class. First, two of those feature maps are pulled from the VGG network, and the \textit{extra layers} provide the rest. All detection layers are implemented using 3\x3 convolutions with an appropriate number of filters, as seen on \cref{fig:VGGSSD}.
 \end{itemize}
@@ -210,9 +210,9 @@ To keep the balance between positive and negative samples, \textit{hard negative
 
 \section{Detection with Temporal Information}
 \label{sec:video_det}
-In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement with dealing with detector instability, and occlusions. 
+In this section, we present two recent models designed specifically for detecting objects in the video. Videos can provide more information to the detector, compared to a set of single independent frames, thanks to the addition of temporal information. Theoretically, using multiple consecutive video frames can provide a large improvement regarding detector instability, and occlusions. 
 
-A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term chunk to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
+A time-space series of detected bounding boxes is usually referred to as a tube or a tublet. If such a series is generated at once for every object, it can provide smooth tracking and reduce the need for post-processing matching of detections. We use the term \textit{chunk} to refer to a series of consecutive video frames, to differentiate from the batch of independent images.
 
 However, adding another dimension to the detection model has a performance impact. It is also much harder to create a dataset suitable for training of detectors with a temporal dimension because a whole series of frames need to be precisely annotated. Of course we can find a few public datasets e.g. \textit{ImageNet VID}\footnote{\url{http://image-net.org/challenges/LSVRC/2017/\#vid}}, \textit{YouTube-8M}\footnote{\url{https://research.google.com/youtube8m}} and some smaller ones like \textit{HollywoodHeads}\footnote{\url{https://www.di.ens.fr/willow/research/headdetection}}.
 
@@ -228,7 +228,7 @@ Tube proposal generation begins with a feature extraction on a chunk of video fr
 
 Analogously to Faster-RCNN, each position in this feature volume is used to create tube proposals using \textit{K} anchor tubes. The proposal for each anchor consists of the \textit{objectness} and position parameters. The \textit{objectness} score reflects the probability of the presence of the same objects as opposed to a background. 
 
-IoU value for tubes is defined as a minimum of spatial IoU at the ends of tubes. The number of proposals is reduced by eliminating tubes with high overlap using a non-maximum suppression based on \textit{objectness} score. 
+IoU value for tubes is defined as a minimum of spatial IoU at the ends of tubes. The number of proposals is reduced by eliminating tubes with high overlap using a non maximum suppression based on \textit{objectness} score. 
 
 A provided data for the training usually consists of a series of ground-truth boxes for individual frames. During the training of TPN, a series of ground-truth boxes is approximated by a ground-truth tube. Those tubes are then matched against the tube proposals using an IoU threshold. A tube proposal network is designed only to consider tubes corresponding to linear motion in order to limit the complexity. 
 

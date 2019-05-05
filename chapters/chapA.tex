@@ -4,7 +4,7 @@
 This appendix provides an overview of the implementation we have used for the experiments. We describe the distribution of the source code into modules and specify the runtime environment requirements. We also provide a short guide into running the code and training the network.
 
 \section{Code structure}
-We illustrate the logical structure of the implementation in \cref{fig:logcode}. We can see the different modules used for training and inference, including the shared core. The entire structure is common to both SSD and SSDTC, except for SSDTC training, where the {\tt ssdtc.py} replaces the {\tt ssd.py} file.
+The logical structure of the implementation is illustrated in \cref{fig:logcode}. The figure shows different modules used for training and inference, including the shared core. This entire structure is common to both SSD and SSDTC, except for SSDTC training, where the {\tt ssdtc.py} replaces the {\tt ssd.py} file.
 
 Physically, the code is organized in the {\tt ssd/} folder as follows:
 \begin{description}
@@ -47,13 +47,15 @@ The following list of the software requirements is stringent because of the \tex
 
 We strongly recommend using this project via a Docker container, however, it is possible to follow the steps inside provided Docker files to set up the native environment ({\tt docker/ssd} and {\tt docker/pytorch}). The unavoidable fact is, that compatible versions of \textit{PyTorch}, \textit{CUDA Toolkit}\footnote{\url{https://developer.nvidia.com/cuda-toolkit}}, \textit{cuDDN} library\footnote{\url{https://developer.nvidia.com/cudnn}} and operating system are needed. Our implementation uses \textit{PyTorch 0.4.1} with \textit{CUDA 9.2}, \textit{cuDDN 7} in a \textit{Ubuntu 16.04} based Docker image.
 
-We streamlined the process of building the Docker container into running a single {\tt docker\_build.sh} script. With the image built, we can start the container:
+We streamlined the process of building the Docker container into running a single {\tt docker\_build.sh} script. 
+
+With the image built, we can start the container:
 
 \begin{lstlisting}[breaklines, frame=single, language=Bash, basicstyle=\ttfamily]
   docker run -it --ipc=host --runtime=nvidia -v data_loc:/data -v save_loc:/save ssd:v1.0
 \end{lstlisting}
 
-It is important to mount the directory with training or input data and the directory for output data into the Docker container.
+\noindent We recommend mounting the directory with training or input data and the directory for output data into the Docker container.
 
 
 \section{Training and Evaluation}
