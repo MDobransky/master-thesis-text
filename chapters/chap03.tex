@@ -18,12 +18,12 @@ To perform a bounding-box detection, we need a parametric representation of both
 
 For a standard soft-max classification, a confidence score for each of the \textit{C} classes is required. However, the network also needs the ability to classify the bbox as a background. An additional parameter with background confidence score \textit{B} can provide the means by being either viewed as a boolean value deciding the presence of an object, or a part of a soft-max classification.
 
-We ended up defining a set of C+5 parameters [c$_1$, ..., c$_C$, B, X, Y, W, H]. In the region-based network, this would represent an output for one region. However, there are no given regions in a one-stage detector, or should we say, every position on a feature map is a region. Given the map [n\x n\x c], we expect to predict described vector of C+5 parameters for [n\x n] cells. This gives us an expected tensor of [n\x n\x C+5] size. 
+We ended up defining a set of C+5 parameters [c$_1$, ..., c$_C$, B, X, Y, W, H]. In the region-based network, this would represent an output for one region. However, there are no given regions in a one-stage detector, or should we say, every position on a feature map is a region. Given the map [n\x n\x c], we expect to predict described vector of C+5 parameters for [n\x n] cells. This gives us an expected tensor of [n\x n\x (C+5)] size. 
 
 \subsubsection{Anchor Boxes}
 In region proposal networks, we saw the use of multiple anchor boxes. Experiments suggest that it is easier for the network to accept a set of proposed boxes and refine them, rather than regress absolute values by itself. It also helps the generalization if the network can associate boxes with certain aspect rations with certain classes.
 
-There are multiple options to include this feature in our model. For each position, we can either predict \textit{K} anchor box parameters and one set of confidence scores or a separate classification for each box. In the first case, we receive the prediction tensor of [n\x n\x K*4+C+1] shape and in the latter case of [n\x n\x K*(C+5)] shape. For simplification, as the details of the implementation are not necessary, let us call this number of parameters \textit{P}.
+There are multiple options to include this feature in our model. For each position, we can either predict \textit{K} anchor box parameters and one set of confidence scores or a separate classification for each box. In the first case, we receive the prediction tensor of [n\x n\x (K*4+C+1)] shape and in the latter case of [n\x n\x (K*(C+5))] shape. For simplification, as the details of the implementation are not necessary, let us call this number of parameters \textit{P}.
 
 \subsection*{Detection}
 Now that we know what the input and output of the detector are, we can design the network layers to meet the defined criteria. We will look at both fully connected and convolutional options.
@@ -152,7 +152,7 @@ SSD is another real-time detector, aiming to outperform Faster R-CNN by using a 
 \subsubsection{Detection}
 One of the main features of SSD is that the detector network is fully convolutional and does not utilize any fully connected layers. Predictions are therefore generated for every position of a convolutional window. SSD adopts similar concept to Faster R-CNN's anchor boxes, this time called default or prior boxes. For each position of the feature map, multiple prior boxes with different aspect ratios are proposed. By default, six boxes are used. Contrary to YOLO, both bbox and classification predictions are made for each position and each prior box.
 
-Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x B*(C+5)] parameters on feature map of [m\x n] size.
+Bboxes are predicted relative to prior box locations which are themselves relative to a feature map location. There is no bbox or region confidence value. Instead, SSD uses an additional background class in classification predictions. Considering \textit{B} prior boxes and \textit{C} classes, SSD generates [m\x n\x (B*(C+5))] parameters on feature map of [m\x n] size.
 
 \textit{SSD} detects objects on multiple feature maps at different scales, to accommodate detection of different sized objects. Moreover, this allows detectors on each level to focus on predicting a smaller range of bbox sizes. For the illustration of this process see \cref{fig:ssddet}.
 

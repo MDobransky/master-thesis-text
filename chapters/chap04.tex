@@ -5,6 +5,8 @@ Our goal is to improve SSD detector proposed by \citeauthor{bib:ssd} and adjust 
 
 We base our work on the implementation of SSD by \citeauthor{bib:ssd}. However, since the performance of the neural network is heavily dependant on the used framework and hardware, and the precision depends on the training data, we had to re-implement and train the baseline SSD for our comparisons.
 
+Although we did not manage to reach the same precision as authors (41.2 mAP@[0.5]), we are aware of deficiencies in our implementation, that if resolved, should equalize the results. To speed up the training process we used fast and simple data augmentation algorithms and trained our models end-to-end without freezing the weights of pre-trained feature extractor and subsequent fine-tuning. We leave both of those issues to future work and instead focus on the relative comparison of models in the equivalent environment.
+
 \section{Feature Extraction Network}
 \label{sec:base}
 Looking at the structure of the network, we found the best candidate for improvement to be the underlying feature extractor. The feature extractor provides the data on which SSD performs detection and is, therefore, the integral part of the model. SSD uses relatively old VGG16 network that compared to more modern CNNs lacks in speed and precision.  The feature extractor is in the context of object detectors often called the \textit{base network}.
@@ -182,7 +184,7 @@ In standard SSD, the detection is performed on a batch of independent images. We
 
 We start by extracting the feature maps, as we would in SSD, independently on each frame with the same network (ResNet34 with \textit{extra layers}). Starting with the chunk \textit{n} = 16, we get 16 sets of feature maps. For the ease of explanation, consider only the first feature map of [38\x38\x c] size. Stacking those maps from the chunk, we get a temporal feature volume of [38\x38\x c\x n] size, where \textit{c} is the number of channels. 
 
-At this point, we apply the temporal convolutional layers, realized using conv3d layers. We apply two conv3d layers on each feature volume, both followed by batch normalization and ReLU activation.  The first one, \textit{Conv3d. 1\x1\x3\x ch} operates only on temporal and channels dimensions.  The subsequent one works with all dimensions of feature volume, applying \textit{Conv3d. 3\x3\x3\x2*ch} layer. 
+At this point, we apply the temporal convolutional layers, realized using conv3d layers. We apply two conv3d layers on each feature volume, both followed by batch normalization and ReLU activation.  The first one, \textit{Conv3d. 1\x1\x3\x ch} operates only on temporal and channels dimensions.  The subsequent one works with all dimensions of feature volume, applying \textit{Conv3d. 3\x3\x3\x(2*ch)} layer. 
 
 No padding is used in the temporal dimension of conv3d layers, therefore we only receive \textit{n-4} detections for \textit{n} input frames. This may seem inefficient because five frames are needed for detection on one frame, but the impact of this constant overhead can be minimized with bigger chunks. 
 

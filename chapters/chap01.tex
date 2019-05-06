@@ -47,6 +47,8 @@ Comparing two models class by class is impractical, especially with the classifi
 
 Most common notation, mAP@[0.5] means mAP with IoU threshold 0.5. The mAP can also be averaged over multiple IoU thresholds, mAP@[.5, .95] denotes the average mAP from IoU 0.5 to 0.95 usually with step 0.05.
 
+We use mAP@[0.5] for all evaluations in this thesis.
+
 \subsection{Inference Time}
 Inference time is a significant factor to consider for the model in real-time application use. With the state-of-the-art models, images are often processed under a second, often in a few milliseconds. Such small numbers can be hard to comprehend. Therefore a more intuitive metric is used. That being the number of processed \textit{frames per second} (fps). However, unlike precision metrics, the fps values are heavily dependant on hardware, software framework, batch size and amount of pre- and post-processing included in the measurement. Hence, only the measurements performed in the identical hardware and software environment are suitable for comparison.
 
@@ -69,7 +71,9 @@ We will also be using three-dimensional convolutional layers, that produce five-
 We sorted the values to allow for unambiguous reference of data without listing every dimension, provided the context of two (2d) or three-dimensional (3d) convolution. For example, data passing between two-dimensional convolutional layers is in the form of four-dimensional tensor, but we will often use only spatial dimensions or spatial and channel dimension to describe given tensor.
 
 \subsubsection*{Convolution}
-Since convolutional layers are usually chained together, and always work with the data with \textit{channel} dimension, we do not need to state the channel depth of the input data explicitly. We know that if previous convolution outputs data with the size of [a\x b\x c], and we need to apply \textit{k\x k} kernel, the actual size of the kernel is [k\x k\x c]. However, we must expressly state the number of channels outputted from the convolution to receive the full information. This number determines how many times we perform the convolution operation with different kernels. We call this multi-channel output of the convolutional layer a \textit{feature map}.
+Since convolutional layers are usually chained together, and always work with the data with \textit{channel} dimension, we do not need to state the channel depth of the input data explicitly. We know that if previous convolution outputs data with the size of [a\x b\x c], and we need to apply \textit{k\x k} kernel, the actual size of the kernel is [k\x k\x c]. However, we must expressly state the number of channels outputted from the convolution to receive the full information. This number determines how many times we perform the convolution operation with different kernels. 
+
+The output of a convolutional layer is commonly called a \textit{feature map}. This output can be either viewed as a set of \textit{c} two-dimensional maps or a single three-dimensional multi-channel feature map. In this thesis, we are not interested in singular feature maps outputted by the convolutional layer but rather look at them as a unified three-dimensional map with spatial and channel dimensions.
 
 Unless stated otherwise, the default parameters for the convolutional layer is stride of one, dilation of one, and sufficient padding to allow the spatial dimensions of the output feature map to stay equal to the input ones. The effects of these parameters are illustrated on \cref{fig:convolutions}.
 
