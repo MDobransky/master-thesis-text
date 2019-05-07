@@ -9,7 +9,7 @@ In this chapter, we provide details on the techniques used to gather the data pr
 
 We started by implementing a common framework for SSD detectors, that would support SSD models with many modifications. Although SSDTC inference is possible in the same framework, we had to create a separate environment for the training (more on SSDTC in \cref{sec:ssdtcImpl}). 
 
-The main characteristics of our framework are the use of \textit{SGD} optimizer and the loss function defined for SSD, also called MultiBox loss (\cref{sec:ssd}). Another essential element of the detection pipeline, used for inference, is the non-maximum suppression algorithm. The parametrization of these modules can be seen in \cref{tab:trainParams}. It is also worth mentioning that for the sake of consistency, all experimental models were trained for 401 epochs with a batch size of 32, using those default parameters.
+The main characteristics of our framework are the use of \textit{SGD} optimizer \cite{bib:sgd} and the loss function defined for SSD, also called MultiBox loss (\cref{sec:ssd}). Another essential element of the detection pipeline, used for inference, is the non-maximum suppression algorithm. The parametrization of these modules can be seen in \cref{tab:trainParams}. It is also worth mentioning that for the sake of consistency, all experimental models were trained for 401 epochs with a batch size of 32, using those default parameters.
 
 \begin{table}
     \centering

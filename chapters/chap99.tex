@@ -1,7 +1,7 @@
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-Our work can be summarized in five segments. We started by reviewing related work and other relevant image processing models based on deep learning. We continued by weighting the options for improving SSD, where we decided to replace VGG feature extractor by a more modern network. Then we took a look at the relationship between detected classes and detector performance. In the fourth part, we returned to improving SSD, this time we focused on one base network, and instead of using the classification network as is, we make a series of adjustments aimed at improving the performance. We dedicated the final part of this work to designing and implementing a version of SSD detector with the use of temporal information from video continuity.
+Our work can be summarized in five segments. We started by reviewing related work and other relevant image processing models based on deep learning. We continued by weighting the options for improving SSD, where we decided to replace VGG feature extractor by a more modern network. Then we took a look at the relationship between detected classes and detector performance. In the fourth part, we returned to improving SSD, this time we focused on one base network, and instead of using the classification network as is, we make a series of adjustments aimed at improving the performance. We dedicated the final part of this work to designing and implementing a version of SSD detector with the use of temporal information.
 
 \subsubsection*{Model review}
 We began by briefly summarizing the development of classification networks by presenting a selection of models while describing their architecture and historical significance. After we covered the bases of image processing, we moved on to region-based object detection and compiled a brief overview of R-CNN family of networks.
@@ -52,5 +52,15 @@ Although our experiments were successful in both improving the SSD detector and 
 \item Speed up the detection through implementation improvements. For example, implement pre- and post-processing operations on GPU or re-implement the network in a fast framework optimized for inference, e.g., TensorRT.
 \end{itemize}
 
+\section*{Applications}
+In the introduction, we mentioned many interesting and useful applications of object detectors.  In this section, we present a selection of additional applications that directly use object detection and build on top of it to generate more complex information about the processed video.
 
+\begin{description}
+\item[Tracking] Thanks to the nature of the video, we expect to be able to locate and track objects in time, observe their direction and speed. The purpose of the tracking is to connect detections from individual frames into a set of continuous trajectories. A tracker can use the centralized bounding-box positions and match those points into a trajectory using a recursive probability estimation, i.e., the Kalman filter \cite{bib:kalman}.
 
+\item[Re-Identification] Re-identification is an extension of the tracking problem to objects passing between fields of view of multiple cameras. Regions inside bounding boxes predicted by an object detector can be used by the DeepReID \cite{bib:reid} or other similar algorithms, to find the matching object.
+
+\item[Search] An automatic annotation of video frames by an object detector can also be used for interactive video retrieval \cite{bib:lokoc} in large video collections.
+For example, the ability of the detector to learn to recognize a set of classes with bounding boxes can be used for sketch based search \cite{bibi:vidsearch} \cite{bib:visione}.
+
+\end{description}
